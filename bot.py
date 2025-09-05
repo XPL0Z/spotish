@@ -23,7 +23,6 @@ def UrlIsRight(link):
     url=url.path.split("/")
     print(url)
     song_id = url[-1]
-    print("TESSSSSSSSSSST" + str(id))
     try:
         if link.find("playlist")==-1:
             track_info = sp.track(f"https://open.spotify.com/track/{song_id}")

@@ -31,20 +31,42 @@ class API():
 
 api = API()
 
+playing = True
+
 queue = {
     "songs": [
-        # { "id": idofthespotify, "author": "username" },
+        # { "id": idofthespotifysong, "author": "username" },
     ]
 }
 
 
 # Version synchronisée de download pour thread
 def download_sync(link,song_id):
+    
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
-    payloadtosend = { "id": str(song_id) }
+
+    if len(queue["songs"]) and not playing:
+
+        playsong(song_id)
+    
+
+    
+def search_index(song_id):
+    i = 0
+    for song in queue["songs"]:
+        i += 1
+        if song == song_id:
+            return i 
+    
+def remove_song(index):
+    queue["songs"].pop(index)
+
+def playsong(song_id):
+    playing = True
+    payloadtosend = { "song_id": str(song_id) }
     response = requests.post(UrlToPlay, json=payloadtosend)
     print("response from player", response.json())
-    
+
 @api.get("/")
 def index(_):
     return { 
@@ -87,6 +109,20 @@ def add(args):
         threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
         return song
         
+@api.post("/finished")
+def add(args):
+    playing = False
+    print(args)
+    song_id = args.get("song_id", None)
+
+    if song_id is None:
+        return { "error": "id parameter is required"}
+    
+    print(queue["songs"])
+    
+
+    return 
+
 @api.post("/delete")
 def delete(args):
     id = args.get("id", None)

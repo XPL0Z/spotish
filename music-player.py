@@ -11,7 +11,7 @@ import vlc
 
 PORT = 7000
 
-# thread.start()
+media_player = vlc.MediaPlayer()
 
 
 class API():
@@ -30,32 +30,24 @@ class API():
 
 api = API()
     
-async def playsong(filepath):
-    player = vlc.MediaPlayer(filepath)
-    player.play()  # ne pas mettre await, play() n'est pas async
-
-    # Boucle non bloquante pour attendre la fin
-    while player.is_playing():
-        await asyncio.sleep(0.1)  # laisse le contrôle à l'event loop
-
-    print("Musique terminée")
 
 
 @api.post("/play")
 def play(args: dict):
     print("play args", args)
-    id = args.get("id", None)
-    print(id)
-    if id is None:
+    song_id = args.get("song_id", None)
+    if song_id is None:
         return { "error": "id parameter required" }
     else:
-        # lance playsong sans attendre
-        # asyncio.create_task(playsong("Songs/"+str(id)+".mp3"))
-        
-        player = vlc.MediaPlayer('Songs/'+str(id)+'.mp3')
-        player.play()
-        return { "playing": id }
-
+        media = vlc.Media("Songs/"+str(song_id)+".mp3")
+        media_player.set_media(media)
+        media_player.play()
+        return { "playing": song_id }
+    
+@api.get("/now")
+def list(_):
+    value = media_player.get_time()
+    return value
 
 
 
