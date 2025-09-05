@@ -7,6 +7,7 @@ import subprocess
 import os
 from dotenv import load_dotenv
 import requests
+import threading
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -37,6 +38,12 @@ queue = {
 }
 
 
+# Version synchronisée de download pour thread
+def download_sync(link,song_id):
+    subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
+    payloadtosend = { "id": str(song_id) }
+    response = requests.post(UrlToPlay, json=payloadtosend)
+    print("response from player", response.json())
     
 @api.get("/")
 def index(_):
@@ -61,28 +68,23 @@ def add(args):
     print(args)
     author = args.get("author", None)
     link = args.get("link", None)
-    id = args.get("id",None)
+    song_id = args.get("song_id", None)
 
     if author is None:
         return { "error": "author parameter required" }
     else:
         if link is None:
             return { "error": "link parameter required" }
-        if id is None:
+        if song_id is None:
             return { "error": "id parameter is required"}
 
         
-        song = { "id": id, "author": author }
-        print(id)
+        song = { "song_id": song_id, "author": author }
+    
         queue["songs"].append(song)
 
-        payloadtosend = { "id": id }
-        # Télécharge la chanson
-        subprocess.Popen(["spotdl", "download", link, "--output", "Songs/"+str(id)+".{output-ext}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
-        # Envoie la chanson au music-player
- 
-        response = requests.post(UrlToPlay, json=payloadtosend)
-        print("response from player", response.json())
+        # Lance le téléchargement dans un thread pour ne pas bloquer
+        threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
         return song
         
 @api.post("/delete")

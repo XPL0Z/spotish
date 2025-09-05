@@ -22,15 +22,15 @@ def UrlIsRight(link):
     url=urlparse(link)
     url=url.path.split("/")
     print(url)
-    id = url[-1]
+    song_id = url[-1]
     print("TESSSSSSSSSSST" + str(id))
     try:
         if link.find("playlist")==-1:
-            track_info = sp.track(f"https://open.spotify.com/track/{id}")
+            track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
         else:
-            track_info = sp.playlist(f"https://open.spotify.com/playlist/{id}")
+            track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
             
-        return id
+        return song_id
     except spotipy.exceptions.SpotifyException as e:
         return False
     
@@ -46,14 +46,13 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if UrlIsRight == False:
         await update.message.reply_text(f"The Spotify url is not right.")
     print(UrlIsRight)
-    id = UrlIsRight(link)
-    print(id)
+    song_id = UrlIsRight(link)
     
-    if not id:
+    if not song_id:
         await update.message.reply_text(f"Lien non valide")
     else:
         payload = {
-            "id" : id,
+            "song_id" : song_id,
             "link": link,
             "author": update.message.from_user.username
         }

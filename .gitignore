@@ -4,3 +4,4 @@
 /.venv/
 Songs/*
 !Songs/.gitkeep
+.gitignore
