@@ -5,46 +5,15 @@ from unicodedata import name
 from urllib.parse import urlparse, parse_qs
 import subprocess
 import os
-import threading
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 PORT = 5000
-
-
-
-# Fichier temporaire pour stocker les liens
-save_file = "songs_to_download.spotdl"
-
-
-# def download_spotify(link,id):
-#     # 1️⃣ Sauvegarder les liens
-#     subprocess.run([
-#         "spotdl", "save", link,
-#         "--save-file", save_file
-#     ])
-
-#     # 2️⃣ Télécharger les chansons
-#     subprocess.run([
-#         "spotdl", "download",
-#         "--save-file", save_file,
-#         "--output", "Songs/"+str(id)+".{output-ext}",
-#         "--client-id", CLIENT_ID,
-#         "--client-secret", CLIENT_SECRET
-#     ])
-
-# Lancer le téléchargement dans un thread
-# thread = threading.Thread(
-#     target=download_spotify,
-#     args=(link, save_file, CLIENT_ID, CLIENT_SECRET),
-#     daemon=True
-# )
-# thread.start()
-
-
+UrlToPlay = "http://127.0.0.1:7000/play"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -63,10 +32,12 @@ api = API()
 
 queue = {
     "songs": [
-        # { "id": 1, "author": "username" },
+        # { "id": idofthespotify, "author": "username" },
     ]
 }
 
+
+    
 @api.get("/")
 def index(_):
     return { 
@@ -87,28 +58,33 @@ def list(_):
     
 @api.post("/addSong")
 def add(args):
+    print(args)
     author = args.get("author", None)
     link = args.get("link", None)
-    link.split("")
+    id = args.get("id",None)
+
     if author is None:
         return { "error": "author parameter required" }
     else:
         if link is None:
-            return { "error": "link parameter required" },
-        if len(queue["songs"]) == 0:
-            id = 1
-        else:
-            id = queue["songs"].copy().pop()["id"] + 1
-            
+            return { "error": "link parameter required" }
+        if id is None:
+            return { "error": "id parameter is required"}
+
+        
         song = { "id": id, "author": author }
+        print(id)
         queue["songs"].append(song)
 
+        payloadtosend = { "id": id }
         # Télécharge la chanson
-        subprocess.Popen(["spotdl", "download", "link", link, "--output", "Songs/"+str(id) +".{output-ext}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
-
+        subprocess.Popen(["spotdl", "download", link, "--output", "Songs/"+str(id)+".{output-ext}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
+        # Envoie la chanson au music-player
+ 
+        response = requests.post(UrlToPlay, json=payloadtosend)
+        print("response from player", response.json())
         return song
-
-
+        
 @api.post("/delete")
 def delete(args):
     id = args.get("id", None)

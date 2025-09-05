@@ -1,8 +1,12 @@
 import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from os import link
+import asyncio
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
+import vlc
+
+
 
 
 PORT = 7000
@@ -25,20 +29,35 @@ class API():
         return wrapper
 
 api = API()
-
-
     
+async def playsong(filepath):
+    player = vlc.MediaPlayer(filepath)
+    player.play()  # ne pas mettre await, play() n'est pas async
+
+    # Boucle non bloquante pour attendre la fin
+    while player.is_playing():
+        await asyncio.sleep(0.1)  # laisse le contrôle à l'event loop
+
+    print("Musique terminée")
 
 
 @api.post("/play")
-def play(args):
+def play(args: dict):
+    print("play args", args)
     id = args.get("id", None)
+    print(id)
     if id is None:
         return { "error": "id parameter required" }
     else:
-        # Lancer la lecture de la chanson
-        subprocess.Popen(["spotdl", "play", "--id", str(id)])
+        # lance playsong sans attendre
+        # asyncio.create_task(playsong("Songs/"+str(id)+".mp3"))
+        
+        player = vlc.MediaPlayer('Songs/'+str(id)+'.mp3')
+        player.play()
         return { "playing": id }
+
+
+
 
 
 if __name__ == "__main__":

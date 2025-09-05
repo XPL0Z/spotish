@@ -1,18 +1,34 @@
 from email.mime import message
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler, Application, ContextTypes
-import subprocess
 import requests
 import os
 from dotenv import load_dotenv
+import spotipy 
+from spotipy.oauth2 import SpotifyClientCredentials
+from urllib.parse import urlparse
+
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
 # le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
-save_file = "songs.spotdl"
 
+def UrlIsRight(link):
+    url=urlparse(link)
+    url=url.path.split("/")
+
+    id = url[-1]
+    try:
+        track_info = sp.track(f"https://open.spotify.com/track/{id}")
+        return id
+    except spotipy.exceptions.SpotifyException as e:
+        return False
+    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "Welcome to the Simple Telegram Bot!"
@@ -22,14 +38,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     link = context.args
     link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
+    if UrlIsRight == False:
+        await update.message.reply_text(f"The Spotify url is not right.")
+    print(UrlIsRight)
+    id = UrlIsRight(link)
+    print(id)
     payload = {
+        "id" : id,
         "link": link,
         "author": update.message.from_user.username
     }
-    print("posted1")
-    
+    print(payload)
+
     response = requests.post(UrlToAdd, json=payload)
-    print("posted2")
     await update.message.reply_text(f"Test command executed: {response.json()}")
 
 
