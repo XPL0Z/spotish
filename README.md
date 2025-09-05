@@ -1,6 +1,6 @@
-## QU'est-ce que Spotish
+## QU'est-ce que Spotish ?
 Spotish sert à mettre de la musique sur un appareil
-## Pourquoi utiliser un bot telegram
+## Pourquoi utiliser un bot telegram ?
 Le bot telegram permet de controller la musique, d'en ajouter et autres
 ## Les fonctionnalitées
 - [ ] Play
