@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 import requests
 import threading
+import time
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -15,6 +16,7 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 PORT = 5000
 UrlToPlay = "http://127.0.0.1:7000/play"
+UrlToGetLenght = "http://127.0.0.1:7000/length"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -31,24 +33,17 @@ class API():
 
 api = API()
 
-playing = True
+playing = False
 
 queue = {
     "songs": [
         # { "id": idofthespotifysong, "author": "username" },
     ]
 }
-
-
-# Version synchronisée de download pour thread
-def download_sync(link,song_id):
-    
-    subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
-
-    if len(queue["songs"]) and not playing:
-
-        playsong(song_id)
-    
+def getlenghtofthecurrentsong():
+    length = requests.post(UrlToPlay)
+    print("durée:" + length)
+    return length
 
     
 def search_index(song_id):
@@ -60,12 +55,30 @@ def search_index(song_id):
     
 def remove_song(index):
     queue["songs"].pop(index)
+    
+# Version synchronisée de download pour thread
+def download_sync(link,song_id):
+    
+    subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
+
+    if not playing:
+        print("YES")
+        playsong(song_id)
 
 def playsong(song_id):
     playing = True
     payloadtosend = { "song_id": str(song_id) }
     response = requests.post(UrlToPlay, json=payloadtosend)
     print("response from player", response.json())
+
+#sleep jusqu'à la fin de la musique puis enlève de la file d'attente et lance la prochaine musique
+def nextsong():
+    queue["songs"].pop(0)
+    time.sleep(getlenghtofthecurrentsong())
+    playing = True
+    playsong(queue["songs"]["id"])
+    
+    
 
 @api.get("/")
 def index(_):
@@ -92,22 +105,19 @@ def add(args):
     link = args.get("link", None)
     song_id = args.get("song_id", None)
 
-    if author is None:
-        return { "error": "author parameter required" }
-    else:
-        if link is None:
-            return { "error": "link parameter required" }
-        if song_id is None:
-            return { "error": "id parameter is required"}
-
-        
-        song = { "song_id": song_id, "author": author }
     
-        queue["songs"].append(song)
+        
+    if link is None:
+        return { "error": "link parameter required" }
+    if song_id is None:
+        return { "error": "id parameter is required"}
+    
+    song = { "song_id": song_id, "author": author }
 
-        # Lance le téléchargement dans un thread pour ne pas bloquer
-        threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
-        return song
+    queue["songs"].append(song)
+    # Lance le téléchargement dans un thread pour ne pas bloquer
+    threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
+    return song
         
 @api.post("/finished")
 def add(args):
@@ -119,7 +129,6 @@ def add(args):
         return { "error": "id parameter is required"}
     
     print(queue["songs"])
-    
 
     return 
 

@@ -5,7 +5,7 @@ import asyncio
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
 import vlc
-
+import time
 
 
 
@@ -13,7 +13,7 @@ PORT = 7000
 
 media_player = vlc.MediaPlayer()
 
-
+Urlfinished =  "http://127.0.0.1:5000/finished"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -31,7 +31,6 @@ class API():
 api = API()
     
 
-
 @api.post("/play")
 def play(args: dict):
     print("play args", args)
@@ -43,13 +42,29 @@ def play(args: dict):
         media_player.set_media(media)
         media_player.play()
         return { "playing": song_id }
-    
+
+@api.post("/pause")
+def pause(args=None):
+    media_player.pause()
+    return {"status": "paused"}
+
+@api.post("/resume")
+def resume(args=None):
+    media_player.play()
+    return {"status": "resumed"}
+        
 @api.get("/now")
 def list(_):
     value = media_player.get_time()
+    
     return value
 
 
+@api.get("/length")
+def list(_):
+    value = media_player.get_length()
+    
+    return value
 
 
 if __name__ == "__main__":

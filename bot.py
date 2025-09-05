@@ -16,6 +16,8 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
+UrlToPause = "http://127.0.0.1:7000/pause"
+UrlToResume = "http://127.0.0.1:7000/resume"
 # le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
 
 def UrlIsRight(link):
@@ -60,7 +62,17 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         response = requests.post(UrlToAdd, json=payload)
         await update.message.reply_text(f"Test command executed: {response.json()}")
 
+async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "La musique a bien été arrêtée."
+    )
+    requests.post(UrlToPause, json={})
 
+async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "La zik continue !"
+    )
+    requests.post(UrlToResume,json={})
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("Option 1", callback_data='button_1')],
@@ -90,6 +102,8 @@ def main():
     # Register command and message handlers
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('play', play))
+    application.add_handler(CommandHandler('pause', pause))
+    application.add_handler(CommandHandler('resume', resume))
     application.add_handler(CommandHandler('help', help_command))
 
     # Register a CallbackQueryHandler to handle button selections
