@@ -21,10 +21,15 @@ UrlToAdd = "http://127.0.0.1:5000/addSong"
 def UrlIsRight(link):
     url=urlparse(link)
     url=url.path.split("/")
-
+    print(url)
     id = url[-1]
+    print("TESSSSSSSSSSST" + str(id))
     try:
-        track_info = sp.track(f"https://open.spotify.com/track/{id}")
+        if link.find("playlist")==-1:
+            track_info = sp.track(f"https://open.spotify.com/track/{id}")
+        else:
+            track_info = sp.playlist(f"https://open.spotify.com/playlist/{id}")
+            
         return id
     except spotipy.exceptions.SpotifyException as e:
         return False
@@ -43,15 +48,19 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(UrlIsRight)
     id = UrlIsRight(link)
     print(id)
-    payload = {
-        "id" : id,
-        "link": link,
-        "author": update.message.from_user.username
-    }
-    print(payload)
+    
+    if not id:
+        await update.message.reply_text(f"Lien non valide")
+    else:
+        payload = {
+            "id" : id,
+            "link": link,
+            "author": update.message.from_user.username
+        }
+        print(payload)
 
-    response = requests.post(UrlToAdd, json=payload)
-    await update.message.reply_text(f"Test command executed: {response.json()}")
+        response = requests.post(UrlToAdd, json=payload)
+        await update.message.reply_text(f"Test command executed: {response.json()}")
 
 
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
