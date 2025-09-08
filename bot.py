@@ -18,7 +18,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
-UrlToStop = "http://127.0.0.1:7000/stop"
+UrlToSkip = "http://127.0.0.1:7000/skip"
 # le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
 
 def UrlIsRight(link):
@@ -73,8 +73,8 @@ async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
     requests.post(UrlToResume,json={})
     
-async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    requests.post(UrlToStop,json={})
+async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    requests.post(UrlToSkip,json={})
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -107,7 +107,7 @@ def main():
     application.add_handler(CommandHandler('play', play))
     application.add_handler(CommandHandler('pause', pause))
     application.add_handler(CommandHandler('resume', resume))
-    application.add_handler(CommandHandler('stop', stop))
+    application.add_handler(CommandHandler('skip', skip))
     application.add_handler(CommandHandler('help', help_command))
 
     # Register a CallbackQueryHandler to handle button selections

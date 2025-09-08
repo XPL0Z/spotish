@@ -66,8 +66,8 @@ def resume(args=None):
     media_player.play()
     return {"status": "resumed"}
 
-@api.post("/stop")
-def stop(args=None):
+@api.post("/skip")
+def skip(args=None):
     media_player.set_time(media_player.get_length())
     return {"status": "paused"}
 

@@ -8,7 +8,6 @@ import os
 from dotenv import load_dotenv
 import requests
 import threading
-import time
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -81,7 +80,8 @@ def playsong(song_id):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
     response = requests.post(UrlToPlay, json=payloadtosend)
-    print("Premier élément retiré :", queue["songs"].pop(0))
+    if len(queue["songs"]) != 0:
+        print("Premier élément retiré :", queue["songs"].pop(0))
     
 
 
