@@ -8,10 +8,14 @@ import os
 from dotenv import load_dotenv
 import requests
 import threading
+import spotipy 
+from spotipy.oauth2 import SpotifyClientCredentials
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 PORT = 5000
 UrlToPlay = "http://127.0.0.1:7000/play"
@@ -55,6 +59,14 @@ songs_to_dl = {
          # { "id": idofthespotifysong, "author": "username" },
     ]
 }
+
+def GetSongFromPlaylist(song_id):
+    
+    for item in sp.playlist(f"https://open.spotify.com/playlist/{song_id}"):
+        track = item.get("track")
+        if track and track.get("external_urls"):
+            songs_to_dl.append(track["external_urls"]["spotify"])
+            
 def getlenghtofthecurrentsong():
     length = requests.post(UrlToPlay)
     return length

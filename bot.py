@@ -39,6 +39,9 @@ def UrlIsRight(link):
     except spotipy.exceptions.SpotifyException as e:
         return False
     
+
+        
+    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         """
@@ -60,7 +63,7 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if UrlIsRight == False:
         await update.message.reply_text(f"The Spotify url is not right.")
     song_id = UrlIsRight(link)
-    
+    GetSongFromPlaylist(song_id)
     if not song_id:
         await update.message.reply_text(f"Lien non valide")
         return
