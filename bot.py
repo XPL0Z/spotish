@@ -40,9 +40,17 @@ def UrlIsRight(link):
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "Welcome to the Simple Telegram Bot!"
+        """
+        Available commands:
+        /start - This menu
+        /play <Spotify URL> - Play a song or add it to the queue
+        /pause - Pause the current song
+        /resume - Resume the paused song
+        /skip - Skip the current song
+        /stop - Stop playback and clear the queue
+        """
     )
-    await show_option_buttons(update, context)
+    
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     link = context.args
