@@ -1,7 +1,9 @@
 #fichier sensible 
 .env 
 #inutile
-/.venv/
+.cache/
+.cache
+.venv/
 Songs/*
 !Songs/.gitkeep
 .gitignore

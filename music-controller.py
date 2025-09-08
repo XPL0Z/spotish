@@ -33,11 +33,25 @@ class API():
 
 api = API()
 
-playing = False
+playing = [False]
 
+def changetoNOTplaying():
+    playing.clear()
+    playing.append(False)
+
+def changetoplaying():
+    playing.clear()
+    playing.append(True)
+    
 queue = {
     "songs": [
         # { "id": idofthespotifysong, "author": "username" },
+    ]
+}
+
+songs_to_dl = {
+    "songs":[
+         # { "id": idofthespotifysong, "author": "username" },
     ]
 }
 def getlenghtofthecurrentsong():
@@ -45,7 +59,7 @@ def getlenghtofthecurrentsong():
     print("durée:" + length)
     return length
 
-    
+
 def search_index(song_id):
     i = 0
     for song in queue["songs"]:
@@ -61,22 +75,21 @@ def download_sync(link,song_id):
     
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
 
-    if not playing:
+    if not playing[0]:
         print("YES")
         playsong(song_id)
 
 def playsong(song_id):
-    playing = True
+    changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
     response = requests.post(UrlToPlay, json=payloadtosend)
+    print(queue["songs"])
+    print("Premier élément retiré :", queue["songs"].pop(0))
+    print(queue["songs"])
     print("response from player", response.json())
+    print(playing)
 
-#sleep jusqu'à la fin de la musique puis enlève de la file d'attente et lance la prochaine musique
-def nextsong():
-    queue["songs"].pop(0)
-    time.sleep(getlenghtofthecurrentsong())
-    playing = True
-    playsong(queue["songs"]["id"])
+
     
     
 
@@ -119,18 +132,16 @@ def add(args):
     threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
     return song
         
-@api.post("/finished")
-def add(args):
-    playing = False
-    print(args)
-    song_id = args.get("song_id", None)
-
-    if song_id is None:
-        return { "error": "id parameter is required"}
-    
+@api.post("/notplaying")
+def notplaying(_):
+    changetoNOTplaying()
+    print("Test")
     print(queue["songs"])
+    if len(queue["songs"]) == 0:
+        return {"error": "No songs in queue"}
+    playsong(queue["songs"][0]["song_id"])
 
-    return 
+    return True
 
 @api.post("/delete")
 def delete(args):
@@ -201,3 +212,4 @@ if __name__ == "__main__":
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
     print(f"Application started at http://127.0.0.1:{PORT}/")
     httpd.serve_forever()
+

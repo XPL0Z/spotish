@@ -7,7 +7,7 @@ Le bot telegram permet de controller la musique, d'en ajouter et autres
   - [x] Des liens Spotify
     - [x] Prétéléchargés
     - [x] Pas prétéléchargés
-  - [ ] Des playlists    
+  - [x] Des playlists    
 - [ ] Playtop
 - [x] Pause
 - [x] Resume

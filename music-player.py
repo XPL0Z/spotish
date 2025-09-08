@@ -5,15 +5,17 @@ import asyncio
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
 import vlc
-import time
-
+from time import sleep
+import asyncio
+import requests
+import threading
 
 
 PORT = 7000
 
 media_player = vlc.MediaPlayer()
 
-Urlfinished =  "http://127.0.0.1:5000/finished"
+Urlnotplaying =  "http://127.0.0.1:5000/notplaying"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -29,7 +31,16 @@ class API():
         return wrapper
 
 api = API()
-    
+
+async def CheckingIfPlaying():
+    print("running")
+    while True:
+        if media_player.is_playing() == 0:
+            requests.post(Urlnotplaying, json={})
+        await asyncio.sleep(1) 
+
+def start_checking():
+    asyncio.run(CheckingIfPlaying())
 
 @api.post("/play")
 def play(args: dict):
@@ -37,11 +48,13 @@ def play(args: dict):
     song_id = args.get("song_id", None)
     if song_id is None:
         return { "error": "id parameter required" }
-    else:
-        media = vlc.Media("Songs/"+str(song_id)+".mp3")
-        media_player.set_media(media)
-        media_player.play()
-        return { "playing": song_id }
+
+    media = vlc.Media("Songs/"+str(song_id)+".mp3")
+    media_player.set_media(media)
+    media_player.play()
+    length = media_player.get_length()
+        
+    return { "length": length }
 
 @api.post("/pause")
 def pause(args=None):
@@ -52,7 +65,12 @@ def pause(args=None):
 def resume(args=None):
     media_player.play()
     return {"status": "resumed"}
-        
+
+@api.post("/stop")
+def stop(args=None):
+    media_player.set_time(media_player.get_length())
+    return {"status": "paused"}
+
 @api.get("/now")
 def list(_):
     value = media_player.get_time()
@@ -115,4 +133,5 @@ if __name__ == "__main__":
 
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
     print(f"Application started at http://127.0.0.1:{PORT}/")
+    threading.Thread(target=start_checking, daemon=True).start()
     httpd.serve_forever()
