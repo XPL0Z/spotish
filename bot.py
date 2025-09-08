@@ -20,6 +20,7 @@ UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToSkip = "http://127.0.0.1:7000/skip"
+UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 
 # le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
 
@@ -41,13 +42,14 @@ def UrlIsRight(link):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         """
-        Available commands:
-        /start - This menu
-        /play <Spotify URL> - Play a song or add it to the queue
-        /pause - Pause the current song
-        /resume - Resume the paused song
-        /skip - Skip the current song
-        /stop - Stop playback and clear the queue
+        Commandes disponibles :
+        /start - Ce menu
+        /play <URL Spotify> - Jouer une chanson ou l’ajouter à la file d’attente
+        /pause - Mettre en pause la chanson en cours
+        /resume - Reprendre la lecture de la chanson en pause
+        /skip - Passer la chanson en cours
+        /stop - Arrêter la lecture et vider la file d’attente
+        /volume <0-100> - Régler le volume
         """
     )
     
@@ -61,15 +63,14 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     if not song_id:
         await update.message.reply_text(f"Lien non valide")
-    else:
-        payload = {
-            "song_id" : song_id,
-            "link": link,
-            "author": update.message.from_user.username
-        }
-
-        response = requests.post(UrlToAdd, json=payload)
-        await update.message.reply_text(f"Test command executed: {response.json()}")
+        return
+    payload = {
+        "song_id" : song_id,
+        "link": link,
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToAdd, json=payload)
+    await update.message.reply_text(f"Test command executed: {response.json()}")
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
@@ -88,6 +89,25 @@ async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     requests.post(UrlToStop,json={})
+
+async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    volume = context.args
+    volume = ' '.join(volume)
+    try:
+        
+        volume = int(volume)
+    except ValueError:
+        return "Erreur : le volume doit être un nombre entre 0 et 100."
+    if int(float(volume)) > 100 or int(float(volume)) < 0:
+        await update.message.reply_text("Intensité du volume non valide. Rappel : /volume 0 à 100")
+        return
+        
+    payload = {
+        "volume" : volume,
+        "author": update.message.from_user.username
+    }
+    requests.post(UrlToChangeVolume,json=payload)
+    await update.message.reply_text(f'Le volume est de {volume}%')
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -105,7 +125,7 @@ async def button_selection_handler(update: Update, context: ContextTypes.DEFAULT
     await query.edit_message_text(f'You selected option: {query.data.split("_")[1]}')
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None: 
     await update.message.reply_text(
         'I can respond to the following commands:\n/start - Start the bot\n/help - Get help information'
     )
@@ -121,6 +141,8 @@ def main():
     application.add_handler(CommandHandler('pause', pause))
     application.add_handler(CommandHandler('resume', resume))
     application.add_handler(CommandHandler('skip', skip))
+    application.add_handler(CommandHandler('stop', stop))
+    application.add_handler(CommandHandler('volume', volume))
     application.add_handler(CommandHandler('help', help_command))
 
     # Register a CallbackQueryHandler to handle button selections

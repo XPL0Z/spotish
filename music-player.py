@@ -76,6 +76,12 @@ def stop(args=None):
     media_player.set_time(media_player.get_length())
     return {"status": "stopped"}
 
+@api.post("/volume")
+def volume(args=int):
+    volume = args.get("volume", None)
+    media_player.audio_set_volume(volume)
+    return {"volume": volume}
+
 @api.get("/now")
 def list(_):
     value = media_player.get_time()
