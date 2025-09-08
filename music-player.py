@@ -71,6 +71,11 @@ def skip(args=None):
     media_player.set_time(media_player.get_length())
     return {"status": "paused"}
 
+@api.post("/stop")
+def stop(args=None):
+    media_player.set_time(media_player.get_length())
+    return {"status": "stopped"}
+
 @api.get("/now")
 def list(_):
     value = media_player.get_time()

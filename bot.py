@@ -16,9 +16,11 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
+UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToSkip = "http://127.0.0.1:7000/skip"
+
 # le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
 
 def UrlIsRight(link):
@@ -75,6 +77,9 @@ async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     requests.post(UrlToSkip,json={})
+    
+async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    requests.post(UrlToStop,json={})
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [

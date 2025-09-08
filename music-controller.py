@@ -16,6 +16,7 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 PORT = 5000
 UrlToPlay = "http://127.0.0.1:7000/play"
 UrlToGetLenght = "http://127.0.0.1:7000/length"
+UrlToStop = "http://127.0.0.1:7000/stop"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -79,7 +80,7 @@ def download_sync(link,song_id):
 def playsong(song_id):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
-    response = requests.post(UrlToPlay, json=payloadtosend)
+    requests.post(UrlToPlay, json=payloadtosend)
     if len(queue["songs"]) != 0:
         print("Premier élément retiré :", queue["songs"].pop(0))
     
@@ -134,6 +135,15 @@ def notplaying(_):
     playsong(queue["songs"][0]["song_id"])
 
     return True
+
+@api.post("/stop")
+def stop(_):
+    print(queue["songs"])
+    changetoNOTplaying()
+    queue["songs"].clear()
+    requests.post(UrlToStop, json={})
+    print(queue["songs"])
+    return "La file d'attente a bien été supprimée"
 
 @api.post("/delete")
 def delete(args):
