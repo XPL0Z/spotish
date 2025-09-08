@@ -11,6 +11,6 @@ Le bot telegram permet de controller la musique, d'en ajouter et autres
 - [ ] Playtop
 - [x] Pause
 - [x] Resume
-- [ ] Stop
+- [x] Stop
 - [x] Système de fil d'attente
 - [ ] Statistiques ?
