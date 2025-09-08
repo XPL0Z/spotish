@@ -24,7 +24,7 @@ UrlToStop = "http://127.0.0.1:7000/stop"
 def UrlIsRight(link):
     url=urlparse(link)
     url=url.path.split("/")
-    print(url)
+    
     song_id = url[-1]
     try:
         if link.find("playlist")==-1:
@@ -47,7 +47,6 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
     if UrlIsRight == False:
         await update.message.reply_text(f"The Spotify url is not right.")
-    print(UrlIsRight)
     song_id = UrlIsRight(link)
     
     if not song_id:
@@ -58,7 +57,6 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "link": link,
             "author": update.message.from_user.username
         }
-        print(payload)
 
         response = requests.post(UrlToAdd, json=payload)
         await update.message.reply_text(f"Test command executed: {response.json()}")

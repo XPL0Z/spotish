@@ -56,7 +56,6 @@ songs_to_dl = {
 }
 def getlenghtofthecurrentsong():
     length = requests.post(UrlToPlay)
-    print("durée:" + length)
     return length
 
 
@@ -76,18 +75,14 @@ def download_sync(link,song_id):
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
 
     if not playing[0]:
-        print("YES")
         playsong(song_id)
 
 def playsong(song_id):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
     response = requests.post(UrlToPlay, json=payloadtosend)
-    print(queue["songs"])
     print("Premier élément retiré :", queue["songs"].pop(0))
-    print(queue["songs"])
-    print("response from player", response.json())
-    print(playing)
+    
 
 
     
@@ -113,7 +108,6 @@ def list(_):
     
 @api.post("/addSong")
 def add(args):
-    print(args)
     author = args.get("author", None)
     link = args.get("link", None)
     song_id = args.get("song_id", None)
@@ -135,8 +129,6 @@ def add(args):
 @api.post("/notplaying")
 def notplaying(_):
     changetoNOTplaying()
-    print("Test")
-    print(queue["songs"])
     if len(queue["songs"]) == 0:
         return {"error": "No songs in queue"}
     playsong(queue["songs"][0]["song_id"])
