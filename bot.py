@@ -19,7 +19,7 @@ UrlToAdd = "http://127.0.0.1:5000/addSong"
 UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
-UrlToSkip = "http://127.0.0.1:7000/skip"
+UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 
 # le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
@@ -85,7 +85,8 @@ async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     requests.post(UrlToResume,json={})
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    requests.post(UrlToSkip,json={})
+    r = requests.post(UrlToSkip,json={})
+    await update.message.reply_text(f'Musique passé, en ce moment : {r.text}')
     
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     requests.post(UrlToStop,json={})

@@ -69,7 +69,7 @@ def resume(args=None):
 @api.post("/skip")
 def skip(args=None):
     media_player.set_time(media_player.get_length())
-    return {"status": "paused"}
+    return {"status": "skipped"}
 
 @api.post("/stop")
 def stop(args=None):

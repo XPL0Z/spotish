@@ -17,6 +17,7 @@ PORT = 5000
 UrlToPlay = "http://127.0.0.1:7000/play"
 UrlToGetLenght = "http://127.0.0.1:7000/length"
 UrlToStop = "http://127.0.0.1:7000/stop"
+UrlToSkip = "http://127.0.0.1:7000/skip"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -135,6 +136,13 @@ def notplaying(_):
     playsong(queue["songs"][0]["song_id"])
 
     return True
+
+@api.post("/skip")
+def skip(_):
+    requests.post(UrlToSkip, json={})
+    if len(queue["songs"]) == 0:
+        return "File d'attente vide"
+    return queue["songs"][0]["song_id"]
 
 @api.post("/stop")
 def stop(_):
