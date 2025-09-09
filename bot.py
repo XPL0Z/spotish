@@ -3,9 +3,9 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler, Application, ContextTypes
 import requests
 import os
-from dotenv import load_dotenv
-import spotipy 
-from spotipy.oauth2 import SpotifyClientCredentials
+from dotenv import load_dotenv # type: ignore
+import spotipy  # type: ignore
+from spotipy.oauth2 import SpotifyClientCredentials # type: ignore
 from urllib.parse import urlparse
 
 
@@ -22,22 +22,9 @@ UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 
-# le fichier dans lequel on garde la liste (utile pour reprendre plus tard)
+songs_to_dl = []
 
-def UrlIsRight(link):
-    url=urlparse(link)
-    url=url.path.split("/")
-    
-    song_id = url[-1]
-    try:
-        if link.find("playlist")==-1:
-            track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
-        else:
-            track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
-            
-        return song_id
-    except spotipy.exceptions.SpotifyException as e:
-        return False
+
     
 
         
@@ -56,19 +43,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """
     )
     
+async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    pass
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     link = context.args
     link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
-    if UrlIsRight == False:
-        await update.message.reply_text(f"The Spotify url is not right.")
-    song_id = UrlIsRight(link)
-    GetSongFromPlaylist(song_id)
-    if not song_id:
-        await update.message.reply_text(f"Lien non valide")
-        return
+    
     payload = {
-        "song_id" : song_id,
         "link": link,
         "author": update.message.from_user.username
     }
@@ -141,6 +123,7 @@ def main():
 
     # Register command and message handlers
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('test', test))
     application.add_handler(CommandHandler('play', play))
     application.add_handler(CommandHandler('pause', pause))
     application.add_handler(CommandHandler('resume', resume))

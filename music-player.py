@@ -4,7 +4,7 @@ from os import link
 import asyncio
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
-import vlc
+import vlc # type: ignore
 from time import sleep
 import asyncio
 import requests
@@ -55,7 +55,6 @@ def play(args: dict):
     length = media_player.get_length()
         
     return { "length": length }
-
 @api.post("/pause")
 def pause(args=None):
     media_player.pause()

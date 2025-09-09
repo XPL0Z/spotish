@@ -5,11 +5,12 @@ from unicodedata import name
 from urllib.parse import urlparse, parse_qs
 import subprocess
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 import requests
 import threading
-import spotipy 
-from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy  # type: ignore # pylint: disable=unused-variable
+from spotipy.oauth2 import SpotifyClientCredentials  # type: ignore # pylint: disable=unused-variable
+import asyncio
 
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -40,6 +41,21 @@ api = API()
 
 playing = [False]
 
+def IsUrlRight(link):
+    url=urlparse(link)
+    url=url.path.split("/")
+    
+    song_id = url[-1]
+    try:
+        if link.find("playlist")==-1:
+            track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
+        else:
+            track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
+            
+        return song_id
+    except spotipy.exceptions.SpotifyException as e:
+        return False
+
 def changetoNOTplaying():
     playing.clear()
     playing.append(False)
@@ -56,16 +72,10 @@ queue = {
 
 songs_to_dl = {
     "songs":[
-         # { "id": idofthespotifysong, "author": "username" },
+         # {"link": urlofthespotifyplaylist, "id": idofthespotifysong, "author": "username" },
     ]
 }
 
-def GetSongFromPlaylist(song_id):
-    
-    for item in sp.playlist(f"https://open.spotify.com/playlist/{song_id}"):
-        track = item.get("track")
-        if track and track.get("external_urls"):
-            songs_to_dl.append(track["external_urls"]["spotify"])
             
 def getlenghtofthecurrentsong():
     length = requests.post(UrlToPlay)
@@ -83,11 +93,14 @@ def remove_song(index):
     queue["songs"].pop(index)
     
 # Version synchronisée de download pour thread
-def download_sync(link,song_id):
-    
+def download_sync(link,song_id,author):
+    print("Try downloading")
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
-
+    song = {"id": song_id, "author": author}
+    
+    queue["songs"].append(song)
     if not playing[0]:
+        print("TESTING")
         playsong(song_id)
 
 def playsong(song_id):
@@ -97,8 +110,38 @@ def playsong(song_id):
     if len(queue["songs"]) != 0:
         print("Premier élément retiré :", queue["songs"].pop(0))
     
+def GetSongFromPlaylist(playlist_id,author):
+    results = sp.playlist_tracks(playlist_id)
+    username = author
+    for item in results['items']:
+        track = item['track']
+        if track:  # Vérifier que la piste existe encore
+            spotify_url = track['external_urls']['spotify']
+            song_id = IsUrlRight(spotify_url )
+            songs_to_dl["songs"].append({
+                "link": spotify_url,
+                "song_id": song_id,
+                "author": username
+            })  
+            
+async def Downloading():
+    print("running")
+    while True:
+        if len(songs_to_dl["songs"]) != 0:
+            i = 0
+            for song in songs_to_dl["songs"]:
+                song_id = songs_to_dl["songs"][i]["song_id"]
+                print(song_id+" "+ str(i))
+                author = songs_to_dl["songs"][i]["author"]
+                link = songs_to_dl["songs"][i]["link"]
+                download_sync(link, song_id,author)
+                songs_to_dl["songs"].remove(song)
+                i += 1
+        await asyncio.sleep(1) 
 
-
+def start_checking():
+    print("Checking if there is songs to download")
+    asyncio.run(Downloading())
     
     
 
@@ -124,20 +167,23 @@ def list(_):
 def add(args):
     author = args.get("author", None)
     link = args.get("link", None)
-    song_id = args.get("song_id", None)
 
-    
+    song_id = IsUrlRight(link)
         
     if link is None:
         return { "error": "link parameter required" }
     if song_id is None:
         return { "error": "id parameter is required"}
+    if author is None:
+        return { "error": "author parameter is required"}
     
-    song = { "song_id": song_id, "author": author }
-
-    queue["songs"].append(song)
+    if link.find("playlist") != -1:
+        GetSongFromPlaylist(song_id,author)
+        return "Added in the queue"
+    song = { "song_id": song_id, "link": link, "author": author }
+    songs_to_dl["songs"].append(song)
     # Lance le téléchargement dans un thread pour ne pas bloquer
-    threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
+    #threading.Thread(target=download_sync, args=(link,song_id), daemon=True).start()
     return song
         
 @api.post("/notplaying")
@@ -232,6 +278,7 @@ if __name__ == "__main__":
 
 
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
+    threading.Thread(target=start_checking, daemon=True).start()
     print(f"Application started at http://127.0.0.1:{PORT}/")
     httpd.serve_forever()
 
