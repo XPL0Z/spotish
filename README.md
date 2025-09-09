@@ -33,13 +33,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/xpl0z/spotish">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="spotish_gh_logo.png" alt="Logo" >
   </a>
 
-<h3 align="center">project_title</h3>
+<h3 align="center">Spotish</h3>
 
   <p align="center">
-    project_description
+    Telegram bot to play music
     <br />
     <a href="https://github.com/xpl0z/spotish"><strong>Explore the docs »</strong></a>
     <br />
@@ -95,14 +95,8 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
 
 ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+* [![Python][Python]][Python-url]
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -111,37 +105,78 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Before you begin, make sure you have installed the following items:
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+* Python
+  Avant de commencer l'installation du projet, vous devez d'abord installer **Python** sur votre machine.
 
-### Installation
+## Prérequis
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/xpl0z/spotish.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-5. Change git remote url to avoid accidental pushes to base project
-   ```sh
-   git remote set-url origin xpl0z/spotish
-   git remote -v # confirm the changes
-   ```
+Avant de commencer, assurez-vous d'avoir **Python** installé sur votre machine.
+
+### Installation de Python
+
+#### Sur Ubuntu / Debian
+
+1. Ouvrez un terminal.
+2. Mettez à jour la liste des paquets :
+    ```bash
+    sudo apt update
+    ```
+3. Installez Python :
+    ```bash
+    sudo apt install python3
+    ```
+4. Vérifiez l'installation :
+    ```bash
+    python3 --version
+    ```
+    Vous devriez voir apparaître un numéro de version, par exemple :
+    ```
+    Python 3.10.12
+    ```
+
+---
+
+#### Sur macOS
+
+1. Ouvrez un terminal.
+2. Installez [Homebrew](https://brew.sh/) si ce n'est pas déjà fait.
+3. Installez Python avec Homebrew :
+    ```bash
+    brew install python
+    ```
+4. Vérifiez l'installation :
+    ```bash
+    python3 --version
+    ```
+    Vous devriez obtenir par exemple :
+    ```
+    Python 3.11.8
+    ```
+
+---
+
+#### Sur Windows
+
+1. Rendez-vous sur le site officiel [python.org/downloads](https://www.python.org/downloads/).
+2. Téléchargez le programme d'installation de la dernière version de Python.
+3. **Important :** Cochez la case **"Add Python to PATH"** lors de l'installation.
+4. Terminez l'installation en suivant les instructions.
+5. Ouvrez l’invite de commande et vérifiez l'installation :
+    ```bash
+    python --version
+    ```
+    Vous devriez voir :
+    ```
+    Python 3.11.8
+    ```
+
+---
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -238,11 +273,11 @@ Project Link: [https://github.com/xpl0z/spotish](https://github.com/xpl0z/spotis
 [issues-shield]: https://img.shields.io/github/issues/xpl0z/spotish.svg?style=for-the-badge
 [issues-url]: https://github.com/xpl0z/spotish/issues
 [product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[Python-url]: https://www.python.org/
+[React]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue]: https://img.shields.io/badge/Vue-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
 [Vue-url]: https://vuejs.org/
 [Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
 [Angular-url]: https://angular.io/
