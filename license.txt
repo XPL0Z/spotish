@@ -1,0 +1,18 @@
+# Spotish License
+
+Copyright (C) 2024 [Your Name]
+
+This project, Spotish, is licensed for personal, non-commercial use only.
+
+You are free to:
+- Use, copy, modify, and share this project for personal or educational purposes.
+
+You are **not** allowed to:
+- Use this project or any part of it for commercial purposes.
+- Sell, sublicense, or otherwise commercially exploit this project.
+
+If you use or share this project, please give appropriate credit by mentioning my name and the Spotish project.
+
+Thank you for respecting these terms!
+
+[Your Name]
