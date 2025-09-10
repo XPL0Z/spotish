@@ -33,7 +33,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/xpl0z/spotish">
-    <img src="images/spotish_gh_logo_no_bg.png" alt="Logo" >
+    <img src="images/spotish_icon_logo_no_bg.png" alt="Logo" >
   </a>
 
 <h3 align="center">Spotish</h3>
