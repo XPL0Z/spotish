@@ -33,7 +33,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/xpl0z/spotish">
-    <img src="spotish_gh_logo.png" alt="Logo" >
+    <img src="images/spotish_gh_logo_no_bg.png" alt="Logo" >
   </a>
 
 <h3 align="center">Spotish</h3>
@@ -85,8 +85,9 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
+<a href="https://github.com/xpl0z/spotish">
+    <img src="images/spotish_gh_logo.png" alt="Logo" >
+  </a>
 Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `xpl0z`, `spotish`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`, `project_license`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
