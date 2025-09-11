@@ -1,6 +1,7 @@
 from email.mime import message
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler, Application, ContextTypes
+from telegram.constants import ParseMode
 import requests
 import os
 from dotenv import load_dotenv # type: ignore
@@ -30,18 +31,15 @@ songs_to_dl = []
         
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        """
-        Commandes disponibles :
-        /start - Ce menu
-        /play <URL Spotify> - Jouer une chanson ou l’ajouter à la file d’attente
-        /pause - Mettre en pause la chanson en cours
-        /resume - Reprendre la lecture de la chanson en pause
-        /skip - Passer la chanson en cours
-        /stop - Arrêter la lecture et vider la file d’attente
-        /volume <0-100> - Régler le volume
-        """
-    )
+    message = ("<b>🎵 Available commands:</b>\n"
+            "/start - 📜 Show this menu\n"
+            "/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue\n"
+            "/pause - ⏸️ Pause the current song\n"
+            "/resume - 🔄 Resume the paused song\n"
+            "/skip - ⏭️ Skip the current song\n"
+            "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
+            "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n")
+    await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
     
 async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     pass
@@ -79,13 +77,8 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     volume = context.args
     volume = ' '.join(volume)
-    try:
-        
-        volume = int(volume)
-    except ValueError:
-        return "Erreur : le volume doit être un nombre entre 0 et 100."
     if int(float(volume)) > 100 or int(float(volume)) < 0:
-        await update.message.reply_text("Intensité du volume non valide. Rappel : /volume 0 à 100")
+        await update.message.reply_text("Volume must be between 0 and 100. Reminder : /volume 0 - 100")
         return
         
     payload = {
@@ -93,7 +86,7 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "author": update.message.from_user.username
     }
     requests.post(UrlToChangeVolume,json=payload)
-    await update.message.reply_text(f'Le volume est de {volume}%')
+    await update.message.reply_text(f'The volume is {volume}%')
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
