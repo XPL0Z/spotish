@@ -53,23 +53,23 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "author": update.message.from_user.username
     }
     response = requests.post(UrlToAdd, json=payload)
-    await update.message.reply_text(f"Test command executed: {response.json()}")
+    await update.message.reply_text(response.json())
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "La musique a bien été arrêtée."
+        "The music has been stopped"
     )
     requests.post(UrlToPause, json={})
 
 async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "La zik continue !"
+        "The music has been resumed"
     )
     requests.post(UrlToResume,json={})
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     r = requests.post(UrlToSkip,json={})
-    await update.message.reply_text(f'Musique passé, en ce moment : {r.text}')
+    await update.message.reply_text(f'Music skipped, Now : {r.text}')
     
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     requests.post(UrlToStop,json={})
