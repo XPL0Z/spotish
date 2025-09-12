@@ -68,18 +68,35 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     requests.post(UrlToStop,json={})
 
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    volume = context.args
-    volume = ' '.join(volume)
-    if int(float(volume)) > 100 or int(float(volume)) < 0:
-        await update.message.reply_text("Volume must be between 0 and 100. Reminder : /volume 0 - 100")
-        return
+    try:
+        # Vérifier si des arguments ont été fournis
+        if not context.args:
+            await update.message.reply_text("Usage: /volume <0-100>")
+            return
+            
+        volume = ' '.join(context.args)
+        volume_int = int(float(volume))  # Conversion ici
         
-    payload = {
-        "volume" : volume,
-        "author": update.message.from_user.username
-    }
-    requests.post(UrlToChangeVolume,json=payload)
-    await update.message.reply_text(f'The volume is {volume}%')
+        if volume_int > 100 or volume_int < 0:
+            await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")
+            return
+        
+        payload = {
+            "volume": volume_int
+        }
+        
+        response = requests.post(UrlToChangeVolume, json=payload)
+        
+        if response.status_code == 200:
+            await update.message.reply_text(f'The volume is {volume_int}%')
+        else:
+            await update.message.reply_text(f'Error: Server returned {response.status_code}')
+            
+    except ValueError:
+        await update.message.reply_text("Please enter a valid number between 0 and 100")
+    except Exception as e:
+        await update.message.reply_text(f"An error occurred: {str(e)}")
+        print(f"Error in volume command: {e}")
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [

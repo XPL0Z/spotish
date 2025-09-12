@@ -55,6 +55,7 @@ def play(args: dict):
     length = media_player.get_length()
         
     return { "length": length }
+
 @api.post("/pause")
 def pause(args=None):
     media_player.pause()
@@ -76,10 +77,23 @@ def stop(args=None):
     return {"status": "stopped"}
 
 @api.post("/volume")
-def volume(args=int):
-    volume = args.get("volume", None)
-    media_player.audio_set_volume(volume)
-    return {"volume": volume}
+def set_volume(args: dict):
+    print("volume args", args)
+    vol = args.get("volume", None)
+    if vol is None:
+        return {"error": "volume parameter required"}
+
+    try:
+        vol = int(vol)  # conversion en entier
+        vol = max(0, min(100, vol))  # clamp entre 0 et 100
+        media_player.audio_set_volume(vol)
+        return {"volume": vol}
+    except ValueError:
+        print("Volume invalide :", vol)
+        return {"error": "Invalid volume value"}
+    except Exception as e:
+        print("Erreur volume :", e)
+        return {"error": str(e)}
 
 @api.get("/now")
 def list(_):
