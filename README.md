@@ -42,10 +42,10 @@
   <p align="center">
     Telegram bot to play music
     <br />
-    <a href="https://github.com/xpl0z/spotish"><strong>Explore the docs »</strong></a>
+    <a href="#small-doc"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/xpl0z/spotish">View Demo</a>
+    <a href="#demo">View Demo</a>
     &middot;
     <a href="https://github.com/xpl0z/spotish/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
@@ -103,6 +103,7 @@ Spotish is a telegram bot to play spotify link on speaker !
 For more examples, please refer to the /start or below.  
 <br>  
 
+<<<<<<< HEAD
 Available commands:  
   /start - 📜 Show this menu  
   /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue    
@@ -111,6 +112,17 @@ Available commands:
   /skip - ⏭️ Skip the current song   
   /stop - 🛑 Stop playback and 🧹 clear the queue   
   /volume &lt;0-100&gt; - 🔊 Adjust the volume   
+=======
+### Small doc 
+Available commands:
+/start - 📜 Show this menu 
+/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue 
+/pause - ⏸️ Pause the current song 
+/resume - 🔄 Resume the paused song 
+/skip - ⏭️ Skip the current song 
+/stop - 🛑 Stop playback and 🧹 clear the queue 
+/volume &lt;0-100&gt; - 🔊 Adjust the volume 
+>>>>>>> 9956620 (fix doc and demo)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -223,7 +235,7 @@ Python 3.11.8
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+---
 
 <!-- ROADMAP -->
 ## Features
