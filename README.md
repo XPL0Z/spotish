@@ -29,11 +29,12 @@
 
 
 
+
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/xpl0z/spotish">
-    <img src="images/spotish_icon_logo_no_bg.png" alt="Logo" width=200>
+    <img src="images/spotish_icon_logo_no_bg.png" alt="Logo" width=400>
   </a>
 
 <h3 align="center">Spotish</h3>
@@ -71,12 +72,11 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#demo">Demo</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -84,15 +84,35 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
+<div align="center">
+  <a href="https://github.com/xpl0z/spotish">
+      <img src="images/spotish_banner.png" alt="Logo" width=100%>
+    </a>
+</div>
 
-<a href="https://github.com/xpl0z/spotish">
-    <img src="images/spotish_gh_logo.png" alt="Logo" >
-  </a>
-Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `xpl0z`, `spotish`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`, `project_license`
-
+### What is Spotish ?
+Spotish is a telegram bot to play spotify link on speaker !
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- USAGE EXAMPLES -->
+## Demo
+<div align="center">
+<img src="images/spotish_demo.gif" width=75%>
+</div>
+<br>
+For more examples, please refer to the /start, you can find it below.
+<br>
 
+Available commands:
+/start - 📜 Show this menu 
+/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue 
+/pause - ⏸️ Pause the current song 
+/resume - 🔄 Resume the paused song 
+/skip - ⏭️ Skip the current song 
+/stop - 🛑 Stop playback and 🧹 clear the queue 
+/volume &lt;0-100&gt; - 🔊 Adjust the volume 
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
@@ -104,94 +124,106 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
 
 
 <!-- GETTING STARTED -->
-## Getting Started
+# Getting Started
 
-Before you begin, make sure you have installed the following items:
 
 ### Prerequisites
 
-* Python
-  Avant de commencer l'installation du projet, vous devez d'abord installer **Python** sur votre machine.
+* 
+  Before you begin installing the project, you must first install **Python** on your machine. Otherwise, follow the instructions below.
 
-## Prérequis
+#### Installing Python
 
-Avant de commencer, assurez-vous d'avoir **Python** installé sur votre machine.
+##### On Ubuntu/Debian
 
-### Installation de Python
-
-#### Sur Ubuntu / Debian
-
-1. Ouvrez un terminal.
-2. Mettez à jour la liste des paquets :
-    ```bash
-    sudo apt update
-    ```
-3. Installez Python :
-    ```bash
-    sudo apt install python3
-    ```
-4. Vérifiez l'installation :
-    ```bash
-    python3 --version
-    ```
-    Vous devriez voir apparaître un numéro de version, par exemple :
-    ```
-    Python 3.10.12
-    ```
+1. Open a terminal.
+2. Update the package list:
+```bash
+sudo apt update
+```
+3. Install Python:
+```bash
+sudo apt install python3
+```
+4. Verify the installation:
+```bash
+python3 --version
+```
+You should see a version number appear, for example:
+```
+Python 3.10.12
+```
 
 ---
 
-#### Sur macOS
+##### On macOS
 
-1. Ouvrez un terminal.
-2. Installez [Homebrew](https://brew.sh/) si ce n'est pas déjà fait.
-3. Installez Python avec Homebrew :
-    ```bash
-    brew install python
-    ```
-4. Vérifiez l'installation :
-    ```bash
-    python3 --version
-    ```
-    Vous devriez obtenir par exemple :
-    ```
-    Python 3.11.8
-    ```
-
----
-
-#### Sur Windows
-
-1. Rendez-vous sur le site officiel [python.org/downloads](https://www.python.org/downloads/).
-2. Téléchargez le programme d'installation de la dernière version de Python.
-3. **Important :** Cochez la case **"Add Python to PATH"** lors de l'installation.
-4. Terminez l'installation en suivant les instructions.
-5. Ouvrez l’invite de commande et vérifiez l'installation :
-    ```bash
-    python --version
-    ```
-    Vous devriez voir :
-    ```
-    Python 3.11.8
-    ```
+1. Open a terminal.
+2. Install [Homebrew](https://brew.sh/) if you haven't already done so.
+3. Install Python with Homebrew:
+```bash
+brew install python
+```
+4. Check the installation:
+```bash
+python3 --version
+```
+You should get something like this:
+```
+Python 3.11.8
+```
 
 ---
+
+##### On Windows
+
+1. Go to the official website [python.org/downloads](https://www.python.org/downloads/).
+2. Download the installer for the latest version of Python.
+3. **Important:** Check the **“Add Python to PATH”** box during installation.
+4. Complete the installation by following the instructions.
+5. Open the command prompt and verify the installation:
+```bash
+python --version
+```
+You should see:
+```
+Python 3.11.8
+```
+
+---
+## Installation of Spotish and his dependencies
+1. Download Spotish
+  ```bash
+    git clone https://github.com/XPL0Z/spotish.git
+  ```
+2. Enter the directory
+  ```bash
+    cd spotish
+  ```
+3. Create an virtual environnement
+  ```bash
+    python -m venv .env
+  ```
+4. Activate the virtual environnement
+  ``` bash
+    source .env/bin/activate
+  ```
+5. Install requirements
+  ```bash
+    pip install -r requirements.txt
+  ```
+6. Rename Example.env to .env
+7. Get a token bot at [@Botfather](https://t.me/botfather)
+8. Get a spotify ClientID and SecretID [here](https://developer.spotify.com/dashboard)
+9. Place your token bot, ClientID and SecretID in the .env
+10. Launch run.py
+  ```bash
+    python run.py
+  ```
 
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- ROADMAP -->
@@ -206,7 +238,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - Skip
 - Stop
 - Volume
-- Système de fil d'attente
+-  Queuing system
 
 
 See the [open issues](https://github.com/xpl0z/spotish/issues) for a full list of proposed features (and known issues).
@@ -251,7 +283,7 @@ Distributed under the project_license. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-XPL0Z - Contact me with [Telegram](https://t.me/xploz)) 
+XPL0Z - Contact me on [Telegram](https://t.me/xploz) 
 
 Share the Project Link: [spotish](https://github.com/xpl0z/spotish) !
 
