@@ -213,6 +213,7 @@ def stop(_):
     print(queue["songs"])
     changetoNOTplaying()
     queue["songs"].clear()
+    songs_to_dl["songs"].clear()
     requests.post(UrlToStop, json={})
     print(queue["songs"])
     return "La file d'attente a bien été supprimée"
