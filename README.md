@@ -195,7 +195,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 
 <!-- ROADMAP -->
-## Roadmap
+## Features
 
 -  Play
     - Spotify
@@ -251,20 +251,12 @@ Distributed under the project_license. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+XPL0Z - Contact me with [Telegram](https://t.me/xploz)) 
 
-Project Link: [https://github.com/xpl0z/spotish](https://github.com/xpl0z/spotish)
+Share the Project Link: [spotish](https://github.com/xpl0z/spotish) !
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* []()
-* []()
-* []()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
