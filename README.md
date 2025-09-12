@@ -112,6 +112,7 @@ Available commands:
   /skip - ⏭️ Skip the current song   
   /stop - 🛑 Stop playback and 🧹 clear the queue   
   /volume &lt;0-100&gt; - 🔊 Adjust the volume   
+  /adduser &lt;username&gt; add user that are authorized (without @)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -215,7 +216,7 @@ Python 3.11.8
 6. Rename Example.env to .env
 7. Get a token bot at [@Botfather](https://t.me/botfather)
 8. Get a spotify ClientID and SecretID [here](https://developer.spotify.com/dashboard)
-9. Place your token bot, ClientID and SecretID in the .env
+9. Place your token bot, ClientID, SecretID and your username in the .env. You can add multiple user, you need to split username by a comma 
 10. Launch run.py
   ```bash
     python run.py
@@ -238,8 +239,8 @@ Python 3.11.8
 - Skip
 - Stop
 - Volume
--  Queuing system
-
+- Queuing system
+- Authorized User
 
 See the [open issues](https://github.com/xpl0z/spotish/issues) for a full list of proposed features (and known issues).
 

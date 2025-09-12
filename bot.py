@@ -14,14 +14,19 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+ADMIN_ID = os.getenv("ADMIN_ID").split(",")
+authorized_user = []
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
+UrlToAddTop = "http://127.0.0.1:5000/addSongtop"
 UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"        
+
+
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
@@ -38,65 +43,110 @@ async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     pass
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    link = context.args
-    link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
     
-    payload = {
-        "link": link,
-        "author": update.message.from_user.username
-    }
-    response = requests.post(UrlToAdd, json=payload)
-    await update.message.reply_text(response.json())
+    
+    if update.message.from_user.username in authorized_user:
+        link = context.args
+        link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
+
+        payload = {
+            "link": link,
+            "author": update.message.from_user.username
+        }
+        response = requests.post(UrlToAdd, json=payload)
+        await update.message.reply_text(response.json())
+    else:
+        await update.message.reply_text("You are not authorized ;)")
+    
+async def playtop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
+    if update.message.from_user.username in authorized_user:
+        link = context.args
+        link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
+
+        payload = {
+            "link": link,
+            "author": update.message.from_user.username
+        }
+        response = requests.post(UrlToAddTop, json=payload)
+        await update.message.reply_text(response.json())
+    else:
+        await update.message.reply_text("You are not authorized ;)")
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "The music has been stopped"
-    )
-    requests.post(UrlToPause, json={})
+    
+    if update.message.from_user.username in authorized_user:
+        await update.message.reply_text(
+            "The music has been stopped"
+        )
+        requests.post(UrlToPause, json={})
+    else:
+        await update.message.reply_text("You are not authorized ;)")
 
 async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "The music has been resumed"
-    )
-    requests.post(UrlToResume,json={})
+    
+    if update.message.from_user.username in authorized_user:
+        await update.message.reply_text("The music has been resumed")
+        requests.post(UrlToResume,json={})
+    else:
+        await update.message.reply_text("You are not authorized ;)")
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    r = requests.post(UrlToSkip,json={})
-    await update.message.reply_text(f'Music skipped, Now : {r.text}')
     
+    if update.message.from_user.username in authorized_user:
+        r = requests.post(UrlToSkip,json={})
+        await update.message.reply_text(f'Music skipped, Now : {r.text}')
+    else:
+        await update.message.reply_text("You are not authorized ;)")
+        
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    requests.post(UrlToStop,json={})
+    if update.message.from_user.username in authorized_user:
+        requests.post(UrlToStop,json={})
+    else:
+        await update.message.reply_text("You are not authorized ;)")
+async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
+    if update.message.from_user.username == ADMIN_ID:
+        user = context.args
+        user = ' '.join(user)
+        authorized_user.append(user)
+    else:
+        await update.message.reply_text("You are not admin ;)")
 
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    try:
+    if update.message.from_user.username in authorized_user:
+        try:
         # Vérifier si des arguments ont été fournis
-        if not context.args:
-            await update.message.reply_text("Usage: /volume <0-100>")
-            return
-            
-        volume = ' '.join(context.args)
-        volume_int = int(float(volume))  # Conversion ici
-        
-        if volume_int > 100 or volume_int < 0:
-            await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")
-            return
-        
-        payload = {
-            "volume": volume_int
-        }
-        
-        response = requests.post(UrlToChangeVolume, json=payload)
-        
-        if response.status_code == 200:
-            await update.message.reply_text(f'The volume is {volume_int}%')
-        else:
-            await update.message.reply_text(f'Error: Server returned {response.status_code}')
-            
-    except ValueError:
-        await update.message.reply_text("Please enter a valid number between 0 and 100")
-    except Exception as e:
-        await update.message.reply_text(f"An error occurred: {str(e)}")
-        print(f"Error in volume command: {e}")
+            if not context.args:
+                await update.message.reply_text("Usage: /volume <0-100>")
+                return
+
+            volume = ' '.join(context.args)
+            volume_int = int(float(volume))  # Conversion ici
+
+            if volume_int > 100 or volume_int < 0:
+                await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")
+                return
+
+            payload = {
+                "volume": volume_int
+            }
+
+            response = requests.post(UrlToChangeVolume, json=payload)
+
+            if response.status_code == 200:
+                await update.message.reply_text(f'The volume is {volume_int}%')
+            else:
+                await update.message.reply_text(f'Error: Server returned {response.status_code}')
+
+        except ValueError:
+            await update.message.reply_text("Please enter a valid number between 0 and 100")
+        except Exception as e:
+            await update.message.reply_text(f"An error occurred: {str(e)}")
+            print(f"Error in volume command: {e}")
+    else:
+            await update.message.reply_text("You are not authorized ;)")
+    
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -126,14 +176,17 @@ def main():
 
     # Register command and message handlers
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('help', start))
     application.add_handler(CommandHandler('test', test))
     application.add_handler(CommandHandler('play', play))
+    application.add_handler(CommandHandler('playtop', playtop))
     application.add_handler(CommandHandler('pause', pause))
     application.add_handler(CommandHandler('resume', resume))
     application.add_handler(CommandHandler('skip', skip))
     application.add_handler(CommandHandler('stop', stop))
     application.add_handler(CommandHandler('volume', volume))
     application.add_handler(CommandHandler('help', help_command))
+    application.add_handler(CommandHandler('adduser', adduser))
 
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
