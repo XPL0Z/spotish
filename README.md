@@ -100,17 +100,17 @@ Spotish is a telegram bot to play spotify link on speaker !
 <img src="images/spotish_demo.gif" width=75%>
 </div>
 <br>
-For more examples, please refer to the /start, you can find it below.
-<br>
+For more examples, please refer to the /start or below.  
+<br>  
 
-Available commands:
-/start - 📜 Show this menu 
-/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue 
-/pause - ⏸️ Pause the current song 
-/resume - 🔄 Resume the paused song 
-/skip - ⏭️ Skip the current song 
-/stop - 🛑 Stop playback and 🧹 clear the queue 
-/volume &lt;0-100&gt; - 🔊 Adjust the volume 
+Available commands:  
+  /start - 📜 Show this menu  
+  /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue    
+  /pause - ⏸️ Pause the current song   
+  /resume - 🔄 Resume the paused song   
+  /skip - ⏭️ Skip the current song   
+  /stop - 🛑 Stop playback and 🧹 clear the queue   
+  /volume &lt;0-100&gt; - 🔊 Adjust the volume   
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -129,8 +129,7 @@ Available commands:
 
 ### Prerequisites
 
-* 
-  Before you begin installing the project, you must first install **Python** on your machine. Otherwise, follow the instructions below.
+* Before you begin installing the project, you must first install **Python** on your machine. Otherwise, follow the instructions below.
 
 #### Installing Python
 
