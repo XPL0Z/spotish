@@ -165,8 +165,12 @@ def index(_):
 @api.get("/list")
 def list(_):
     return {
+        
         "count": len(queue["songs"]),
-        "songs": queue["songs"]
+        "count to dl": len(songs_to_dl["songs"]),
+        "songs": queue["songs"],
+        "songstodl": songs_to_dl["songs"]
+        
     }
 
     
