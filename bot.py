@@ -21,14 +21,7 @@ UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToSkip = "http://127.0.0.1:5000/skip"
-UrlToChangeVolume = "http://127.0.0.1:7000/volume"
-
-songs_to_dl = []
-
-
-    
-
-        
+UrlToChangeVolume = "http://127.0.0.1:7000/volume"        
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"

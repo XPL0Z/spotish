@@ -101,12 +101,10 @@ def download_sync(link,song_id,author):
     song = {"id": song_id, "author": author}
     
     queue["songs"].append(song)
-    if not playing[0]:
-        print("TESTING")
-        playsong(song_id)
 
 def playsong(song_id):
     changetoplaying()
+    print("TEEEEEEEST" + str(playing[0]))
     payloadtosend = { "song_id": str(song_id) }
     requests.post(UrlToPlay, json=payloadtosend)
     if len(queue["songs"]) != 0:
@@ -132,19 +130,26 @@ async def Downloading():
         if len(songs_to_dl["songs"]) != 0:
             i = 0
             for song in songs_to_dl["songs"]:
-                song_id = songs_to_dl["songs"][i]["song_id"]
+                song_id = songs_to_dl["songs"][0]["song_id"]
                 print(str(song_id)+" "+ str(i))
-                author = songs_to_dl["songs"][i]["author"]
-                link = songs_to_dl["songs"][i]["link"]
+                author = songs_to_dl["songs"][0]["author"]
+                link = songs_to_dl["songs"][0]["link"]
                 download_sync(link, song_id,author)
-                songs_to_dl["songs"].remove(song)
+                songs_to_dl["songs"].pop(0)
                 i += 1
         await asyncio.sleep(1) 
 
-def start_checking():
-    print("Checking if there is songs to download")
-    asyncio.run(Downloading())
-    
+async def CheckingifQueueisempty():
+    global playing
+    while True:
+        if len(queue["songs"]) != 0 and playing[0] == False:
+            print(playing[0])
+            playsong(queue["songs"][0]["id"])
+            await asyncio.sleep(2)
+            print("playfromewhile")
+            
+        await asyncio.sleep(2)
+
     
 
 @api.get("/")
@@ -193,7 +198,6 @@ def notplaying(_):
     changetoNOTplaying()
     if len(queue["songs"]) == 0:
         return {"error": "No songs in queue"}
-    playsong(queue["songs"][0]["song_id"])
 
     return True
 
@@ -202,7 +206,7 @@ def skip(_):
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return "File d'attente vide"
-    return queue["songs"][0]["song_id"]
+    return queue["songs"][0]["id"]
 
 @api.post("/stop")
 def stop(_):
@@ -231,6 +235,17 @@ def delete(args):
             return { "deleted": id }
         else:
             return { "error": f"song not found with id {id}" }
+        
+
+def start_checking():
+    print("Checking if there is songs to download")
+    asyncio.run(Downloading())
+
+
+def start_checkingQueue():
+    print("Checking if there is songs to play")
+    asyncio.run(CheckingifQueueisempty())
+    
 
 
 if __name__ == "__main__":
@@ -281,6 +296,7 @@ if __name__ == "__main__":
 
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
     threading.Thread(target=start_checking, daemon=True).start()
+    threading.Thread(target=start_checkingQueue, daemon=True).start()
     print(f"Application started at http://127.0.0.1:{PORT}/")
     httpd.serve_forever()
 

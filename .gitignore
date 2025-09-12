@@ -1,6 +1,7 @@
 #fichier sensible 
 .env 
 #inutile
+test.py
 .cache/
 .cache
 .venv/
