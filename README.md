@@ -103,7 +103,7 @@ Spotish is a telegram bot to play spotify link on speaker !
 For more examples, please refer to the /start or below.  
 <br>  
 
-<<<<<<< HEAD
+### Small Doc
 Available commands:  
   /start - 📜 Show this menu  
   /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue    
@@ -112,17 +112,6 @@ Available commands:
   /skip - ⏭️ Skip the current song   
   /stop - 🛑 Stop playback and 🧹 clear the queue   
   /volume &lt;0-100&gt; - 🔊 Adjust the volume   
-=======
-### Small doc 
-Available commands:
-/start - 📜 Show this menu 
-/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue 
-/pause - ⏸️ Pause the current song 
-/resume - 🔄 Resume the paused song 
-/skip - ⏭️ Skip the current song 
-/stop - 🛑 Stop playback and 🧹 clear the queue 
-/volume &lt;0-100&gt; - 🔊 Adjust the volume 
->>>>>>> 9956620 (fix doc and demo)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
