@@ -202,11 +202,11 @@ Python 3.11.8
   ```
 3. Create an virtual environnement
   ```bash
-    python -m venv .env
+    python -m venv .venv
   ```
 4. Activate the virtual environnement
   ``` bash
-    source .env/bin/activate
+    source .venv/bin/activate
   ```
 5. Install requirements
   ```bash
