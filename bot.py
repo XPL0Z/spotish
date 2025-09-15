@@ -23,6 +23,7 @@ UrlToAddTop = "http://127.0.0.1:5000/addSongtop"
 UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToAutoplay = "http://127.0.0.1:5000/autoplay"
 UrlToSkip = "http://127.0.0.1:5000/skip"
+UrlToSearch = "http://127.0.0.1:5000/search"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
@@ -149,10 +150,33 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
             await update.message.reply_text("You are not authorized ;)")
     
-async def autoplay(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    response = requests.post(UrlToAutoplay, json={})
-    await update.message.reply_text(response.text)
-    
+async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message.from_user.username in authorized_user:
+        if not context.args:
+            await update.message.reply_text("Usage: /search name of the song")
+            return
+        search = ' '.join(context.args)
+        
+        payload = {
+            "research" : search,
+            "author": update.message.from_user.username
+        }
+        
+        response = requests.post(UrlToSearch, json=payload)
+        await update.message.reply_text(response.text)
+    else: 
+        await update.message.reply_text("You are not authorized ;)")
+
+async def autoplay (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message.from_user.username in authorized_user:
+        
+        
+        response = requests.post(UrlToAutoplay, json={})
+        
+        await update.message.reply_text(response.text)
+    else:
+        await update.message.reply_text("You are not authorized ;)")
+        
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("Option 1", callback_data='button_1')],
@@ -192,6 +216,7 @@ def main():
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('adduser', adduser))
     application.add_handler(CommandHandler('autoplay', autoplay))
+    application.add_handler(CommandHandler('search', search))
 
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))

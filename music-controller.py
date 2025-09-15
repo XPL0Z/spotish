@@ -335,6 +335,26 @@ def autoplay(_):
         autoplaying.clear()
         autoplaying.append(False)
         return "Autoplay is now OFF"
+    
+@api.post("/search")
+def search(args):
+    research = args.get("research", None)
+    author = args.get("author", None)
+    if author is None:
+        return { "error": "author parameter is required"}
+    
+    response =sp.search(q=research,limit=1,offset=0,type="track")
+    name = response["tracks"]["items"][0]["name"]
+    link = response["tracks"]["items"][0]["external_urls"]["spotify"]
+    url=urlparse(link)
+    url=url.path.split("/")
+    song_id = url[-1]
+    print(name)
+    song = {"song_id" :song_id, "link": link, "author": "recommendation"}
+    songs_to_dl["songs"].append(song)
+    return f"{name} was added to the queue"
+
+
 @api.post("/delete")
 def delete(args):
     id = args.get("id", None)
