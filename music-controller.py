@@ -13,16 +13,7 @@ from spotipy.oauth2 import SpotifyClientCredentials  # type: ignore # pylint: di
 import asyncio
 
 load_dotenv()
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
-
-PORT = 5000
-UrlToPlay = "http://127.0.0.1:7000/play"
-UrlToGetLenght = "http://127.0.0.1:7000/length"
-UrlToStop = "http://127.0.0.1:7000/stop"
-UrlToSkip = "http://127.0.0.1:7000/skip"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -39,8 +30,49 @@ class API():
 
 api = API()
 
-playing = [False]
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
+
+PORT = 5000
+UrlToPlay = "http://127.0.0.1:7000/play"
+UrlToGetLenght = "http://127.0.0.1:7000/length"
+UrlToStop = "http://127.0.0.1:7000/stop"
+UrlToSkip = "http://127.0.0.1:7000/skip"
+
+playing = [False]
+autoplaying= [False]
+queue = {
+    "songs": [
+        # { "id": idofthespotifysong, "author": "username" },
+    ]
+}
+
+songs_to_dl = {
+    "songs":[
+         # {"link": urlofthespotify, "id": idofthespotifysong, "author": "username" },
+    ]
+}
+
+songs_to_dl_atfirst = {
+    "songs":[
+        # {"link": urlofthespotify, "id": idofthespotifysong, "author": "username" },
+    ]
+}
+
+history = {
+    "songs" :[
+        # {"id" : idofthespotifysong}
+        {"id": "3Z0qLOS0cqWKPHXkbTXmNF"},
+        {"id": "5TRPicyLGbAF2LGBFbHGvO"},
+        {"id": "75IQVo8hqI1iwVZyvkN2VT"},
+        {"id": "77KnJc8o5G1eKVwX5ywMeZ"},
+        {"id": "7LPGJhkRDEW6KopWhD8DbX"},
+    ]
+}
+            
+#<---------------------------Function Section ----------------------------->
 def IsUrlRight(link):
     url=urlparse(link)
     url=url.path.split("/")
@@ -66,26 +98,7 @@ def changetoplaying():
     playing.clear()
     playing.append(True)
     
-queue = {
-    "songs": [
-        # { "id": idofthespotifysong, "author": "username" },
-    ]
-}
 
-songs_to_dl = {
-    "songs":[
-         # {"link": urlofthespotify, "id": idofthespotifysong, "author": "username" },
-    ]
-}
-
-songs_to_dl_atfirst = {
-    "songs":[
-        # {"link": urlofthespotify, "id": idofthespotifysong, "author": "username" },
-    ]
-}
-
-
-            
 def getlenghtofthecurrentsong():
     length = requests.post(UrlToPlay)
     return length
@@ -115,9 +128,11 @@ def download_sync(link,song_id,author,first):
 def playsong(song_id):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
+    history["songs"].insert(0, str(song_id))
     requests.post(UrlToPlay, json=payloadtosend)
     if len(queue["songs"]) != 0:
         print("Premier élément retiré :", queue["songs"].pop(0))
+    
     
 def GetSongFromPlaylist(playlist_id,author):
     results = sp.playlist_tracks(playlist_id)
@@ -175,16 +190,44 @@ async def Downloading():
 
 async def CheckingifQueueisempty():
     global playing
+    global autoplaying
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False:
             print(playing[0])
             playsong(queue["songs"][0]["id"])
-            await asyncio.sleep(2)
+        
+        
+        
+        if len(queue["songs"]) == 0 and autoplaying[0] == True:
+            print("executed")
+            # Extraire les 6 premiers IDs
+            seed_ids = [song["id"] for song in history["songs"][0:6]]
+            GetRecommandation(seed_ids)
             
         await asyncio.sleep(2)
+def GetRecommandation(seeds_list):
+    print(seeds_list)
+    seeds = (",").join(seeds_list)
+    url = f"https://api.reccobeats.com/v1/track/recommendation?size=1&seeds={seeds}"
+    print(f"https://api.reccobeats.com/v1/track/recommendation?size=1&seeds={seeds}")
+    payload = {}
+    headers = {
+      'Accept': 'application/json'
+    }
 
+    response = requests.request("GET", url, headers=headers, data=payload)
+    data = response.json()
+    link = data["content"][0]["href"]
+    url=urlparse(link)
+    url=url.path.split("/")
+    song_id = url[-1]
+    song = {"song_id" :song_id, "link": link, "author": "recommendation"}
+    print(song)
+    songs_to_dl["songs"].append(song)
     
 
+    
+# <----------------- API SECTION ---------------------->
 @api.get("/")
 def index(_):
     return { 
@@ -202,7 +245,8 @@ def list(_):
         "count": len(queue["songs"]),
         "count to dl": len(songs_to_dl["songs"]),
         "songs": queue["songs"],
-        "songstodl": songs_to_dl["songs"]
+        "songstodl": songs_to_dl["songs"],
+        "history": history["songs"]
         
     }
 
@@ -274,6 +318,23 @@ def stop(_):
     print(queue["songs"])
     return "La file d'attente a bien été supprimée"
 
+@api.post("/autoplay")
+def autoplay(_):
+    
+    if autoplaying[0] == False: 
+        
+        autoplaying.clear()
+        autoplaying.append(True)
+        
+        if len(history["songs"])<5:
+            return "You must have played at least 5 songs"
+        print(autoplaying[0])
+        return "Autoplay is now ON"
+    else:
+        
+        autoplaying.clear()
+        autoplaying.append(False)
+        return "Autoplay is now OFF"
 @api.post("/delete")
 def delete(args):
     id = args.get("id", None)
@@ -293,6 +354,7 @@ def delete(args):
         else:
             return { "error": f"song not found with id {id}" }
         
+
 
 def start_checking():
     print("Checking if there is songs to download")

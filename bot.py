@@ -21,12 +21,12 @@ sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
 UrlToAddTop = "http://127.0.0.1:5000/addSongtop"
 UrlToStop = "http://127.0.0.1:5000/stop"
+UrlToAutoplay = "http://127.0.0.1:5000/autoplay"
+UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
-UrlToSkip = "http://127.0.0.1:5000/skip"
-UrlToChangeVolume = "http://127.0.0.1:7000/volume"        
-
-
+UrlToChangeVolume = "http://127.0.0.1:7000/volume"
+ 
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print("=== START COMMAND CALLED ===")
@@ -115,6 +115,7 @@ async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("You are not admin ;)")
 
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("Test")
     if update.message.from_user.username in authorized_user:
         try:
         # Vérifier si des arguments ont été fournis
@@ -148,6 +149,9 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
             await update.message.reply_text("You are not authorized ;)")
     
+async def autoplay(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    response = requests.post(UrlToAutoplay, json={})
+    await update.message.reply_text(response.text)
     
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -187,6 +191,7 @@ def main():
     application.add_handler(CommandHandler('volume', volume))
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('adduser', adduser))
+    application.add_handler(CommandHandler('autoplay', autoplay))
 
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
