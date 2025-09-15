@@ -30,7 +30,6 @@ UrlToChangeVolume = "http://127.0.0.1:7000/volume"
  
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("=== START COMMAND CALLED ===")
     message = ("<b>🎵 Available commands:</b>\n"
             "/start - 📜 Show this menu\n"
             "/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue\n"
@@ -38,7 +37,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/resume - 🔄 Resume the paused song\n"
             "/skip - ⏭️ Skip the current song\n"
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
-            "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n")
+            "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
+            "/mix ♾️ songs | play recommation from history\n"
+            "/search &lt;name of a track&gt;")
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
     
 async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
