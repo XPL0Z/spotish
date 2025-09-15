@@ -21,7 +21,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
 UrlToAddTop = "http://127.0.0.1:5000/addSongtop"
 UrlToStop = "http://127.0.0.1:5000/stop"
-UrlToAutoplay = "http://127.0.0.1:5000/autoplay"
+UrlToMix = "http://127.0.0.1:5000/mix"
 UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToSearch = "http://127.0.0.1:5000/search"
 UrlToPause = "http://127.0.0.1:7000/pause"
@@ -169,11 +169,11 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else: 
         await update.message.reply_text("You are not authorized ;)")
 
-async def autoplay (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.from_user.username in authorized_user:
         
         
-        response = requests.post(UrlToAutoplay, json={})
+        response = requests.post(UrlToMix, json={})
         
         await update.message.reply_text(response.text)
     else:
@@ -217,7 +217,7 @@ def main():
     application.add_handler(CommandHandler('volume', volume))
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('adduser', adduser))
-    application.add_handler(CommandHandler('autoplay', autoplay))
+    application.add_handler(CommandHandler('mix', mix))
     application.add_handler(CommandHandler('search', search))
 
     # Register a CallbackQueryHandler to handle button selections

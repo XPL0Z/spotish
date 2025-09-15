@@ -42,7 +42,7 @@ UrlToStop = "http://127.0.0.1:7000/stop"
 UrlToSkip = "http://127.0.0.1:7000/skip"
 
 playing = [False]
-autoplaying= [False]
+mixing= [False]
 queue = {
     "songs": [
         # { "id": idofthespotifysong, "author": "username" },
@@ -190,7 +190,7 @@ async def Downloading():
 
 async def CheckingifQueueisempty():
     global playing
-    global autoplaying
+    global mixing
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False:
             print(playing[0])
@@ -198,7 +198,7 @@ async def CheckingifQueueisempty():
         
         
         
-        if len(queue["songs"]) == 0 and autoplaying[0] == True:
+        if len(queue["songs"]) == 0 and mixing[0] == True:
             print("executed")
             # Extraire les 6 premiers IDs
             seed_ids = [song["id"] for song in history["songs"][0:6]]
@@ -318,23 +318,23 @@ def stop(_):
     print(queue["songs"])
     return "La file d'attente a bien été supprimée"
 
-@api.post("/autoplay")
-def autoplay(_):
+@api.post("/mix")
+def mix(_):
     
-    if autoplaying[0] == False: 
+    if mixing[0] == False: 
         
-        autoplaying.clear()
-        autoplaying.append(True)
+        mixing.clear()
+        mixing.append(True)
         
         if len(history["songs"])<5:
             return "You must have played at least 5 songs"
-        print(autoplaying[0])
-        return "Autoplay is now ON"
+        print(mixing[0])
+        return "mix is now ON"
     else:
         
-        autoplaying.clear()
-        autoplaying.append(False)
-        return "Autoplay is now OFF"
+        mixing.clear()
+        mixing.append(False)
+        return "Msix is now OFF"
     
 @api.post("/search")
 def search(args):
