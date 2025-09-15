@@ -38,6 +38,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/skip - ⏭️ Skip the current song\n"
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
+            "/adduser &lt;username&gt; add user that are authorized (without @)"
             "/mix ♾️ songs | play recommation from history\n"
             "/search &lt;name of a track&gt;")
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
