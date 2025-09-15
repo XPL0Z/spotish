@@ -113,7 +113,9 @@ Available commands:
   /skip - ⏭️ Skip the current song   
   /stop - 🛑 Stop playback and 🧹 clear the queue   
   /volume &lt;0-100&gt; - 🔊 Adjust the volume   
-  /adduser &lt;username&gt; add user that are authorized (without @)
+  /adduser &lt;username&gt; add user that are authorized (without @)   
+  /mix ♾️ songs | play recommation from history   
+  /search &lt;name of a track&gt;
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
