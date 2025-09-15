@@ -234,6 +234,7 @@ Python 3.11.8
     - Spotify
       -  Songs
       -  Playlist
+- Playtop
 - Pause
 - Resume
 - Skip
