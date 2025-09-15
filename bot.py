@@ -14,8 +14,8 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-ADMIN_ID = os.getenv("ADMIN_ID").split(",")
-authorized_user = []
+ADMIN_ID = os.getenv("ADMIN_ID")
+authorized_user = ADMIN_ID.split()
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
@@ -29,6 +29,7 @@ UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 
     
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("=== START COMMAND CALLED ===")
     message = ("<b>🎵 Available commands:</b>\n"
             "/start - 📜 Show this menu\n"
             "/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue\n"
@@ -176,7 +177,6 @@ def main():
 
     # Register command and message handlers
     application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('help', start))
     application.add_handler(CommandHandler('test', test))
     application.add_handler(CommandHandler('play', play))
     application.add_handler(CommandHandler('playtop', playtop))
@@ -195,4 +195,5 @@ def main():
     application.run_polling()
 
 print("Bot started...")
+print(authorized_user)
 main()
