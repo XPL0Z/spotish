@@ -334,7 +334,7 @@ def mix(_):
         
         mixing.clear()
         mixing.append(False)
-        return "Msix is now OFF"
+        return "Mix is now OFF"
     
 @api.post("/search")
 def search(args):
