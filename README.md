@@ -106,7 +106,8 @@ For more examples, please refer to the /start or below.
 ### Small Doc
 Available commands:  
   /start - 📜 Show this menu  
-  /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue    
+  /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue
+  /play &lt;Spotify URL&gt; - ▶️ Add a song to the queue in first place
   /pause - ⏸️ Pause the current song   
   /resume - 🔄 Resume the paused song   
   /skip - ⏭️ Skip the current song   
@@ -253,6 +254,9 @@ See the [open issues](https://github.com/xpl0z/spotish/issues) for a full list o
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+if you find a bug please fork the repo and create a pull request. You can also simply open an issue with the tag "bug" and priority tag.
+Don't forget to give the project a star! Thanks again!
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
