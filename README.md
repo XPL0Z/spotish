@@ -107,15 +107,15 @@ For more examples, please refer to the /start or below.
 Available commands:  
   /start - 📜 Show this menu  
   /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue
-  /play &lt;Spotify URL&gt; - ▶️ Add a song to the queue in first place
+  /playtop &lt;Spotify URL&gt; - ▶️ Add a song to the queue in first place
   /pause - ⏸️ Pause the current song   
   /resume - 🔄 Resume the paused song   
   /skip - ⏭️ Skip the current song   
   /stop - 🛑 Stop playback and 🧹 clear the queue   
   /volume &lt;0-100&gt; - 🔊 Adjust the volume   
   /adduser &lt;username&gt; add user that are authorized (without @)   
-  /mix ♾️ songs | play recommation from history   
-  /search &lt;name of a track&gt;
+  /mix - ♾️ songs | play recommation from history   
+  /search &lt;name of a track&gt; - play a song only with the name  
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
