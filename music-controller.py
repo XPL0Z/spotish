@@ -11,6 +11,11 @@ import threading
 import spotipy  # type: ignore # pylint: disable=unused-variable
 from spotipy.oauth2 import SpotifyClientCredentials  # type: ignore # pylint: disable=unused-variable
 import asyncio
+import glob
+from pathlib import Path
+import random
+
+path = Path.cwd()
 
 load_dotenv()
 
@@ -32,6 +37,7 @@ api = API()
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+path = os.getcwd()
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
@@ -347,7 +353,7 @@ def notplaying(_):
 def skip(_):
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
-        return "File d'attente vide"
+        return f"File d'attente vide"
     name = GetNameFromId(queue["songs"][0]["song_id"],False)
     return f"Music skipped, Now playing : {name}"
 
@@ -357,7 +363,7 @@ def stop(_):
     queue["songs"].clear()
     songs_to_dl["songs"].clear()
     requests.post(UrlToStop, json={})
-    return "La file d'attente a bien été supprimée"
+    return f"La file d'attente a bien été supprimée"
 
 @api.post("/mix")
 def mix(_):
@@ -366,7 +372,7 @@ def mix(_):
         mixing.clear()
         mixing.append(True)
         if len(history["songs"])<5:
-            return "You must have played at least 5 songs"
+            return f"You must have played at least 5 songs"
         
     
         return f"mix is now ON"
@@ -394,6 +400,24 @@ def search(args):
     songs_to_dl["songs"].append(song)
     return f"{name} was added to the queue"
 
+@api.post("/playrandom")
+def playrandom(args):
+    author = args.get("author", None)
+    if author is None:
+        return { "error": "author parameter is required"}
+    folder_path = Path("Songs")
+
+    # Tous les fichiers MP3
+    mp3_files = folder_path.glob("*.mp3")
+    songs = []
+    for file in mp3_files:
+        filename = file.name.split(".")
+        
+        songs.append(filename[0])
+
+    choice = random.choice(songs)
+    playsong(choice ,author)
+    return f"{name} was added to the queue"
 
 @api.post("/delete")
 def delete(args):

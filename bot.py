@@ -24,6 +24,7 @@ UrlToStop = "http://127.0.0.1:5000/stop"
 UrlToMix = "http://127.0.0.1:5000/mix"
 UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToSearch = "http://127.0.0.1:5000/search"
+UrlToPlayRandom = "http://127.0.1:5000/playrandom"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
@@ -111,6 +112,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         requests.post(UrlToStop,json={})
     else:
         await update.message.reply_text("You are not authorized ;)")
+        
 async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     if update.message.from_user.username == ADMIN_ID:
@@ -180,7 +182,19 @@ async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
         await update.message.reply_text(response.text)
     else:
+        await update.message.reply_text("You are not authorized") 
+
+async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
+    if update.message.from_user.username in authorized_user:
+        payload = {
+            "author": update.message.from_user.username
+        }
+        response = requests.post(UrlToPlayRandom,json=payload)
+        await update.message.reply_text(response.text)
+    else:
         await update.message.reply_text("You are not authorized ;)")
+        
         
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -218,6 +232,7 @@ def main():
     application.add_handler(CommandHandler('adduser', adduser))
     application.add_handler(CommandHandler('mix', mix))
     application.add_handler(CommandHandler('search', search))
+    application.add_handler(CommandHandler('random', random))
 
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
