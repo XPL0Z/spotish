@@ -46,34 +46,32 @@ mixing= [False]
 downloadingmix = [False]
 queue = {
     "songs": [
-        # { "id": idofthespotifysong, "author": "username" },
+        # { "song_id": idofthespotifysong, "author": "username" },
     ]
 }
 
 songs_to_dl = {
     "songs":[
-         # {"link": urlofthespotify, "id": idofthespotifysong, "author": "username" },
+         # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
     ]
 }
 
 songs_to_dl_atfirst = {
     "songs":[
-        # {"link": urlofthespotify, "id": idofthespotifysong, "author": "username" },
+        # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
     ]
 }
 
 history = {
     "songs" :[
-        # {"id" : idofthespotifysong}
-        {"song_id": "3Z0qLOS0cqWKPHXkbTXmNF"},
-        {"song_id": "5TRPicyLGbAF2LGBFbHGvO"},
-        {"song_id": "75IQVo8hqI1iwVZyvkN2VT"},
-        {"song_id": "77KnJc8o5G1eKVwX5ywMeZ"},
-        {"song_id": "7LPGJhkRDEW6KopWhD8DbX"},
+        # {"song_id" : idofthespotifysong}
     ]
 }
-            
+
+############################################################################      
 #<---------------------------Function Section ----------------------------->
+############################################################################
+
 def IsUrlRight(link):
     url=urlparse(link)
     url=url.path.split("/")
@@ -119,7 +117,7 @@ def remove_song(index):
 def download_sync(link,song_id,author,first):
     print("Try downloading")
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
-    song = {"id": song_id, "author": author}
+    song = {"song_id": song_id, "author": author}
     if first == 1:
         print("FIRST")
         queue["songs"].insert(0,song)
@@ -193,9 +191,14 @@ def GetRecommandation(seeds_list):
     url=urlparse(link)
     url=url.path.split("/")
     song_id = url[-1]
-    song = {"song_id" :song_id, "link": link, "author": "recommendation"}
+    name = data["content"][0]["trackTitle"]
+    song = {"song_id" :song_id, "link": link, "author": "recommendation","name": name }
     print("Song" + str(song))
     return song
+
+########################################################
+# <-------------- WHILE TRUE SECTION ------------------>
+########################################################
 
 async def Downloading():
     print("running")
@@ -223,13 +226,14 @@ async def Downloading():
         await asyncio.sleep(1) 
         
 
+
 async def CheckingifQueueisempty():
     global playing
     global mixing
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False:
             print(playing[0])
-            playsong(queue["songs"][0]["id"], queue["songs"][0]["author"])
+            playsong(queue["songs"][0]["song_id"], queue["songs"][0]["author"])
         
         if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False:
             seed_ids = [song["song_id"] for song in history["songs"][0:5]]
@@ -242,8 +246,10 @@ async def CheckingifQueueisempty():
     
     
 
-    
+########################################################
 # <----------------- API SECTION ---------------------->
+########################################################
+
 
 @api.get("/")
 def index(_):
@@ -323,7 +329,7 @@ def skip(_):
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return "File d'attente vide"
-    return queue["songs"][0]["id"]
+    return queue["songs"][0]["song_id"]
 
 @api.post("/stop")
 def stop(_):
@@ -382,7 +388,7 @@ def delete(args):
         song_deleted = False
 
         for song in queue["songs"]:
-            if song["id"] == id:
+            if song["song_id"] == id:
                 queue["songs"].remove(song)
                 song_deleted = True
                 break
