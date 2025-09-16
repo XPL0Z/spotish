@@ -51,7 +51,7 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     if update.message.from_user.username in authorized_user:
         link = context.args
-        link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
+        link = ' '.join(link)# Convert the list into a string
 
         payload = {
             "link": link,
@@ -66,7 +66,7 @@ async def playtop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     if update.message.from_user.username in authorized_user:
         link = context.args
-        link = ' '.join(link)# Convertit la liste en une seule chaîne de caractères
+        link = ' '.join(link)# Convert the list into a string
 
         payload = {
             "link": link,
@@ -121,13 +121,13 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print("Test")
     if update.message.from_user.username in authorized_user:
         try:
-        # Vérifier si des arguments ont été fournis
+        # Check if there is argument
             if not context.args:
                 await update.message.reply_text("Usage: /volume <0-100>")
                 return
 
             volume = ' '.join(context.args)
-            volume_int = int(float(volume))  # Conversion ici
+            volume_int = int(float(volume))  # Change to int
 
             if volume_int > 100 or volume_int < 0:
                 await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")

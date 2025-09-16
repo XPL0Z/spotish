@@ -43,6 +43,7 @@ UrlToSkip = "http://127.0.0.1:7000/skip"
 
 playing = [False]
 mixing= [False]
+downloadingmix = [False]
 queue = {
     "songs": [
         # { "id": idofthespotifysong, "author": "username" },
@@ -64,11 +65,11 @@ songs_to_dl_atfirst = {
 history = {
     "songs" :[
         # {"id" : idofthespotifysong}
-        {"id": "3Z0qLOS0cqWKPHXkbTXmNF"},
-        {"id": "5TRPicyLGbAF2LGBFbHGvO"},
-        {"id": "75IQVo8hqI1iwVZyvkN2VT"},
-        {"id": "77KnJc8o5G1eKVwX5ywMeZ"},
-        {"id": "7LPGJhkRDEW6KopWhD8DbX"},
+        {"song_id": "3Z0qLOS0cqWKPHXkbTXmNF"},
+        {"song_id": "5TRPicyLGbAF2LGBFbHGvO"},
+        {"song_id": "75IQVo8hqI1iwVZyvkN2VT"},
+        {"song_id": "77KnJc8o5G1eKVwX5ywMeZ"},
+        {"song_id": "7LPGJhkRDEW6KopWhD8DbX"},
     ]
 }
             
@@ -114,7 +115,7 @@ def search_index(song_id):
 def remove_song(index):
     queue["songs"].pop(index)
     
-# Version synchronisée de download pour thread
+# Function to download
 def download_sync(link,song_id,author,first):
     print("Try downloading")
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
@@ -125,21 +126,31 @@ def download_sync(link,song_id,author,first):
         return
     queue["songs"].append(song)
 
-def playsong(song_id):
+def playsong(song_id, author):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
-    history["songs"].insert(0, str(song_id))
+    song = {"song_id": song_id}
+    history["songs"].insert(0, song)
     requests.post(UrlToPlay, json=payloadtosend)
+    print("mixing " +str(mixing[0]))
+    print("LONGUEUR" + str(len(queue["songs"])))
+    print("playingGGG" + str(playing[0]))
     if len(queue["songs"]) != 0:
         print("Premier élément retiré :", queue["songs"].pop(0))
     
+    if author == "recommendation":
+        downloadingmix.clear()
+        downloadingmix.append(False)
+    
+    
+        
     
 def GetSongFromPlaylist(playlist_id,author):
     results = sp.playlist_tracks(playlist_id)
     username = author
     for item in results['items']:
         track = item['track']
-        if track:  # Vérifier que la piste existe encore
+        if track:  # Check if track exist
             spotify_url = track['external_urls']['spotify']
             song_id = IsUrlRight(spotify_url )
             songs_to_dl["songs"].append({
@@ -161,7 +172,31 @@ def GetSongFromPlaylistAndPlaceItatFirst(playlist_id,author):
                 "song_id": song_id,
                 "author": username
             }) 
-            
+
+def GetRecommandation(seeds_list):
+    print("EXECUTING")
+    seeds = (",").join(seeds_list)
+    print(seeds)
+    url = f"https://api.reccobeats.com/v1/track/recommendation?size=1&seeds={seeds}"
+    payload = {}
+    headers = {
+      'Accept': 'application/json'
+    }
+    
+    downloadingmix.clear()
+    downloadingmix.append(True)
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    data = response.json()
+    print(data)
+    link = data["content"][0]["href"]
+    url=urlparse(link)
+    url=url.path.split("/")
+    song_id = url[-1]
+    song = {"song_id" :song_id, "link": link, "author": "recommendation"}
+    print("Song" + str(song))
+    return song
+
 async def Downloading():
     print("running")
     while True:
@@ -194,40 +229,22 @@ async def CheckingifQueueisempty():
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False:
             print(playing[0])
-            playsong(queue["songs"][0]["id"])
+            playsong(queue["songs"][0]["id"], queue["songs"][0]["author"])
         
-        
-        
-        if len(queue["songs"]) == 0 and mixing[0] == True:
-            print("executed")
-            # Extraire les 6 premiers IDs
-            seed_ids = [song["id"] for song in history["songs"][0:6]]
-            GetRecommandation(seed_ids)
+        if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False:
+            seed_ids = [song["song_id"] for song in history["songs"][0:5]]
+            print("Seds to send" + str(seed_ids))
+            print("-------------------------------")
+            songs_to_dl["songs"].append(GetRecommandation(seed_ids))
             
-        await asyncio.sleep(2)
-def GetRecommandation(seeds_list):
-    print(seeds_list)
-    seeds = (",").join(seeds_list)
-    url = f"https://api.reccobeats.com/v1/track/recommendation?size=1&seeds={seeds}"
-    print(f"https://api.reccobeats.com/v1/track/recommendation?size=1&seeds={seeds}")
-    payload = {}
-    headers = {
-      'Accept': 'application/json'
-    }
+        await asyncio.sleep(3)
 
-    response = requests.request("GET", url, headers=headers, data=payload)
-    data = response.json()
-    link = data["content"][0]["href"]
-    url=urlparse(link)
-    url=url.path.split("/")
-    song_id = url[-1]
-    song = {"song_id" :song_id, "link": link, "author": "recommendation"}
-    print(song)
-    songs_to_dl["songs"].append(song)
+    
     
 
     
 # <----------------- API SECTION ---------------------->
+
 @api.get("/")
 def index(_):
     return { 
@@ -320,15 +337,16 @@ def stop(_):
 
 @api.post("/mix")
 def mix(_):
-    
+    print("MIIIIIIIIIIIXING" +str(mixing[0]))
     if mixing[0] == False: 
         
         mixing.clear()
         mixing.append(True)
-        
+        print("MIXING2" +str(mixing[0]))
         if len(history["songs"])<5:
             return "You must have played at least 5 songs"
-        print(mixing[0])
+        
+    
         return "mix is now ON"
     else:
         

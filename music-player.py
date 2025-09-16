@@ -84,8 +84,8 @@ def set_volume(args: dict):
         return {"error": "volume parameter required"}
 
     try:
-        vol = int(vol)  # conversion en entier
-        vol = max(0, min(100, vol))  # clamp entre 0 et 100
+        vol = int(vol)  # convert into a int
+        vol = max(0, min(100, vol))  # max between 0 et 100
         media_player.audio_set_volume(vol)
         return {"volume": vol}
     except ValueError:
