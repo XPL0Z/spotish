@@ -84,7 +84,7 @@ def IsUrlRight(link):
         else:
             track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
             name = track_info["name"]
-            print(name)
+            
         return song_id, name
     except spotipy.exceptions.SpotifyException as e:
         return False
@@ -105,8 +105,7 @@ def GetNameFromId(song_id,Playlist:bool):
         else:
             track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
             name = track_info["name"]
-            print(name)
-        return name
+            return name
     except spotipy.exceptions.SpotifyException as e:
         return False
 def changetoNOTplaying():
@@ -135,7 +134,6 @@ def remove_song(index):
     
 # Function to download
 def download_sync(link,song_id,author,first):
-    print("Try downloading")
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
     song = {"song_id": song_id, "author": author}
     if first == 1:
@@ -150,11 +148,9 @@ def playsong(song_id, author):
     song = {"song_id": song_id}
     history["songs"].insert(0, song)
     requests.post(UrlToPlay, json=payloadtosend)
-    print("mixing " +str(mixing[0]))
-    print("LONGUEUR" + str(len(queue["songs"])))
-    print("playingGGG" + str(playing[0]))
+    
     if len(queue["songs"]) != 0:
-        print("Premier élément retiré :", queue["songs"].pop(0))
+        print("First element removed :", queue["songs"].pop(0))
     
     if author == "recommendation":
         downloadingmix.clear()
@@ -192,9 +188,7 @@ def GetSongFromPlaylistAndPlaceItatFirst(playlist_id,author):
             }) 
 
 def GetRecommandation(seeds_list):
-    print("EXECUTING")
     seeds = (",").join(seeds_list)
-    print(seeds)
     url = f"https://api.reccobeats.com/v1/track/recommendation?size=1&seeds={seeds}"
     payload = {}
     headers = {
@@ -206,14 +200,12 @@ def GetRecommandation(seeds_list):
 
     response = requests.request("GET", url, headers=headers, data=payload)
     data = response.json()
-    print(data)
     link = data["content"][0]["href"]
     url=urlparse(link)
     url=url.path.split("/")
     song_id = url[-1]
     name = data["content"][0]["trackTitle"]
     song = {"song_id" :song_id, "link": link, "author": "recommendation","name": name }
-    print("Song" + str(song))
     return song
 
 ########################################################
@@ -236,7 +228,6 @@ async def Downloading():
             return
         if len(songs_to_dl["songs"]) != 0:
             for song in songs_to_dl["songs"]:
-                print("yes")
                 song_id = songs_to_dl["songs"][0]["song_id"]
                 author = songs_to_dl["songs"][0]["author"]
                 link = songs_to_dl["songs"][0]["link"]
@@ -252,13 +243,10 @@ async def CheckingifQueueisempty():
     global mixing
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False:
-            print(playing[0])
             playsong(queue["songs"][0]["song_id"], queue["songs"][0]["author"])
         
         if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False:
             seed_ids = [song["song_id"] for song in history["songs"][0:5]]
-            print("Seds to send" + str(seed_ids))
-            print("-------------------------------")
             songs_to_dl["songs"].append(GetRecommandation(seed_ids))
             
         await asyncio.sleep(3)
@@ -307,7 +295,6 @@ def add(args):
     link = args.get("link", None)
 
     song_id = GetIdFromLink(link)
-    print(song_id)
      
         
     if link is None:
@@ -366,22 +353,18 @@ def skip(_):
 
 @api.post("/stop")
 def stop(_):
-    print(queue["songs"])
     changetoNOTplaying()
     queue["songs"].clear()
     songs_to_dl["songs"].clear()
     requests.post(UrlToStop, json={})
-    print(queue["songs"])
     return "La file d'attente a bien été supprimée"
 
 @api.post("/mix")
 def mix(_):
-    print("MIIIIIIIIIIIXING" +str(mixing[0]))
     if mixing[0] == False: 
         
         mixing.clear()
         mixing.append(True)
-        print("MIXING2" +str(mixing[0]))
         if len(history["songs"])<5:
             return "You must have played at least 5 songs"
         
@@ -406,7 +389,6 @@ def search(args):
     url=urlparse(link)
     url=url.path.split("/")
     song_id = url[-1]
-    print(name)
     song = {"song_id" :song_id, "link": link, "author": "recommendation"}
     songs_to_dl["songs"].append(song)
     return f"{name} was added to the queue"
