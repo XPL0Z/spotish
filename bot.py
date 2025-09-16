@@ -41,7 +41,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
             "/adduser &lt;username&gt; ➕ Add an authorized user (without @)\n"
             "/search &lt;track name&gt; – 🔍 Search for and play a track by name\n"
-            "/mix ♾️ songs | play recommation from history\n"
+            "/mix ♾️ songs | play recommendation from history\n"
             ) 
      
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
