@@ -215,7 +215,6 @@ def main():
     application.add_handler(CommandHandler('skip', skip))
     application.add_handler(CommandHandler('stop', stop))
     application.add_handler(CommandHandler('volume', volume))
-    application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('adduser', adduser))
     application.add_handler(CommandHandler('mix', mix))
     application.add_handler(CommandHandler('search', search))
