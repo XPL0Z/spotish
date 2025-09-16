@@ -389,7 +389,8 @@ def search(args):
     url=urlparse(link)
     url=url.path.split("/")
     song_id = url[-1]
-    song = {"song_id" :song_id, "link": link, "author": "recommendation"}
+    song = {"song_id" :song_id, "link": link, "author": author}
+    print(song)
     songs_to_dl["songs"].append(song)
     return f"{name} was added to the queue"
 
