@@ -170,7 +170,7 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         }
         
         response = requests.post(UrlToSearch, json=payload)
-        await update.message.reply_text(response.text)
+        await update.message.reply_text(response.json())
     else: 
         await update.message.reply_text("You are not authorized ;)")
 
@@ -180,7 +180,7 @@ async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
         response = requests.post(UrlToMix, json={})
         
-        await update.message.reply_text(response.text)
+        await update.message.reply_text(response.json())
     else:
         await update.message.reply_text("You are not authorized") 
 
@@ -191,7 +191,7 @@ async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "author": update.message.from_user.username
         }
         response = requests.post(UrlToPlayRandom,json=payload)
-        await update.message.reply_text(response.text)
+        await update.message.reply_text(response.json())
     else:
         await update.message.reply_text("You are not authorized ;)")
         

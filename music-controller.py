@@ -108,9 +108,13 @@ def GetNameFromId(song_id,Playlist:bool):
         if Playlist == False:
             track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
             name = track_info["name"]
+            print(name)
+            return name
         else:
+    
             track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
             name = track_info["name"]
+            
             return name
     except spotipy.exceptions.SpotifyException as e:
         return False
@@ -324,15 +328,14 @@ def add(args):
 def add(args):
     author = args.get("author", None)
     link = args.get("link", None)
-
-    song_id, name = IsUrlRight(link)
-        
+    
     if link is None:
         return { "error": "link parameter required" }
-    if song_id is None:
-        return { "error": "id parameter is required"}
+    
     if author is None:
         return { "error": "author parameter is required"}
+    
+    song_id, name = IsUrlRight(link)
     
     if link.find("playlist") != -1:
         GetSongFromPlaylist(song_id,author)
@@ -340,6 +343,9 @@ def add(args):
     song = { "song_id": song_id, "link": link, "author": author }
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
+
+
+    
         
 @api.post("/notplaying")
 def notplaying(_):
@@ -417,7 +423,7 @@ def playrandom(args):
 
     choice = random.choice(songs)
     playsong(choice ,author)
-    name = GetNameFromId(choice)
+    name = GetNameFromId(choice, False)
     return f"{name} was added to the queue"
 
 @api.post("/delete")
