@@ -17,12 +17,12 @@ if current != repo.head.commit:
 else:
     print("You have the last version")
     
-scripts = ["bot.py", "music-player.py", "music-controller.py"]
+scripts = ["bot.py", "music-controller.py", "music-player.py"]
 
 
 processes = []
-for s in scripts:
-    p = Process(target=subprocess.run, args=(["python3", s],))
+for file in scripts:
+    p = Process(target=subprocess.run, args=(["python3", file],))
     p.start()
     processes.append(p)
 
