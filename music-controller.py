@@ -417,6 +417,7 @@ def playrandom(args):
 
     choice = random.choice(songs)
     playsong(choice ,author)
+    name = GetNameFromId(choice)
     return f"{name} was added to the queue"
 
 @api.post("/delete")
