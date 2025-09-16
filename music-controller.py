@@ -89,6 +89,26 @@ def IsUrlRight(link):
     except spotipy.exceptions.SpotifyException as e:
         return False
 
+def GetIdFromLink(link):
+    url=urlparse(link)
+    url=url.path.split("/")
+    song_id = url[-1]
+    return song_id
+
+# IF it's a playlist Playlist == FALSE
+
+def GetNameFromId(song_id,Playlist:bool):
+    try:
+        if Playlist == False:
+            track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
+            name = track_info["name"]
+        else:
+            track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
+            name = track_info["name"]
+            print(name)
+        return name
+    except spotipy.exceptions.SpotifyException as e:
+        return False
 def changetoNOTplaying():
     playing.clear()
     playing.append(False)
@@ -243,7 +263,14 @@ async def CheckingifQueueisempty():
             
         await asyncio.sleep(3)
 
-    
+def start_checking():
+    print("Checking if there is songs to download")
+    asyncio.run(Downloading())
+
+
+def start_checkingQueue():
+    print("Checking if there is songs to play")
+    asyncio.run(CheckingifQueueisempty())
     
 
 ########################################################
@@ -279,7 +306,9 @@ def add(args):
     author = args.get("author", None)
     link = args.get("link", None)
 
-    song_id, name = IsUrlRight(link)
+    song_id = GetIdFromLink(link)
+    print(song_id)
+     
         
     if link is None:
         return { "error": "link parameter required" }
@@ -289,8 +318,11 @@ def add(args):
         return { "error": "author parameter is required"}
     
     if link.find("playlist") != -1:
+        name = GetNameFromId(song_id,True)
         GetSongFromPlaylist(song_id,author)
         return f"The playlist {name} was added to the queue"
+    
+    name = GetNameFromId(song_id,False)
     song = { "song_id": song_id, "link": link, "author": author }
     songs_to_dl["songs"].append(song)
     return f"The song {name} was added to the queue"
@@ -329,7 +361,8 @@ def skip(_):
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return "File d'attente vide"
-    return queue["songs"][0]["song_id"]
+    name = GetNameFromId(queue["songs"][0]["song_id"],False)
+    return f"Music skipped, Now playing : {name}"
 
 @api.post("/stop")
 def stop(_):
@@ -353,12 +386,12 @@ def mix(_):
             return "You must have played at least 5 songs"
         
     
-        return "mix is now ON"
+        return f"mix is now ON"
     else:
         
         mixing.clear()
         mixing.append(False)
-        return "Mix is now OFF"
+        return f"Mix is now OFF"
     
 @api.post("/search")
 def search(args):
@@ -400,14 +433,7 @@ def delete(args):
         
 
 
-def start_checking():
-    print("Checking if there is songs to download")
-    asyncio.run(Downloading())
 
-
-def start_checkingQueue():
-    print("Checking if there is songs to play")
-    asyncio.run(CheckingifQueueisempty())
     
 
 
