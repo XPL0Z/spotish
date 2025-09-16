@@ -33,14 +33,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
             "/start - 📜 Show this menu\n"
             "/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue\n"
+            "/playtop &lt;Spotify URL&gt; ⬆️ Add a track to the top of the queue"
             "/pause - ⏸️ Pause the current song\n"
             "/resume - 🔄 Resume the paused song\n"
             "/skip - ⏭️ Skip the current song\n"
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
-            "/adduser &lt;username&gt; add user that are authorized (without @)\n"
+            "/adduser &lt;username&gt; ➕ Add an authorized user (without @)\n"
+            "/search &lt;track name&gt; – 🔍 Search for and play a track by name\n"
             "/mix ♾️ songs | play recommation from history\n"
-            "/search &lt;name of a track&gt;")
+            ) 
+     
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
     
 async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -195,10 +198,7 @@ async def button_selection_handler(update: Update, context: ContextTypes.DEFAULT
     await query.edit_message_text(f'You selected option: {query.data.split("_")[1]}')
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None: 
-    await update.message.reply_text(
-        'I can respond to the following commands:\n/start - Start the bot\n/help - Get help information'
-    )
+
 
 
 def main():
