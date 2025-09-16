@@ -25,6 +25,7 @@ UrlToMix = "http://127.0.0.1:5000/mix"
 UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToSearch = "http://127.0.0.1:5000/search"
 UrlToPlayRandom = "http://127.0.1:5000/playrandom"
+UrlToDownload = "http://127.0.1:5000/download"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
@@ -43,6 +44,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/adduser &lt;username&gt; ➕ Add an authorized user (without @)\n"
             "/search &lt;track name&gt; – 🔍 Search for and play a track by name\n"
             "/mix ♾️ songs | play recommendation from history\n"
+            "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
             ) 
      
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
@@ -195,7 +197,21 @@ async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         await update.message.reply_text("You are not authorized ;)")
         
-        
+async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
+    if update.message.from_user.username in authorized_user:
+        link = context.args
+        link = ' '.join(link)# Convert the list into a string
+
+        payload = {
+            "link": link,
+            "author": update.message.from_user.username
+        }
+        response = requests.post(UrlToDownload,json=payload)
+        await update.message.reply_text(response.json())
+    else:
+        await update.message.reply_text("You are not authorized ;)")
+           
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("Option 1", callback_data='button_1')],
@@ -233,7 +249,8 @@ def main():
     application.add_handler(CommandHandler('mix', mix))
     application.add_handler(CommandHandler('search', search))
     application.add_handler(CommandHandler('random', random))
-
+    application.add_handler(CommandHandler('download', download))
+    
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
 

@@ -115,7 +115,8 @@ Available commands:
   /volume &lt;0-100&gt; - 🔊 Adjust the volume    
   /adduser &lt;username&gt; ➕ Add an authorized user (without @)    
   /search &lt;track name&gt; – 🔍 Search for and play a track by name    
-  /mix ♾️ songs | play recommendation from history    
+  /mix ♾️ songs | play recommendation from history 
+  /download &lt;Spotify URL&gt; - 💾 Download a song or a playlist     
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
