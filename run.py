@@ -2,6 +2,7 @@ from multiprocessing import Process
 import subprocess
 import git  # pip install gitpython
 import os 
+import time
 
 
 current_dir = os.getcwd() 
@@ -25,6 +26,7 @@ for file in scripts:
     p = Process(target=subprocess.run, args=(["python3", file],))
     p.start()
     processes.append(p)
+    time.sleep(2)
 
 print("Tous les scripts tournent en parallèle.")
 
