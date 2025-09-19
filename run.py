@@ -202,6 +202,12 @@ def main_loop():
     manager.stop_all_scripts()
     time.sleep(3)
     
+    # Check and update repo at startup
+    print("🚀 Checking git at startup...")
+    startup_updated = check_and_update_repo()
+    if startup_updated:
+        print("🔄 Repository updated at startup")
+    
     # Start scripts
     manager.start_all_scripts()
     
