@@ -68,6 +68,7 @@ def main_loop():
     except KeyboardInterrupt:
         print("Arrêt manuel, kill des scripts...")
         stop_scripts(processes)
+         
 
 if __name__ == "__main__":
     main_loop()
