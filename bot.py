@@ -30,7 +30,6 @@ UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
  
-    
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
             "/start - 📜 Show this menu\n"
@@ -53,153 +52,158 @@ async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     pass
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
-    
-    if update.message.from_user.username in authorized_user:
-        link = context.args
-        link = ' '.join(link)# Convert the list into a string
-
-        payload = {
-            "link": link,
-            "author": update.message.from_user.username
-        }
-        response = requests.post(UrlToAdd, json=payload)
-        await update.message.reply_text(response.json())
-    else:
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    
+    link = context.args
+    link = ' '.join(link)# Convert the list into a string
+    payload = {
+        "link": link,
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToAdd, json=payload)
+    await update.message.reply_text(response.json())
+
+    
     
 async def playtop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
-    if update.message.from_user.username in authorized_user:
-        link = context.args
-        link = ' '.join(link)# Convert the list into a string
-
-        payload = {
-            "link": link,
-            "author": update.message.from_user.username
-        }
-        response = requests.post(UrlToAddTop, json=payload)
-        await update.message.reply_text(response.json())
-    else:
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    link = context.args
+    link = ' '.join(link)# Convert the list into a string
+    payload = {
+        "link": link,
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToAddTop, json=payload)
+    await update.message.reply_text(response.json())
+    
+    await update.message.reply_text("You are not authorized ;)")
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
-    if update.message.from_user.username in authorized_user:
-        await update.message.reply_text(
-            "The music has been stopped"
-        )
-    else:
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    await update.message.reply_text(
+        "The music has been stopped"
+    )
+    
 
 async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
-    if update.message.from_user.username in authorized_user:
-        await update.message.reply_text("The music has been resumed")
-        requests.post(UrlToResume,json={})
-    else:
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    await update.message.reply_text("The music has been resumed")
+    requests.post(UrlToResume,json={})
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
-    if update.message.from_user.username in authorized_user:
-        r = requests.post(UrlToSkip,json={})
-        await update.message.reply_text(f'Music skipped, Now : {r.text}')
-    else:
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    r = requests.post(UrlToSkip,json={})
+    await update.message.reply_text(f'Music skipped, Now : {r.text}')
+    
+    
         
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username in authorized_user:
-        response = requests.post(UrlToStop,json={})
-        await update.message.reply_text(response.json())
-    else:
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    response = requests.post(UrlToStop,json={})
+    await update.message.reply_text(response.json())
+    
         
 async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
-    if update.message.from_user.username == ADMIN_ID:
-        user = context.args
-        user = ' '.join(user)
-        authorized_user.append(user)
-    else:
-        await update.message.reply_text("You are not admin ;)")
+    if update.message.from_user.username not in authorized_user:
+        await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    user = context.args
+    user = ' '.join(user)
+    authorized_user.append(user)
+    
 
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print("Test")
-    if update.message.from_user.username in authorized_user:
-        try:
-        # Check if there is argument
-            if not context.args:
-                await update.message.reply_text("Usage: /volume <0-100>")
-                return
-
-            volume = ' '.join(context.args)
-            volume_int = int(float(volume))  # Change to int
-
-            if volume_int > 100 or volume_int < 0:
-                await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")
-                return
-
-            payload = {
-                "volume": volume_int
-            }
-
-            response = requests.post(UrlToChangeVolume, json=payload)
-
-            if response.status_code == 200:
-                await update.message.reply_text(f'The volume is {volume_int}%')
-            else:
-                await update.message.reply_text(f'Error: Server returned {response.status_code}')
-
-        except ValueError:
-            await update.message.reply_text("Please enter a valid number between 0 and 100")
-        except Exception as e:
-            await update.message.reply_text(f"An error occurred: {str(e)}")
-            print(f"Error in volume command: {e}")
-    else:
-            await update.message.reply_text("You are not authorized ;)")
+    if update.message.from_user.username not in authorized_user:
+        await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    try:
+    # Check if there is argument
+        if not context.args:
+            await update.message.reply_text("Usage: /volume <0-100>")
+            return
+        volume = ' '.join(context.args)
+        volume_int = int(float(volume))  # Change to int
+        if volume_int > 100 or volume_int < 0:
+            await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")
+            return
+        payload = {
+            "volume": volume_int
+        }
+        response = requests.post(UrlToChangeVolume, json=payload)
+        if response.status_code == 200:
+            await update.message.reply_text(f'The volume is {volume_int}%')
+        else:
+            await update.message.reply_text(f'Error: Server returned {response.status_code}')
+    except ValueError:
+        await update.message.reply_text("Please enter a valid number between 0 and 100")
+    except Exception as e:
+        await update.message.reply_text(f"An error occurred: {str(e)}")
+        print(f"Error in volume command: {e}")
     
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username in authorized_user:
-        if not context.args:
-            await update.message.reply_text("Usage: /search name of the song")
-            return
-        search = ' '.join(context.args)
-        
-        payload = {
-            "research" : search,
-            "author": update.message.from_user.username
-        }
-        
-        response = requests.post(UrlToSearch, json=payload)
-        await update.message.reply_text(response.json())
-    else: 
+    if update.message.from_user.username not in authorized_user:
         await update.message.reply_text("You are not authorized ;)")
+        return
+    
+    if not context.args:
+        await update.message.reply_text("Usage: /search name of the song")
+        return
+    search = ' '.join(context.args)
+    
+    payload = {
+        "research" : search,
+        "author": update.message.from_user.username
+    }
+    
+    response = requests.post(UrlToSearch, json=payload)
+    await update.message.reply_text(response.json())
+    
 
 async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username in authorized_user:
+    
         
         
-        response = requests.post(UrlToMix, json={})
-        
-        await update.message.reply_text(response.json())
-    else:
-        await update.message.reply_text("You are not authorized") 
+    response = requests.post(UrlToMix, json={})
+    
+    await update.message.reply_text(response.json())
+
+    await update.message.reply_text("You are not authorized") 
 
 async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
-    if update.message.from_user.username in authorized_user:
-        payload = {
-            "author": update.message.from_user.username
-        }
-        response = requests.post(UrlToPlayRandom,json=payload)
-        await update.message.reply_text(response.json())
-    else:
-        await update.message.reply_text("You are not authorized ;)")
+    
+    payload = {
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToPlayRandom,json=payload)
+    await update.message.reply_text(response.json())
+
+    await update.message.reply_text("You are not authorized ;)")
         
 async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
-    if update.message.from_user.username in authorized_user:
+    
         link = context.args
         link = ' '.join(link)# Convert the list into a string
 
@@ -209,7 +213,7 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         }
         response = requests.post(UrlToDownload,json=payload)
         await update.message.reply_text(response.json())
-    else:
+    
         await update.message.reply_text("You are not authorized ;)")
            
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
