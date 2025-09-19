@@ -101,7 +101,7 @@ def GetIdFromLink(link):
     song_id = url[-1]
     return song_id
 
-# IF it's a playlist Playlist == FALSE
+# IF it's a playlist Playlist == TRUE
 
 def GetNameFromId(song_id,Playlist:bool):
     try:
@@ -311,14 +311,16 @@ def add(args):
         return { "error": "id parameter is required"}
     if author is None:
         return { "error": "author parameter is required"}
+    song_id, name = IsUrlRight(link)
     
     if link.find("playlist") != -1:
-        name = GetNameFromId(song_id,True)
-        GetSongFromPlaylist(song_id,author)
-        return f"The playlist {name} was added to the queue"
+        for element in GetSongFromPlaylist(song_id,author):
+            songs_to_dl["songs"].append({"link": element["link"], "song_id":element["song_id"],"author": element["author"], "needtobeplay": True})
+        return f"The playlist {name} will be download"
     
-    name = GetNameFromId(song_id,False)
+    
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
+    print(song)
     songs_to_dl["songs"].append(song)
     return f"The song {name} was added to the queue"
 
@@ -336,8 +338,9 @@ def add(args):
     song_id, name = IsUrlRight(link)
     
     if link.find("playlist") != -1:
-        GetSongFromPlaylist(song_id,author)
-        return f"The playlist {name} was added to the queue"
+        for element in GetSongFromPlaylist(song_id,author):
+            songs_to_dl["songs"].insert(0,{"link": element["link"], "song_id":element["song_id"],"author": element["author"], "needtobeplay": True})
+        return f"The playlist {name} will be download"
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
