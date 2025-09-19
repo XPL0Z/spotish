@@ -3,6 +3,11 @@ import subprocess
 import git  # pip install gitpython
 import os
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+IntervalBetweenCheckForUpdate = os.getenv("INTERVAL")
 
 # liste de tes scripts
 scripts = ["bot.py", "music-controller.py", "music-player.py"]
@@ -55,7 +60,7 @@ def main_loop():
                 processes = start_scripts()
                 
             # attend 1 heure
-            time.sleep(3600)
+            time.sleep(IntervalBetweenCheckForUpdate)
     except KeyboardInterrupt:
         print("Arrêt manuel, kill des scripts...")
         for p in processes:
