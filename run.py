@@ -61,6 +61,7 @@ def main_loop():
                 # si pull effectué, relance les scripts
                 print("🔄 Relance des scripts après pull")
                 stop_scripts(processes)
+                time.sleep(10)
                 processes = start_scripts()
                 
             # attend l’intervalle défini
