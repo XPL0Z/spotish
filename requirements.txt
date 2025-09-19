@@ -107,3 +107,4 @@ wrapt==1.17.3
 yarg==0.1.9
 yt-dlp==2025.8.27
 ytmusicapi==1.11.1
+psutil==7.1.0
