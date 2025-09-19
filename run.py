@@ -38,7 +38,7 @@ def check_and_update_repo():
     """Vérifie si le repo est à jour, fait git pull si nécessaire"""
     repo = git.Repo(repo_path)
     origin = repo.remotes.origin
-    origin.fetch()  # récupère les dernières infos du remote
+    origin.fetch()  # get les dernières infos du remote
     branch = repo.active_branch
 
     behind = list(repo.iter_commits(f'{branch.name}..origin/{branch.name}'))
