@@ -237,6 +237,7 @@ def main():
 
     # Register command and message handlers
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('help', start))
     application.add_handler(CommandHandler('test', test))
     application.add_handler(CommandHandler('play', play))
     application.add_handler(CommandHandler('playtop', playtop))
