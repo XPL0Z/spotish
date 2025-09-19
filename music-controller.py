@@ -78,21 +78,17 @@ history = {
 #<---------------------------Function Section ----------------------------->
 ############################################################################
 
-def IsUrlRight(link):
-    url=urlparse(link)
-    url=url.path.split("/")
+def GetNameFromLink(link):
     
-    song_id = url[-1]
     try:
         if link.find("playlist")==-1:
-            track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
+            track_info = sp.track(link)
             name = track_info["name"]
         else:
-            track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
+            track_info = sp.playlist(link)
             name = track_info["name"]
-            print(song_id)
             
-        return song_id, name
+        return name
     except spotipy.exceptions.SpotifyException as e:
         return False
 
@@ -172,7 +168,7 @@ def GetSongFromPlaylist(playlist_id,author):
         track = item['track']
         if track:  # Check if track exist
             spotify_url = track['external_urls']['spotify']
-            song_id, name = IsUrlRight(spotify_url )
+            song_id = GetIdFromLink(spotify_url)
             song = {"link": spotify_url,"song_id": song_id,"author": author}
             songs.append(song)
     return songs
@@ -197,7 +193,7 @@ def GetSongFromPlaylistAndPlaceItatFirst(playlist_id,author):
         track = item['track']
         if track:  # Vérifier que la piste existe encore
             spotify_url = track['external_urls']['spotify']
-            song_id = IsUrlRight(spotify_url )
+            song_id = GetIdFromLink(spotify_url )
             songs_to_dl_atfirst["songs"].insert(0, {
                 "link": spotify_url,
                 "song_id": song_id,
@@ -315,23 +311,25 @@ def add(args):
     author = args.get("author", None)
     link = args.get("link", None)
 
-    song_id = GetIdFromLink(link)
-     
+    
         
     if link is None:
         return { "error": "link parameter required" }
-    if song_id is None:
-        return { "error": "id parameter is required"}
     if author is None:
         return { "error": "author parameter is required"}
-    song_id, name = IsUrlRight(link)
+    
+    
+    song_id = GetIdFromLink(link)
+    print(song_id)
     
     if link.find("playlist") != -1:
+        name = GetNameFromId(song_id,True)
         for element in GetAllTrackIdsFromPlaylist(song_id):
-            songs_to_dl["songs"].append({"song_id":element["song_id"],"author": author, "needtobeplay": True})
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
     
-    
+    name = GetNameFromId(song_id,False)
+    print(name)
     song = { "song_id": song_id, "author": author, "needtobeplay" : True }
     print(song)
     songs_to_dl["songs"].append(song)
@@ -348,13 +346,15 @@ def add(args):
     if author is None:
         return { "error": "author parameter is required"}
     
-    song_id, name = IsUrlRight(link)
+    song_id = GetIdFromLink(link)
     print(song_id)
     if link.find("playlist") != -1:
+        name = GetNameFromId(song_id, True)
         for element in GetAllTrackIdsFromPlaylist(song_id):
             print(element)
             songs_to_dl["songs"].insert(0,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
         return f"The playlist {name} was added at the top of the queue"
+    name = GetNameFromId(song_id,False)
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
@@ -368,12 +368,14 @@ def download(args):
     if author is None:
         return { "error": "author parameter is required"}
     
-    song_id, name = IsUrlRight(link)
+    song_id = GetIdFromLink(link)
     if link.find("playlist") != -1:
+        name = GetNameFromId(song_id,True)
         for element in GetAllTrackIdsFromPlaylist(song_id):
             print(element)
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
         return f"The playlist {name} will be download"
+    name = GetNameFromId(song_id,False)
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : False}
     songs_to_dl["songs"].append(song)
     return f"The song {name} will be download"
