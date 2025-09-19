@@ -5,102 +5,141 @@ import os
 import time
 import signal
 import psutil  # pip install psutil
+from datetime import datetime, time as dt_time
 from dotenv import load_dotenv
 
 load_dotenv()
 
-IntervalBetweenCheckForUpdate = int(os.getenv("INTERVAL", 60))  # défaut 60s
+# Check hours (24h format) - add/remove hours as needed
+CHECK_HOURS = [int(h.strip()) for h in os.getenv("CHECK_HOURS", "9,12,15,18,21").split(",")]
+IntervalBetweenCheckForUpdate = int(os.getenv("INTERVAL", 300))  # default 5min
 
-# liste de tes scripts
+# list of your scripts
 scripts = ["bot.py", "music-controller.py", "music-player.py"]
-  
-# chemin vers ton repo
+
+# path to your repo
 repo_path = os.getcwd()
 
 class ScriptManager:
     def __init__(self):
         self.processes = {}
         
-    def is_script_running(self, script_name):
-        """Vérifie si un script est déjà en cours d'exécution sur le système"""
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+    def find_script_processes(self, script_name):
+        """Find ALL processes running the script (more robust detection)"""
+        found_processes = []
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline', 'exe']):
             try:
+                # Check command line
                 cmdline = proc.info['cmdline']
-                if cmdline and len(cmdline) >= 2:
-                    if 'python' in cmdline[0] and script_name in cmdline[1]:
-                        return True
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                if cmdline:
+                    cmdline_str = ' '.join(cmdline)
+                    if script_name in cmdline_str and ('python' in cmdline_str or 'py' in proc.info['name']):
+                        found_processes.append(proc)
+                        continue
+                
+                # Check executable path
+                exe = proc.info.get('exe', '')
+                if exe and script_name in exe:
+                    found_processes.append(proc)
+                    
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
-        return False
+        return found_processes
+    
+    def is_script_running(self, script_name):
+        """Check if a script is already running on the system"""
+        return len(self.find_script_processes(script_name)) > 0
     
     def start_script(self, script_name):
-        """Lance un script uniquement s'il n'est pas déjà en cours"""
+        """Start a script only if it's not already running"""
         if self.is_script_running(script_name):
-            print(f"⚠️  {script_name} est déjà en cours d'exécution")
+            print(f"⚠️  {script_name} is already running")
             return None
             
-        print(f"🚀 Lancement de {script_name}")
+        print(f"🚀 Starting {script_name}")
         p = Process(target=subprocess.run, args=(["python3", script_name],))
         p.start()
         return p
     
     def start_all_scripts(self):
-        """Lance tous les scripts"""
+        """Start all scripts"""
         self.processes = {}
         for script in scripts:
             p = self.start_script(script)
             if p:
                 self.processes[script] = p
-            time.sleep(2)  # délai entre les lancements
+            time.sleep(2)  # delay between launches
         
-        print(f"✅ {len(self.processes)} scripts lancés")
+        print(f"✅ {len(self.processes)} scripts started")
     
     def stop_all_scripts(self):
-        """Arrête proprement tous les scripts gérés + ceux du système"""
-        print("🛑 Arrêt de tous les scripts...")
+        """Properly stop all scripts managed + system ones"""
+        print("🛑 Stopping all scripts...")
         
-        # Arrête les processus qu'on a lancés
+        # Stop processes we launched
         for script, p in self.processes.items():
             if p and p.is_alive():
-                print(f"  Arrêt de {script}")
+                print(f"  Stopping managed {script}")
                 p.terminate()
                 try:
                     p.join(timeout=5)
                 except:
-                    p.kill()  # force kill si terminate échoue
+                    print(f"  Force killing managed {script}")
+                    p.kill()
         
-        # Vérifie et tue les processus restants sur le système
+        # Find and kill ALL system processes
         for script in scripts:
-            self.kill_system_process(script)
+            self.kill_all_script_processes(script)
             
         self.processes = {}
-        print("✅ Tous les scripts arrêtés")
+        print("✅ All scripts stopped")
     
-    def kill_system_process(self, script_name):
-        """Force l'arrêt d'un script au niveau système"""
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+    def kill_all_script_processes(self, script_name):
+        """Force stop ALL instances of a script at system level"""
+        processes = self.find_script_processes(script_name)
+        for proc in processes:
             try:
-                cmdline = proc.info['cmdline']
-                if cmdline and len(cmdline) >= 2:
-                    if 'python' in cmdline[0] and script_name in cmdline[1]:
-                        print(f"  🔪 Force kill de {script_name} (PID: {proc.info['pid']})")
-                        proc.kill()
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
+                print(f"  🔪 Force killing {script_name} (PID: {proc.pid})")
+                proc.kill()
+                proc.wait(timeout=3)  # wait for process to die
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.TimeoutExpired):
+                try:
+                    # Try SIGTERM first, then SIGKILL
+                    proc.send_signal(signal.SIGTERM)
+                    time.sleep(1)
+                    if proc.is_running():
+                        proc.send_signal(signal.SIGKILL)
+                except:
+                    pass
     
     def check_scripts_health(self):
-        """Vérifie si les scripts tournent encore et les relance si nécessaire"""
+        """Check if scripts are still running and restart them if necessary"""
         for script in scripts:
             if script in self.processes:
                 p = self.processes[script]
                 if not p.is_alive():
-                    print(f"💀 {script} s'est arrêté, relance...")
+                    print(f"💀 {script} has stopped, restarting...")
                     new_p = self.start_script(script)
                     if new_p:
                         self.processes[script] = new_p
+    
+    def debug_running_scripts(self):
+        """Debug: show all running script processes"""
+        print("\n🔍 Debug - Current running processes:")
+        for script in scripts:
+            processes = self.find_script_processes(script)
+            if processes:
+                for proc in processes:
+                    try:
+                        print(f"  {script}: PID {proc.pid} - {proc.cmdline()}")
+                    except:
+                        print(f"  {script}: PID {proc.pid} - <cannot read cmdline>")
+            else:
+                print(f"  {script}: Not running")
+        print()
 
 def check_and_update_repo():
-    """Vérifie et met à jour le repo si nécessaire"""
+    """Check and update repo if necessary"""
     try:
         repo = git.Repo(repo_path)
         origin = repo.remotes.origin
@@ -109,53 +148,112 @@ def check_and_update_repo():
 
         behind = list(repo.iter_commits(f'{branch.name}..origin/{branch.name}'))
         if behind:
-            print(f"⬇️ Repo en retard de {len(behind)} commit(s). Pull en cours...")
+            print(f"⬇️ Repo behind by {len(behind)} commit(s). Pulling...")
             origin.pull()
             return True
         else:
-            print("✅ Repo à jour")
+            print("✅ Repo up to date")
             return False
     except Exception as e:
-        print(f"❌ Erreur lors de la vérification du repo: {e}")
+        print(f"❌ Error checking repo: {e}")
         return False
+
+def should_check_now():
+    """Check if current time matches one of the check hours"""
+    current_hour = datetime.now().hour
+    return current_hour in CHECK_HOURS
+
+def wait_until_next_check():
+    """Wait until the next scheduled check time"""
+    current_time = datetime.now()
+    current_hour = current_time.hour
+    
+    # Find next check hour
+    next_check_hour = None
+    for hour in sorted(CHECK_HOURS):
+        if hour > current_hour:
+            next_check_hour = hour
+            break
+    
+    # If no hour found today, use first hour of tomorrow
+    if next_check_hour is None:
+        next_check_hour = min(CHECK_HOURS)
+        next_check_time = datetime.combine(
+            current_time.date().replace(day=current_time.day + 1),
+            dt_time(next_check_hour, 0)
+        )
+    else:
+        next_check_time = datetime.combine(
+            current_time.date(),
+            dt_time(next_check_hour, 0)
+        )
+    
+    wait_seconds = (next_check_time - current_time).total_seconds()
+    print(f"⏰ Next check at {next_check_time.strftime('%H:%M')} (in {wait_seconds/3600:.1f}h)")
+    return wait_seconds
 
 def main_loop():
     manager = ScriptManager()
     
-    # Nettoie d'éventuels processus en cours
+    print(f"🕐 Scheduled checks at: {', '.join([f'{h}:00' for h in sorted(CHECK_HOURS)])}")
+    
+    # Clean any existing processes
+    manager.debug_running_scripts()  # debug before cleanup
     manager.stop_all_scripts()
     time.sleep(3)
     
-    # Lance les scripts
+    # Start scripts
     manager.start_all_scripts()
+    
+    last_check_time = None
     
     try:
         while True:
-            # Vérifie la santé des scripts
+            current_time = datetime.now()
+            
+            # Check scripts health periodically (every interval)
             manager.check_scripts_health()
             
-            # Vérifie le repo
-            if check_and_update_repo():
-                print("🔄 Redémarrage après mise à jour...")
-                manager.stop_all_scripts()
-                time.sleep(5)  # délai pour que tout s'arrête
-                manager.start_all_scripts()
+            # Check repo only at scheduled hours
+            if should_check_now():
+                current_hour = current_time.hour
+                
+                # Avoid checking multiple times in the same hour
+                if last_check_time is None or last_check_time.hour != current_hour:
+                    print(f"\n🕐 Scheduled check at {current_time.strftime('%H:%M')}")
+                    
+                    if check_and_update_repo():
+                        print("🔄 Restarting after update...")
+                        manager.debug_running_scripts()  # debug before restart
+                        manager.stop_all_scripts()
+                        time.sleep(5)  # wait for everything to stop
+                        manager.start_all_scripts()
+                    
+                    last_check_time = current_time
+                    
+                    # Wait until next scheduled check
+                    wait_seconds = wait_until_next_check()
+                    if wait_seconds > IntervalBetweenCheckForUpdate:
+                        print(f"💤 Sleeping until next check...")
+                        time.sleep(wait_seconds)
+                        continue
             
             time.sleep(IntervalBetweenCheckForUpdate)
             
     except KeyboardInterrupt:
-        print("\n🛑 Arrêt manuel détecté")
+        print("\n🛑 Manual stop detected")
+        manager.debug_running_scripts()  # debug before cleanup
         manager.stop_all_scripts()
 
 def signal_handler(signum, frame):
-    """Gestionnaire pour arrêt propre via signal"""
-    print(f"\n🛑 Signal {signum} reçu, arrêt en cours...")
+    """Handler for clean stop via signal"""
+    print(f"\n🛑 Signal {signum} received, stopping...")
     manager = ScriptManager()
     manager.stop_all_scripts()
     exit(0)
 
 if __name__ == "__main__":
-    # Gestionnaire de signaux pour arrêt propre
+    # Signal handlers for clean stop
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
