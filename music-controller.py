@@ -402,7 +402,7 @@ def stop(_):
     queue["songs"].clear()
     songs_to_dl["songs"].clear()
     requests.post(UrlToStop, json={})
-    return f"La file d'attente a bien été supprimée"
+    return f"The queue has been cleared"
 
 @api.post("/mix")
 def mix(_):
