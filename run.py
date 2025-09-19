@@ -25,6 +25,15 @@ def start_scripts():
         time.sleep(1)  # léger délai pour éviter les conflits au démarrage
     return processes
 
+def stop_scripts(processes):
+    """Arrête proprement tous les scripts"""
+    print("🛑 Arrêt des scripts...")
+    for p in processes:
+        if p.is_alive():
+            p.terminate()
+            p.join()
+    print("✅ Tous les scripts ont été arrêtés.")
+
 def check_and_update_repo():
     """Vérifie si le repo est à jour, fait git pull si nécessaire"""
     repo = git.Repo(repo_path)
@@ -47,25 +56,18 @@ def main_loop():
 
     try:
         while True:
-            
-            
             # vérifie le repo
             if check_and_update_repo():
                 # si pull effectué, relance les scripts
                 print("🔄 Relance des scripts après pull")
-                for p in processes:
-                    p.terminate()
-                    p.join()
-                
+                stop_scripts(processes)
                 processes = start_scripts()
                 
-            # attend 1 heure
+            # attend l’intervalle défini
             time.sleep(IntervalBetweenCheckForUpdate)
     except KeyboardInterrupt:
         print("Arrêt manuel, kill des scripts...")
-        for p in processes:
-            p.terminate()
-            p.join()
+        stop_scripts(processes)
 
 if __name__ == "__main__":
     main_loop()
