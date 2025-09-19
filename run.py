@@ -13,7 +13,7 @@ IntervalBetweenCheckForUpdate = int(os.getenv("INTERVAL", 60))  # défaut 60s
 
 # liste de tes scripts
 scripts = ["bot.py", "music-controller.py", "music-player.py"]
-
+  
 # chemin vers ton repo
 repo_path = os.getcwd()
 
