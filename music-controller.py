@@ -350,9 +350,15 @@ def add(args):
     print(song_id)
     if link.find("playlist") != -1:
         name = GetNameFromId(song_id, True)
-        for element in GetAllTrackIdsFromPlaylist(song_id):
-            print(element)
-            songs_to_dl["songs"].insert(0,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
+        AllTracks= GetAllTrackIdsFromPlaylist(song_id)
+        for element in AllTracks:
+            i = 0
+            total = len(AllTracks)
+            current_length = len(songs_to_dl["songs"])
+            position = current_length+total-i
+            print(position)
+            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
+            i+=1
         return f"The playlist {name} was added at the top of the queue"
     name = GetNameFromId(song_id,False)
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
@@ -371,8 +377,9 @@ def download(args):
     song_id = GetIdFromLink(link)
     if link.find("playlist") != -1:
         name = GetNameFromId(song_id,True)
+        
         for element in GetAllTrackIdsFromPlaylist(song_id):
-            print(element)
+            len(GetAllTrackIdsFromPlaylist(song_id))
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
         return f"The playlist {name} will be download"
     name = GetNameFromId(song_id,False)
