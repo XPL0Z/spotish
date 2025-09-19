@@ -356,7 +356,6 @@ def add(args):
             total = len(AllTracks)
             current_length = len(songs_to_dl["songs"])
             position = current_length+total-i
-            print(position)
             songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
             i+=1
         return f"The playlist {name} was added at the top of the queue"

@@ -89,8 +89,6 @@ async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(
             "The music has been stopped"
         )
-        response = requests.post(UrlToPause, json={})
-        await update.message.reply_text(response.json())
     else:
         await update.message.reply_text("You are not authorized ;)")
 
@@ -112,7 +110,8 @@ async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.from_user.username in authorized_user:
-        requests.post(UrlToStop,json={})
+        response = requests.post(UrlToStop,json={})
+        await update.message.reply_text(response.json())
     else:
         await update.message.reply_text("You are not authorized ;)")
         
