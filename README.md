@@ -135,7 +135,7 @@ Available commands:
 
 ### Prerequisites
 
-* Before you begin installing the project, you must first install **Python** on your machine. Otherwise, follow the instructions below.
+* Before you begin installing the project, you must first have installed **Python** on your machine. Otherwise, follow the instructions below.
 
 #### Installing Python
 
