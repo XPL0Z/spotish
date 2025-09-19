@@ -90,6 +90,7 @@ def IsUrlRight(link):
         else:
             track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
             name = track_info["name"]
+            print(song_id)
             
         return song_id, name
     except spotipy.exceptions.SpotifyException as e:
@@ -164,7 +165,6 @@ def playsong(song_id, author):
     
     
         
-    
 def GetSongFromPlaylist(playlist_id,author):
     results = sp.playlist_tracks(playlist_id)
     songs = []
@@ -176,6 +176,19 @@ def GetSongFromPlaylist(playlist_id,author):
             song = {"link": spotify_url,"song_id": song_id,"author": author}
             songs.append(song)
     return songs
+
+def GetAllTrackIdsFromPlaylist(playlist_id):
+    results = sp.playlist_items(playlist_id, limit=100, offset=0, fields="items.track.id,next")
+    track_ids = [item['track']['id'] for item in results['items'] if item['track']]
+    print("Test")
+    while results['next']:
+        results = sp.next(results)
+        track_ids.extend(
+            item['track']['id'] for item in results['items'] if item['track']
+        )
+    
+    return track_ids
+
             
 def GetSongFromPlaylistAndPlaceItatFirst(playlist_id,author):
     results = sp.playlist_tracks(playlist_id)
@@ -314,12 +327,12 @@ def add(args):
     song_id, name = IsUrlRight(link)
     
     if link.find("playlist") != -1:
-        for element in GetSongFromPlaylist(song_id,author):
-            songs_to_dl["songs"].append({"link": element["link"], "song_id":element["song_id"],"author": element["author"], "needtobeplay": True})
-        return f"The playlist {name} will be download"
+        for element in GetAllTrackIdsFromPlaylist(song_id):
+            songs_to_dl["songs"].append({"song_id":element["song_id"],"author": author, "needtobeplay": True})
+        return f"The playlist {name} was added to the queue"
     
     
-    song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
+    song = { "song_id": song_id, "author": author, "needtobeplay" : True }
     print(song)
     songs_to_dl["songs"].append(song)
     return f"The song {name} was added to the queue"
@@ -336,11 +349,12 @@ def add(args):
         return { "error": "author parameter is required"}
     
     song_id, name = IsUrlRight(link)
-    
+    print(song_id)
     if link.find("playlist") != -1:
-        for element in GetSongFromPlaylist(song_id,author):
-            songs_to_dl["songs"].insert(0,{"link": element["link"], "song_id":element["song_id"],"author": element["author"], "needtobeplay": True})
-        return f"The playlist {name} will be download"
+        for element in GetAllTrackIdsFromPlaylist(song_id):
+            print(element)
+            songs_to_dl["songs"].insert(0,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
+        return f"The playlist {name} was added at the top of the queue"
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
@@ -356,8 +370,9 @@ def download(args):
     
     song_id, name = IsUrlRight(link)
     if link.find("playlist") != -1:
-        for element in GetSongFromPlaylist(song_id,author):
-            songs_to_dl["songs"].append({"link": element["link"], "song_id":element["song_id"],"author": element["author"], "needtobeplay": False})
+        for element in GetAllTrackIdsFromPlaylist(song_id):
+            print(element)
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
         return f"The playlist {name} will be download"
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : False}
     songs_to_dl["songs"].append(song)
@@ -461,10 +476,6 @@ def delete(args):
         else:
             return { "error": f"song not found with id {id}" }
         
-
-
-
-    
 
 
 if __name__ == "__main__":
