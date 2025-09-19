@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-IntervalBetweenCheckForUpdate = os.getenv("INTERVAL")
+IntervalBetweenCheckForUpdate = int(os.getenv("INTERVAL"))
 
 # liste de tes scripts
 scripts = ["bot.py", "music-controller.py", "music-player.py"]
