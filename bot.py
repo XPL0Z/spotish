@@ -89,7 +89,8 @@ async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(
             "The music has been stopped"
         )
-        requests.post(UrlToPause, json={})
+        response = requests.post(UrlToPause, json={})
+        await update.message.reply_text(response.json())
     else:
         await update.message.reply_text("You are not authorized ;)")
 
