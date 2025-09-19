@@ -24,7 +24,7 @@ def start_scripts():
         processes.append(p)
         time.sleep(1)  # léger délai pour éviter les conflits au démarrage
     return processes
-
+  
 def stop_scripts(processes):
     """Arrête proprement tous les scripts"""
     print("🛑 Arrêt des scripts...")
