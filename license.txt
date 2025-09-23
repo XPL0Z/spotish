@@ -1,6 +1,6 @@
 # Spotish License
 
-Copyright (C) 2024 [Your Name]
+Copyright (C) 2024 XPL0Z
 
 This project, Spotish, is licensed for personal, non-commercial use only.
 
@@ -15,4 +15,4 @@ If you use or share this project, please give appropriate credit by mentioning m
 
 Thank you for respecting these terms!
 
-[Your Name]
+XPL0Z
