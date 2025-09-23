@@ -3,6 +3,8 @@
 #inutile
 test.json
 test.py
+resultats.jsonl
+result.json
 .cache/
 .cache
 .venv/

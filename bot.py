@@ -8,6 +8,8 @@ from dotenv import load_dotenv # type: ignore
 import spotipy  # type: ignore
 from spotipy.oauth2 import SpotifyClientCredentials # type: ignore
 from urllib.parse import urlparse
+import time
+
 
 
 load_dotenv()
@@ -15,7 +17,9 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 ADMIN_ID = os.getenv("ADMIN_ID")
-authorized_user = ADMIN_ID.split()
+admins = ADMIN_ID.split()
+
+authorized_user = []
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 UrlToAdd = "http://127.0.0.1:5000/addSong"
@@ -29,6 +33,25 @@ UrlToDownload = "http://127.0.1:5000/download"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
+
+for admin in admins:
+    authorized_user.append({"username": admin, "endat": -1})
+
+# this function checks if a date of a user is expired and delete it, primary usage is to check if a user is authorized
+async def isauthorized(username):
+    for i in range(len(authorized_user)):
+        print(authorized_user[i]["endat"])
+        if authorized_user[i]["endat"] > int(time.time()) or authorized_user[i]["endat"] == -1:
+            print("TEST")
+            if authorized_user[i]["username"] == username:
+                return True
+        else:
+            
+            if authorized_user[i]["endat"] < int(time.time()) and authorized_user[i]["endat"] != -1:
+                print("deleted")
+                del authorized_user[i]
+
+    return False
  
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
@@ -40,7 +63,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/skip - ⏭️ Skip the current song\n"
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
-            "/adduser &lt;username&gt; - ➕ Add an authorized user (without @)\n"
+            "/adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user (without @)\n"
             "/search &lt;track name&gt; - 🔍 Search for and play a track by name\n"
             "/mix - ♾️ play recommendation from history\n"
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
@@ -48,11 +71,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
      
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
     
-async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    pass
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
@@ -69,10 +90,10 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     
 async def playtop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
+    
     link = context.args
     link = ' '.join(link)# Convert the list into a string
     payload = {
@@ -82,10 +103,9 @@ async def playtop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response = requests.post(UrlToAddTop, json=payload)
     await update.message.reply_text(response.json())
     
-    await update.message.reply_text("You are not authorized ;)")
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
@@ -95,15 +115,14 @@ async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
 
 async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     await update.message.reply_text("The music has been resumed")
     requests.post(UrlToResume,json={})
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
@@ -113,27 +132,52 @@ async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
         
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
     response = requests.post(UrlToStop,json={})
     await update.message.reply_text(response.json())
     
+async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if await isauthorized(update.message.from_user.username) == True:
+        await update.message.reply_text("You are authorized ;)")
+    else:
+        await update.message.reply_text("You are not authorized ;)")
         
 async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
-    if update.message.from_user.username not in authorized_user:
+    # if update.message.from_user.username not in authorized_user:
+    #     await update.message.reply_text("You are not authorized ;)")
+    #     return
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
+    if len(context.args) != 3:
+        await update.message.reply_text("Invalid. Usage: /adduser alice 30 m Use s (seconds), m (minutes), or h (hours).")
+        return
     
-    user = context.args
-    user = ' '.join(user)
-    authorized_user.append(user)
+    username = context.args[0]
+    duration = int(context.args[1])
+    unit = context.args[2]
+    current_time = int(time.time())
+    if unit == "s":
+        endat = current_time + duration
+        await update.message.reply_text(f"{username} is now allowed for {duration} seconds")
+    elif unit == "m":
+        endat = current_time + duration * 60
+        await update.message.reply_text(f"{username} is now allowed for {duration} minutes")
+    elif unit == "h":
+        endat = current_time + duration *3600
+        await update.message.reply_text(f"{username} is now allowed for {duration} hours")
+    else:
+        await update.message.reply_text("Invalid. Usage: /adduser alice 30 m Use s (seconds), m (minutes), or h (hours).")
+    
+    authorized_user.append({"username": username,"endat":endat})
+    print(authorized_user)
     
 
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
@@ -162,7 +206,7 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(f"Error in volume command: {e}")
     
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.from_user.username not in authorized_user:
+    if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
@@ -181,9 +225,10 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
 
 async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if await isauthorized(update.message.from_user.username) != True:
+        await update.message.reply_text("You are not authorized ;)")
+        return
     
-        
-        
     response = requests.post(UrlToMix, json={})
     
     await update.message.reply_text(response.json())
@@ -191,7 +236,9 @@ async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("You are not authorized") 
 
 async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
+    if await isauthorized(update.message.from_user.username) != True:
+        await update.message.reply_text("You are not authorized ;)")
+        return
     
     payload = {
         "author": update.message.from_user.username
@@ -202,7 +249,9 @@ async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("You are not authorized ;)")
         
 async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
+        if await isauthorized(update.message.from_user.username) != True:
+            await update.message.reply_text("You are not authorized ;)")
+            return
     
         link = context.args
         link = ' '.join(link)# Convert the list into a string
@@ -230,9 +279,6 @@ async def button_selection_handler(update: Update, context: ContextTypes.DEFAULT
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(f'You selected option: {query.data.split("_")[1]}')
-
-
-
 
 
 def main():
