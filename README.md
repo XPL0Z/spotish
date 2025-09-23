@@ -118,6 +118,7 @@ Available commands:
   /mix - ♾️ play recommendation from history   
   /download &lt;Spotify URL&gt; - 💾 Download a song or a playlist     
   /adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user  
+  /whoami - ❓ who am I ? I forgot...   
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

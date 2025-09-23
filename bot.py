@@ -67,7 +67,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/search &lt;track name&gt; - 🔍 Search and play a track by name\n"
             "/mix - ♾️ play recommendation from history\n"
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
-            
+            "/whoami - ❓ who am I ? I forgot...\n"
             ) 
      
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
@@ -145,6 +145,12 @@ async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("You are authorized ;)")
     else:
         await update.message.reply_text("You are not authorized ;)")
+        
+async def whoami(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if await isauthorized(update.message.from_user.username) == True:
+        await update.message.reply_text(f"You are @{update.message.from_user.username} and authorized ;)")
+    else:
+        await update.message.reply_text(f"You are @{update.message.from_user.username} and not authorized ;)")
         
 async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # if update.message.from_user.username not in authorized_user:
@@ -302,6 +308,7 @@ def main():
     application.add_handler(CommandHandler('search', search))
     application.add_handler(CommandHandler('random', random))
     application.add_handler(CommandHandler('download', download))
+    application.add_handler(CommandHandler('whoami', whoami))
     
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
