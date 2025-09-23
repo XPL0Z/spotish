@@ -63,7 +63,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/skip - ⏭️ Skip the current song\n"
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
-            "/adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user (without @)\n"
+            "/adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user \n"
             "/search &lt;track name&gt; - 🔍 Search for and play a track by name\n"
             "/mix - ♾️ play recommendation from history\n"
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
