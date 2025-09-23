@@ -64,9 +64,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
             "/adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user \n"
-            "/search &lt;track name&gt; - 🔍 Search for and play a track by name\n"
+            "/search &lt;track name&gt; - 🔍 Search and play a track by name\n"
             "/mix - ♾️ play recommendation from history\n"
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
+            
             ) 
      
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
