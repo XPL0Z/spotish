@@ -314,7 +314,7 @@ def main():
     application.add_handler(CommandHandler('search', search))
     application.add_handler(CommandHandler('random', random))
     application.add_handler(CommandHandler('download', download))
-    application.add_handler(CommandHandler('whoami', whoami))
+    application.add_handler(CommandHandler('isauthorize', isauthorize))
     
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
