@@ -378,7 +378,6 @@ def download(args):
         name = GetNameFromId(song_id,True)
         
         for element in GetAllTrackIdsFromPlaylist(song_id):
-            len(GetAllTrackIdsFromPlaylist(song_id))
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
         return f"The playlist {name} will be download"
     name = GetNameFromId(song_id,False)
@@ -398,7 +397,7 @@ def notplaying(_):
 def skip(_):
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
-        return f"File d'attente vide"
+        return f"The queue is empty"
     name = GetNameFromId(queue["songs"][0]["song_id"],False)
     return f"Music skipped, Now playing : {name}"
 

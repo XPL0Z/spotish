@@ -59,12 +59,12 @@ def play(args: dict):
 @api.post("/pause")
 def pause(args=None):
     media_player.pause()
-    return {"status": "paused"}
+    return f"The music has been paused"
 
 @api.post("/resume")
 def resume(args=None):
     media_player.play()
-    return {"status": "resumed"}
+    return f"The music has been resumed"
 
 @api.post("/skip")
 def skip(args=None):

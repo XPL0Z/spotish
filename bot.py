@@ -110,9 +110,9 @@ async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("You are not authorized ;)")
         return
     
-    await update.message.reply_text(
-        "The music has been stopped"
-    )
+    response = requests.post(UrlToPause, json={})
+    await update.message.reply_text(response.json())
+    
     
 
 async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -120,15 +120,15 @@ async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("You are not authorized ;)")
         return
     await update.message.reply_text("The music has been resumed")
-    requests.post(UrlToResume,json={})
+    response = requests.post(UrlToResume,json={})
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
     
-    r = requests.post(UrlToSkip,json={})
-    await update.message.reply_text(f'Music skipped, Now : {r.text}')
+    response = requests.post(UrlToSkip,json={})
+    await update.message.reply_text(response.json())
     
     
         
@@ -240,7 +240,6 @@ async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     await update.message.reply_text(response.json())
 
-    await update.message.reply_text("You are not authorized") 
 
 async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await isauthorized(update.message.from_user.username) != True:
@@ -253,7 +252,6 @@ async def random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response = requests.post(UrlToPlayRandom,json=payload)
     await update.message.reply_text(response.json())
 
-    await update.message.reply_text("You are not authorized ;)")
         
 async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if await isauthorized(update.message.from_user.username) != True:
@@ -270,7 +268,6 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         response = requests.post(UrlToDownload,json=payload)
         await update.message.reply_text(response.json())
     
-        await update.message.reply_text("You are not authorized ;)")
            
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
