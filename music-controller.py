@@ -98,18 +98,25 @@ def GetIdFromLink(link):
     song_id = url[-1]
     return song_id
 
-# IF it's a playlist Playlist == TRUE
+# type if it's a track type = 0
+# type if it's a playlist type = 1
+# type if it's a album type = 2
 
-def GetNameFromId(song_id,Playlist:bool):
+def GetNameFromId(song_id,type:int):
     try:
-        if Playlist == False:
+        if type == 0:
             track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
             name = track_info["name"]
             print(name)
             return name
-        else:
+        elif type == 1:
     
             track_info = sp.playlist(f"https://open.spotify.com/playlist/{song_id}")
+            name = track_info["name"]
+            
+            return name
+        elif type == 2:
+            track_info = sp.album(f"https://open.spotify.com/album/{song_id}")
             name = track_info["name"]
             
             return name
@@ -173,15 +180,51 @@ def GetSongFromPlaylist(playlist_id,author):
             songs.append(song)
     return songs
 
-def GetAllTrackIdsFromPlaylist(playlist_id):
-    results = sp.playlist_items(playlist_id, limit=100, offset=0, fields="items.track.id,next")
-    track_ids = [item['track']['id'] for item in results['items'] if item['track']]
+def GetSongFromAlbum(album_id):
+    results = sp.album_tracks(album_id)
+    #print(results)
+    track_ids = []
+
+    for item in results['items']:
+        
+        track = item.get('id')
+        #print(track)
+        if track:
+            track_ids.append(track)
+    
+    while results['next']:
+        # Récupère la page suivante de résultats
+        results = sp.next(results)
+
+        # Parcourt chaque élément de la page
+        for item in results['items']:
+        
+            track = item.get('id')
+            print(track)
+            if track:
+                    track_ids.append(track)
+    return track_ids
+
+def GetAllTrackIdsFromPlaylist(album_id):
+    
+    results = sp.album_tracks(album_id)
+    track_ids = []
+
+    for item in results['items']:
+        track = item.get('track')
+        if track:
+            track_ids.append(track['id'])
     print("Test")
     while results['next']:
+        # Récupère la page suivante de résultats
         results = sp.next(results)
-        track_ids.extend(
-            item['track']['id'] for item in results['items'] if item['track']
-        )
+
+        # Parcourt chaque élément de la page
+        for item in results['items']:
+            track = item.get('track')
+            if track:
+                track_ids.append(track['id'])
+
     
     return track_ids
 
@@ -322,22 +365,30 @@ def add(args):
     song_id = GetIdFromLink(link)
     print(song_id)
     
-    if link.find("playlist") != -1:
-        name = GetNameFromId(song_id,True)
+    if link.find("playlist") !=-1:
+        print("not album")
+        name = GetNameFromId(song_id,1)
         for element in GetAllTrackIdsFromPlaylist(song_id):
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
     
-    name = GetNameFromId(song_id,False)
+    if link.find("album") != -1:
+        print("album")
+        name = GetNameFromId(song_id, 2)
+        for element in GetSongFromAlbum(song_id):
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+        return f"The album {name} was added to the queue"
+    
+    name = GetNameFromId(song_id,0)
     print(name)
-    song = { "song_id": song_id, "author": author, "needtobeplay" : True }
+    song = {"link": link, "song_id": song_id, "author": author, "needtobeplay" : True }
     print(song)
     songs_to_dl["songs"].append(song)
     return f"The song {name} was added to the queue"
 
 @api.post("/addSongtop")
 def add(args):
-    author = args.get("author", None)
+    author = args.get("author", None)   
     link = args.get("link", None)
     
     if link is None:
@@ -348,8 +399,8 @@ def add(args):
     
     song_id = GetIdFromLink(link)
     print(song_id)
-    if link.find("playlist") != -1:
-        name = GetNameFromId(song_id, True)
+    if link.find("playlist") != -1 :
+        name = GetNameFromId(song_id, 1)
         AllTracks= GetAllTrackIdsFromPlaylist(song_id)
         for element in AllTracks:
             i = 0
@@ -359,7 +410,7 @@ def add(args):
             songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
             i+=1
         return f"The playlist {name} was added at the top of the queue"
-    name = GetNameFromId(song_id,False)
+    name = GetNameFromId(song_id,0)
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : True }
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
@@ -375,12 +426,12 @@ def download(args):
     
     song_id = GetIdFromLink(link)
     if link.find("playlist") != -1:
-        name = GetNameFromId(song_id,True)
+        name = GetNameFromId(song_id,1)
         
         for element in GetAllTrackIdsFromPlaylist(song_id):
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
         return f"The playlist {name} will be download"
-    name = GetNameFromId(song_id,False)
+    name = GetNameFromId(song_id,0)
     song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : False}
     songs_to_dl["songs"].append(song)
     return f"The song {name} will be download"
@@ -398,7 +449,7 @@ def skip(_):
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return f"The queue is empty"
-    name = GetNameFromId(queue["songs"][0]["song_id"],False)
+    name = GetNameFromId(queue["songs"][0]["song_id"],0)
     return f"Music skipped, Now playing : {name}"
 
 @api.post("/stop")
@@ -461,7 +512,7 @@ def playrandom(args):
 
     choice = random.choice(songs)
     playsong(choice ,author)
-    name = GetNameFromId(choice, False)
+    name = GetNameFromId(choice, 0)
     return f"{name} was added to the queue"
 
 @api.post("/delete")
