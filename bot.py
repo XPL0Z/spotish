@@ -9,6 +9,7 @@ import spotipy  # type: ignore
 from spotipy.oauth2 import SpotifyClientCredentials # type: ignore
 from urllib.parse import urlparse
 import time
+import json
 
 
 
@@ -37,6 +38,18 @@ UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 for admin in admins:
     authorized_user.append({"username": admin, "endat": -1})
 
+FILE_PATH = './authorize.json'
+# add user that are save in authorize.json into authorized_user
+with open('authorize.json', 'r') as file:
+    python_obj = json.load(file)
+for user in python_obj:
+    authorized_user.append(user)
+
+async def WriteAauthorizeUser():
+    with open(FILE_PATH, 'w') as output_file:
+    	print(json.dumps(authorized_user, indent=2), file=output_file)
+ 
+  
 # this function checks if a date of a user is expired and delete it, primary usage is to check if a user is authorized
 async def isauthorized(username):
     for i in range(len(authorized_user)):
@@ -44,6 +57,7 @@ async def isauthorized(username):
         if authorized_user[i]["endat"] > int(time.time()) or authorized_user[i]["endat"] == -1:
             print("TEST")
             if authorized_user[i]["username"] == username:
+                await WriteAauthorizeUser()
                 return True
         else:
             
@@ -52,7 +66,7 @@ async def isauthorized(username):
                 del authorized_user[i]
 
     return False
- 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
             "/start - 📜 Show this menu\n"
@@ -162,9 +176,7 @@ async def isauthorize(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     
         
 async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # if update.message.from_user.username not in authorized_user:
-    #     await update.message.reply_text("You are not authorized ;)")
-    #     return
+    
     if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
