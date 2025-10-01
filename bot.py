@@ -10,6 +10,7 @@ from spotipy.oauth2 import SpotifyClientCredentials # type: ignore
 from urllib.parse import urlparse
 import time
 import json
+import aiofiles
 
 
 
@@ -42,12 +43,14 @@ FILE_PATH = './authorize.json'
 # add user that are save in authorize.json into authorized_user
 with open('authorize.json', 'r') as file:
     python_obj = json.load(file)
-for user in python_obj:
-    authorized_user.append(user)
 
-async def WriteAauthorizeUser():
-    with open(FILE_PATH, 'w') as output_file:
-    	print(json.dumps(authorized_user, indent=2), file=output_file)
+for user in python_obj:
+    if user not in authorized_user and int(time.time())<user["endat"]:
+        authorized_user.append(user)
+
+async def WriteAuthorizeUser():
+    async with aiofiles.open(FILE_PATH, 'w') as output_file:
+        await output_file.write(json.dumps(authorized_user, indent=2))
  
   
 # this function checks if a date of a user is expired and delete it, primary usage is to check if a user is authorized
@@ -57,7 +60,7 @@ async def isauthorized(username):
         if authorized_user[i]["endat"] > int(time.time()) or authorized_user[i]["endat"] == -1:
             print("TEST")
             if authorized_user[i]["username"] == username:
-                await WriteAauthorizeUser()
+                await WriteAuthorizeUser()
                 return True
         else:
             
@@ -180,6 +183,7 @@ async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
+    
     if len(context.args) != 3:
         await update.message.reply_text("Invalid. Usage: /adduser alice 30 m Use s (seconds), m (minutes), or h (hours).")
         return
@@ -188,20 +192,28 @@ async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     duration = int(context.args[1])
     unit = context.args[2]
     current_time = int(time.time())
+    
     if unit == "s":
         endat = current_time + duration
-        await update.message.reply_text(f"{username} is now allowed for {duration} seconds")
+        message = f"{username} is now allowed for {duration} seconds"
     elif unit == "m":
         endat = current_time + duration * 60
-        await update.message.reply_text(f"{username} is now allowed for {duration} minutes")
+        message = f"{username} is now allowed for {duration} minutes"
     elif unit == "h":
-        endat = current_time + duration *3600
-        await update.message.reply_text(f"{username} is now allowed for {duration} hours")
+        endat = current_time + duration * 3600
+        message = f"{username} is now allowed for {duration} hours"
     else:
         await update.message.reply_text("Invalid. Usage: /adduser alice 30 m Use s (seconds), m (minutes), or h (hours).")
+        return
     
-    authorized_user.append({"username": username,"endat":endat})
+    
+    authorized_user.append({"username": username, "endat": endat})
+    
+    
+    await WriteAuthorizeUser()
+    
     print(authorized_user)
+    await update.message.reply_text(message)
     
 
 async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
