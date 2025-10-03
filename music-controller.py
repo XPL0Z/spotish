@@ -64,8 +64,14 @@ queue = {
 songs_to_dl = {
     "songs":[
         # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
-        
-         
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong1", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong2", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong3", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong4", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong5", "author": "username","needtobeplay":False },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong6", "author": "username","needtobeplay":False },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong7", "author": "username","needtobeplay":False },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong8", "author": "username","needtobeplay":False }
     ]
 }
 
@@ -377,10 +383,15 @@ def add(args):
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The album {name} was added to the queue"
     
-    name = GetNameFromId(song_id,0)
-    print(name)
+    #name = GetNameFromId(song_id,0)
     song = {"link": link, "song_id": song_id, "author": author, "needtobeplay" : True}
-    print(song)
+    if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
+        for i in range(len(songs_to_dl["songs"])-1,0,-1):
+            if songs_to_dl["songs"][i]["needtobeplay"] == True:
+                songs_to_dl["songs"].insert(i+1,song)
+                return f"The song {name} was added to the queue"
+
+    
     songs_to_dl["songs"].append(song)
     return f"The song {name} was added to the queue"
 
@@ -622,7 +633,7 @@ if __name__ == "__main__":
 
 
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
-    threading.Thread(target=start_checking, daemon=True).start()
+    #threading.Thread(target=start_checking, daemon=True).start()
     threading.Thread(target=start_checkingQueue, daemon=True).start()
     print(f"Application started at http://127.0.0.1:{PORT}/")
     httpd.serve_forever()
