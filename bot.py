@@ -86,6 +86,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/mix - ♾️ play recommendation from history\n"
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
             "/isauthorize  - ❓ Checks if someone is authorize\n"
+            "/queue - 📋 Get future songs to play"
             ) 
      
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
@@ -306,14 +307,14 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if await isauthorized(update.message.from_user.username) != True:
             await update.message.reply_text("You are not authorized ;)")
             return
-    
         index = context.args
-        index = ' '.join(index)# Convert the list into a string
-
-        if index is None:
-            index = 0
+        if len(index) == 0:
+            index = 1
+        else:
+            index = ' '.join(index)
+        print(index)
         payload = {
-            "index": index,
+            "index": int(index)
         }
         response = requests.post(UrlToGetQueue,json=payload)
         await update.message.reply_text(response.json())
@@ -355,6 +356,7 @@ def main():
     application.add_handler(CommandHandler('random', random))
     application.add_handler(CommandHandler('download', download))
     application.add_handler(CommandHandler('isauthorize', isauthorize))
+    application.add_handler(CommandHandler('queue', queue))
     
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))

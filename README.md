@@ -118,7 +118,8 @@ Available commands:
   /mix - ♾️ play recommendation from history   
   /download &lt;Spotify URL&gt; - 💾 Download a song or a playlist     
   /adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user  
-  /isauthorize  - ❓ Checks if someone is authorize. If there is no argument you are checking yourself. Don't put @   
+  /isauthorize  - ❓ Checks if someone is authorize. If there is no argument you are checking yourself. Don't put @  
+  /queue - 📋 Get future songs to play   
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -50,26 +50,45 @@ UrlToSkip = "http://127.0.0.1:7000/skip"
 playing = [False]
 mixing= [False]
 downloadingmix = [False]
+# queue = {
+#     "songs": [
+#         # { "song_id": idofthespotifysong, "author": "username" },
+#     ]
+# }
 queue = {
     "songs": [
-        # { "song_id": idofthespotifysong, "author": "username" },
+        { "song_id": "idofthespotifysong1", "author": "username", "link": "test1"},
+        { "song_id": "idofthespotifysong2", "author": "username", "link": "test2"},
+        { "song_id": "idofthespotifysong3", "author": "username", "link": "test3"},
     ]
 }
 
 songs_to_dl = {
     "songs":[
-         # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
+        # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
+        { "song_id": "idofthespotifysong4", "author": "username", "link": "test4"},
+        { "song_id": "idofthespotifysong5", "author": "username", "link": "test5"},
+        { "song_id": "idofthespotifysong6", "author": "username", "link": "test6"},
+        { "song_id": "idofthespotifysong7", "author": "username", "link": "test7"},
+        { "song_id": "idofthespotifysong8", "author": "username", "link": "test8"},
+        { "song_id": "idofthespotifysong9", "author": "username", "link": "test9"},
+        { "song_id": "idofthespotifysong10", "author": "username", "link": "test10"},
+        { "song_id": "idofthespotifysong11", "author": "username", "link": "test11"},
+        { "song_id": "idofthespotifysong12", "author": "username", "link": "test12"}
+         
     ]
 }
 
 songs_to_dl_atfirst = {
     "songs":[
         # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
+        
     ]
 }
 
 history = {
     "songs" :[
+        
         # {"song_id" : idofthespotifysong}
     ]
 }
@@ -269,31 +288,32 @@ def GetRecommandation(seeds_list):
 ########################################################
 
 async def Downloading():
-    print("running")
-    while True:
-        if len(songs_to_dl_atfirst["songs"]) != 0:
-            for song in songs_to_dl_atfirst["songs"]:
-                song_id = songs_to_dl_atfirst["songs"][0]["song_id"]
-                author = songs_to_dl_atfirst["songs"][0]["author"]
-                link = songs_to_dl_atfirst["songs"][0]["link"]
-                print("added")
-                queue["songs"].insert(0,download_sync(link, song_id,author))
-                if len(songs_to_dl_atfirst["songs"]) != 0:
-                    songs_to_dl_atfirst["songs"].pop(0)
+    # print("running")
+    # while True:
+    #     if len(songs_to_dl_atfirst["songs"]) != 0:
+    #         for song in songs_to_dl_atfirst["songs"]:
+    #             song_id = songs_to_dl_atfirst["songs"][0]["song_id"]
+    #             author = songs_to_dl_atfirst["songs"][0]["author"]
+    #             link = songs_to_dl_atfirst["songs"][0]["link"]
+    #             print("added")
+    #             queue["songs"].insert(0,download_sync(link, song_id,author))
+    #             if len(songs_to_dl_atfirst["songs"]) != 0:
+    #                 songs_to_dl_atfirst["songs"].pop(0)
             
-            return
-        if len(songs_to_dl["songs"]) != 0:
-            for song in songs_to_dl["songs"]:
-                song_id = songs_to_dl["songs"][0]["song_id"]
-                author = songs_to_dl["songs"][0]["author"]
-                link = songs_to_dl["songs"][0]["link"]
-                if songs_to_dl["songs"][0]["needtobeplay"] == False:
-                    download_sync(link,song_id,author)
-                else:    
-                    queue["songs"].append(download_sync(link, song_id,author))
-                if len(songs_to_dl["songs"]) != 0 :
-                    songs_to_dl["songs"].pop(0)
-        await asyncio.sleep(1) 
+    #         return
+    #     if len(songs_to_dl["songs"]) != 0:
+    #         for song in songs_to_dl["songs"]:
+    #             song_id = songs_to_dl["songs"][0]["song_id"]
+    #             author = songs_to_dl["songs"][0]["author"]
+    #             link = songs_to_dl["songs"][0]["link"]
+    #             if songs_to_dl["songs"][0]["needtobeplay"] == False:
+    #                 download_sync(link,song_id,author)
+    #             else:    
+    #                 queue["songs"].append(download_sync(link, song_id,author))
+    #             if len(songs_to_dl["songs"]) != 0 :
+    #                 songs_to_dl["songs"].pop(0)
+    #     await asyncio.sleep(1) 
+    return
         
 
 
@@ -301,9 +321,9 @@ async def CheckingifQueueisempty():
     global playing
     global mixing
     while True:
-        if len(queue["songs"]) != 0 and playing[0] == False :
-            print(queue["songs"])
-            playsong(queue["songs"][0]["song_id"], queue["songs"][0]["author"])
+        # if len(queue["songs"]) != 0 and playing[0] == False :
+        #     print(queue["songs"])
+        #     playsong(queue["songs"][0]["song_id"], queue["songs"][0]["author"])
         
         if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False:
             seed_ids = [song["song_id"] for song in history["songs"][0:5]]
@@ -415,6 +435,26 @@ def add(args):
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
 
+@api.post("/download")
+def download(args):
+    link = args.get("link", None)
+    author = args.get("author", None)
+    if link is None:
+        return { "error": "link parameter required" }
+    if author is None:
+        return { "error": "author parameter is required"}
+    
+    song_id = GetIdFromLink(link)
+    if link.find("playlist") != -1:
+        name = GetNameFromId(song_id,1)
+        
+        for element in GetAllTrackIdsFromPlaylist(song_id):
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
+        return f"The playlist {name} will be download"
+    name = GetNameFromId(song_id,0)
+    song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : False}
+    songs_to_dl["songs"].append(song)
+    return f"The song {name} will be download"
         
 @api.post("/notplaying")
 def notplaying(_):
@@ -450,7 +490,7 @@ def mix(_):
             return f"You must have played at least 5 songs"
         
     
-        return f"Mix is now ON"
+        return f"mix is now ON"
     else:
         
         mixing.clear()
@@ -475,20 +515,6 @@ def search(args):
     songs_to_dl["songs"].append(song)
     return f"{name} was added to the queue"
 
-@api.post("/queue")
-def search(args):
-    index = args.get("index", None)
-    songs_to_return = []
-    if index is None:
-        return { "error": "index parameter is required"}
-    for i in range(len(queue["songs"])):
-        songs_to_return.append(queue["songs"][i]["link"]) 
-    for i in range(len(songs_to_dl_atfirst["songs"])):
-        songs_to_return.append(songs_to_dl_atfirst["songs"][i]["link"])
-    for i in range(songs_to_dl["songs"][i]["link"]):
-        songs_to_return.append(songs_to_dl["songs"][i]["link"])
-    return songs_to_return[index-1:index+10]
-
 @api.post("/playrandom")
 def playrandom(args):
     author = args.get("author", None)
@@ -509,6 +535,29 @@ def playrandom(args):
     name = GetNameFromId(choice, 0)
     return f"{name} was added to the queue"
 
+@api.post("/queue")
+def getqueue(args):
+    index = args.get("index", None)
+    if index is None:
+        return { "error": "index parameter required" }
+    
+    if index > len(queue["songs"]) + len(songs_to_dl_atfirst["songs"]) + len(songs_to_dl["songs"]):
+        return f"There is no songs at this index"
+    
+    songs_to_return = []
+    
+    for i in range(len(queue["songs"])):
+        songs_to_return.append(queue["songs"][i]["song_id"]) 
+
+    for i in range(len(songs_to_dl_atfirst["songs"])):
+       songs_to_return.append(songs_to_dl_atfirst["songs"][i]["song_id"])
+
+    for i in range(len(songs_to_dl["songs"])):
+       songs_to_return.append(songs_to_dl["songs"][i]["song_id"])
+    print(songs_to_return)
+    print(songs_to_return[index-2])
+    return  songs_to_return[index-1:index+9]
+
 @api.post("/delete")
 def delete(args):
     id = args.get("id", None)
@@ -527,7 +576,7 @@ def delete(args):
             return { "deleted": id }
         else:
             return { "error": f"song not found with id {id}" }
-        
+    
 
 
 if __name__ == "__main__":
