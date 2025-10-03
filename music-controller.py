@@ -415,26 +415,6 @@ def add(args):
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
 
-@api.post("/download")
-def download(args):
-    link = args.get("link", None)
-    author = args.get("author", None)
-    if link is None:
-        return { "error": "link parameter required" }
-    if author is None:
-        return { "error": "author parameter is required"}
-    
-    song_id = GetIdFromLink(link)
-    if link.find("playlist") != -1:
-        name = GetNameFromId(song_id,1)
-        
-        for element in GetAllTrackIdsFromPlaylist(song_id):
-            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
-        return f"The playlist {name} will be download"
-    name = GetNameFromId(song_id,0)
-    song = { "song_id": song_id, "link": link, "author": author, "needtobeplay" : False}
-    songs_to_dl["songs"].append(song)
-    return f"The song {name} will be download"
         
 @api.post("/notplaying")
 def notplaying(_):
@@ -470,7 +450,7 @@ def mix(_):
             return f"You must have played at least 5 songs"
         
     
-        return f"mix is now ON"
+        return f"Mix is now ON"
     else:
         
         mixing.clear()
@@ -494,6 +474,20 @@ def search(args):
     print(song)
     songs_to_dl["songs"].append(song)
     return f"{name} was added to the queue"
+
+@api.post("/queue")
+def search(args):
+    index = args.get("index", None)
+    songs_to_return = []
+    if index is None:
+        return { "error": "index parameter is required"}
+    for i in range(len(queue["songs"])):
+        songs_to_return.append(queue["songs"][i]["link"]) 
+    for i in range(len(songs_to_dl_atfirst["songs"])):
+        songs_to_return.append(songs_to_dl_atfirst["songs"][i]["link"])
+    for i in range(songs_to_dl["songs"][i]["link"]):
+        songs_to_return.append(songs_to_dl["songs"][i]["link"])
+    return songs_to_return[index-1:index+10]
 
 @api.post("/playrandom")
 def playrandom(args):

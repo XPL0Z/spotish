@@ -32,6 +32,7 @@ UrlToSkip = "http://127.0.0.1:5000/skip"
 UrlToSearch = "http://127.0.0.1:5000/search"
 UrlToPlayRandom = "http://127.0.1:5000/playrandom"
 UrlToDownload = "http://127.0.1:5000/download"
+UrlToGetQueue = "http://127.0.1:5000/queue"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
@@ -301,7 +302,22 @@ async def download(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         response = requests.post(UrlToDownload,json=payload)
         await update.message.reply_text(response.json())
     
-           
+async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if await isauthorized(update.message.from_user.username) != True:
+            await update.message.reply_text("You are not authorized ;)")
+            return
+    
+        index = context.args
+        index = ' '.join(index)# Convert the list into a string
+
+        if index is None:
+            index = 0
+        payload = {
+            "index": index,
+        }
+        response = requests.post(UrlToGetQueue,json=payload)
+        await update.message.reply_text(response.json())
+        
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("Option 1", callback_data='button_1')],
