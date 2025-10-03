@@ -64,7 +64,14 @@ queue = {
 songs_to_dl = {
     "songs":[
         # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
-        
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong1", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong2", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong3", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong4", "author": "username","needtobeplay":True },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong5", "author": "username","needtobeplay":False },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong6", "author": "username","needtobeplay":False },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong7", "author": "username","needtobeplay":False },
+        {"link": "urlofthespotify", "song_id": "idofthespotifysong8", "author": "username","needtobeplay":False }
     ]
 }
 
@@ -363,9 +370,18 @@ def add(args):
     if link.find("playlist") !=-1:
         print("not album")
         name = GetNameFromId(song_id,1)
-        print(name)
-        for element in GetSongFromPlaylist(song_id):
-            
+        elements = GetSongFromPlaylist(song_id)
+        if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
+            for i in range(len(songs_to_dl["songs"])-1,0,-1):
+                if songs_to_dl["songs"][i]["needtobeplay"] == True:
+                    for j in range(len(elements)):
+                        print("J: " + str(j))
+                        print("I: "+ str(i))
+                        element = elements[j]
+                        print(element)
+                        songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+                    return f"The playlist {name} was added to the queue"
+        for element in elements:
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
     
