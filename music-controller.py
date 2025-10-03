@@ -64,14 +64,7 @@ queue = {
 songs_to_dl = {
     "songs":[
         # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong1", "author": "username","needtobeplay":True },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong2", "author": "username","needtobeplay":True },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong3", "author": "username","needtobeplay":True },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong4", "author": "username","needtobeplay":True },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong5", "author": "username","needtobeplay":False },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong6", "author": "username","needtobeplay":False },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong7", "author": "username","needtobeplay":False },
-        {"link": "urlofthespotify", "song_id": "idofthespotifysong8", "author": "username","needtobeplay":False }
+        
     ]
 }
 
