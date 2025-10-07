@@ -258,9 +258,9 @@ def GetRecommandation(seeds_list):
     song = {"song_id" :song_id, "link": link, "author": "recommendation","needtobeplay" : True}
     return song
 
-########################################################
-# <-------------- WHILE TRUE SECTION ------------------>
-########################################################
+#########################################################
+# <-------------- WHILE TRUE SECTION ------------------>#
+#########################################################
 
 async def Downloading():
     print("running")
@@ -316,9 +316,9 @@ def start_checkingQueue():
     asyncio.run(CheckingifQueueisempty())
     
 
-########################################################
-# <----------------- API SECTION ---------------------->
-########################################################
+#########################################################
+# <----------------- API SECTION ---------------------->#
+#########################################################
 
 
 @api.get("/")
@@ -364,13 +364,15 @@ def add(args):
         print("not album")
         name = GetNameFromId(song_id,1)
         elements = GetSongFromPlaylist(song_id)
-        if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
-            for i in range(len(songs_to_dl["songs"])-1,0,-1):
-                if songs_to_dl["songs"][i]["needtobeplay"] == True:
-                    for j in range(len(elements)):
-                        element = elements[j]
-                        songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
-                    return f"The playlist {name} was added to the queue"
+        if len(songs_to_dl["songs"]) > 0:
+            if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
+                for i in range(len(songs_to_dl["songs"])-1,0,-1):
+                    if songs_to_dl["songs"][i]["needtobeplay"] == True:
+                        print(songs_to_dl["songs"][i])
+                        for j in range(len(elements)):
+                            element = elements[j]
+                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+                        return f"The playlist {name} was added to the queue"
         for element in elements:
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
@@ -379,18 +381,19 @@ def add(args):
         print("album")
         name = GetNameFromId(song_id, 2)
         elements = GetSongFromAlbum(song_id)
-        if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
-            for i in range(len(songs_to_dl["songs"])-1,0,-1):
-                if songs_to_dl["songs"][i]["needtobeplay"] == True:
-                    for j in range(len(elements)):
-                        element = elements[j]
-                        songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
-                    return f"The playlist {name} was added to the queue"
+        if len(songs_to_dl["songs"]) > 0:
+            if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
+                for i in range(len(songs_to_dl["songs"])-1,0,-1):
+                    if songs_to_dl["songs"][i]["needtobeplay"] == True:
+                        for j in range(len(elements)):
+                            element = elements[j]
+                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+                        return f"The playlist {name} was added to the queue"
         for element in GetSongFromAlbum(song_id):
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The album {name} was added to the queue"
     
-    #name = GetNameFromId(song_id,0)
+    name = GetNameFromId(song_id,0)
     song = {"link": link, "song_id": song_id, "author": author, "needtobeplay" : True}
     if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
         for i in range(len(songs_to_dl["songs"])-1,0,-1):
