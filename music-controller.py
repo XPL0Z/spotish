@@ -361,14 +361,14 @@ def add(args):
     print(song_id)
     
     if link.find("playlist") !=-1:
-        print("not album")
+        print("Playlist")
         name = GetNameFromId(song_id,1)
         elements = GetSongFromPlaylist(song_id)
         if len(songs_to_dl["songs"]) > 0:
             if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
-                for i in range(len(songs_to_dl["songs"])-1,0,-1):
-                    if songs_to_dl["songs"][i]["needtobeplay"] == True:
-                        print(songs_to_dl["songs"][i])
+                for i in range(len(songs_to_dl["songs"])-1,-1,-1):
+                    
+                    if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0:
                         for j in range(len(elements)):
                             element = elements[j]
                             songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
@@ -383,8 +383,8 @@ def add(args):
         elements = GetSongFromAlbum(song_id)
         if len(songs_to_dl["songs"]) > 0:
             if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
-                for i in range(len(songs_to_dl["songs"])-1,0,-1):
-                    if songs_to_dl["songs"][i]["needtobeplay"] == True:
+                for i in range(len(songs_to_dl["songs"])-1,.1,-1):
+                    if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0 :
                         for j in range(len(elements)):
                             element = elements[j]
                             songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
@@ -396,8 +396,8 @@ def add(args):
     name = GetNameFromId(song_id,0)
     song = {"link": link, "song_id": song_id, "author": author, "needtobeplay" : True}
     if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
-        for i in range(len(songs_to_dl["songs"])-1,0,-1):
-            if songs_to_dl["songs"][i]["needtobeplay"] == True:
+        for i in range(len(songs_to_dl["songs"])-1,-1,-1):
+            if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0:
                 songs_to_dl["songs"].insert(i+1,song)
                 return f"The song {name} was added to the queue"
 
