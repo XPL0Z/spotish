@@ -329,6 +329,7 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         for i in range(len(response.json())):
             message += f"{responsejson[i]["place"]} {responsejson[i]["name"]} {responsejson[i]["song_id"]}\n"
 
+
         await update.message.reply_text(message)
 
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

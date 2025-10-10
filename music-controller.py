@@ -52,7 +52,7 @@ mixing= [False]
 downloadingmix = [False]
 queue = {
     "songs": [
-        # { "song_id": idofthespotifysong, "author": "username" },
+        #{ "song_id": "idofthespotifysong", "author": "username" },
     ]
 }
 
