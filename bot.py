@@ -327,7 +327,7 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
         message = ""
         for i in range(len(response.json())):
-            message += f"{responsejson[i]["place"]} {responsejson[i]["name"]} {responsejson[i]["song_id"]}\n"
+            message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']}\n"
 
 
         await update.message.reply_text(message)
