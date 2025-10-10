@@ -587,17 +587,17 @@ def delete(args):
         print(song)
         if song["song_id"] == song_id:
             queue["songs"].remove(song)
-            return f"The song {GetNameFromId(song["song_id"], 0 )} was removed"
+            return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
 
     for song in songs_to_dl_atfirst["songs"]:
         if song["song_id"] == song_id:
             songs_to_dl_atfirst["songs"].remove(song)
-            return f"The song {GetNameFromId(song["song_id"], 0 )} was removed"
+            return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
     
     for song in songs_to_dl["songs"]:
         if song["song_id"] == song_id:
             songs_to_dl["songs"].remove(song)
-            return f"The song {GetNameFromId(song["song_id"], 0 )} was removed"
+            return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
 
 
 if __name__ == "__main__":
