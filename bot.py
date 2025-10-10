@@ -320,8 +320,14 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         }
 
         response = requests.post(UrlToGetQueue,json=payload)
+        responsejson = response.json()
+        print(responsejson)
         
-        await update.message.reply_text(response.json())
+        message = ""
+        for i in range(len(response.json())):
+            message += f"{responsejson[i]["place"]} {responsejson[i]["name"]} {responsejson[i]["song_id"]}\n"
+
+        await update.message.reply_text(message)
         
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [

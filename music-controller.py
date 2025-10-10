@@ -50,16 +50,12 @@ UrlToSkip = "http://127.0.0.1:7000/skip"
 playing = [False]
 mixing= [False]
 downloadingmix = [False]
-# queue = {
-#     "songs": [
-#         # { "song_id": idofthespotifysong, "author": "username" },
-#     ]
-# }
 queue = {
     "songs": [
-        # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
+        # { "song_id": idofthespotifysong, "author": "username" },
     ]
 }
+
 
 songs_to_dl = {
     "songs":[
@@ -549,6 +545,7 @@ def playrandom(args):
 @api.post("/queue")
 def getqueue(args):
     index = args.get("index", None)
+   
     if index is None:
         return { "error": "index parameter required" }
     
@@ -566,33 +563,21 @@ def getqueue(args):
     for i in range(len(songs_to_dl["songs"])):
        songs_to_return.append(songs_to_dl["songs"][i]["song_id"])
     print(songs_to_return[index-2])
-    names = []
+    
+    NamesAndID = []
+    i = index
     for song_id in songs_to_return[index-1:index+9]:
-        names.append(GetNameFromId(song_id,0))
-    return  names
+        song = {"place": i, "song_id": song_id,"name": GetNameFromId(song_id,0)}
+        NamesAndID.append(song)
+        i+= 1
+    return  NamesAndID
 
 @api.get("/shuffle")
 def shuffle(_):
     random.shuffle(queue["songs"])
     random.shuffle(songs_to_dl["songs"])
-@api.post("/delete")
-def delete(args):
-    id = args.get("id", None)
-    if id is None:
-        return { "error": "id parameter required" }
-    else:
-        song_deleted = False
+    
 
-        for song in queue["songs"]:
-            if song["song_id"] == id:
-                queue["songs"].remove(song)
-                song_deleted = True
-                break
-
-        if song_deleted:
-            return { "deleted": id }
-        else:
-            return { "error": f"song not found with id {id}" }
     
 
 
@@ -643,8 +628,8 @@ if __name__ == "__main__":
 
 
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
-    threading.Thread(target=start_checking, daemon=True).start()
-    threading.Thread(target=start_checkingQueue, daemon=True).start()
+    #threading.Thread(target=start_checking, daemon=True).start()
+    #threading.Thread(target=start_checkingQueue, daemon=True).start()
     print(f"Application started at http://127.0.0.1:{PORT}/")
     httpd.serve_forever()
 
