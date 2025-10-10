@@ -59,7 +59,7 @@ queue = {
 
 songs_to_dl = {
     "songs":[
-        # {"link": urlofthespotify, "song_id": idofthespotifysong, "author": "username" },
+        #{"link": "urlofthespotify", "song_id": "idofthespotifysong", "author": "username" },
         
     ]
 }
@@ -577,8 +577,27 @@ def shuffle(_):
     random.shuffle(queue["songs"])
     random.shuffle(songs_to_dl["songs"])
     
+@api.post("/delete")
+def delete(args):
+    song_id = args.get("song_id", None)
+    if song_id is None:
+        return { "error": "id parameter required" }
 
+    for song in queue["songs"]:
+        print(song)
+        if song["song_id"] == song_id:
+            queue["songs"].remove(song)
+            return f"The song {GetNameFromId(song["song_id"], 0 )} was removed"
+
+    for song in songs_to_dl_atfirst["songs"]:
+        if song["song_id"] == song_id:
+            songs_to_dl_atfirst["songs"].remove(song)
+            return f"The song {GetNameFromId(song["song_id"], 0 )} was removed"
     
+    for song in songs_to_dl["songs"]:
+        if song["song_id"] == song_id:
+            songs_to_dl["songs"].remove(song)
+            return f"The song {GetNameFromId(song["song_id"], 0 )} was removed"
 
 
 if __name__ == "__main__":

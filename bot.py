@@ -33,6 +33,7 @@ UrlToSearch = "http://127.0.0.1:5000/search"
 UrlToPlayRandom = "http://127.0.1:5000/playrandom"
 UrlToDownload = "http://127.0.1:5000/download"
 UrlToGetQueue = "http://127.0.1:5000/queue"
+UrlToDelete = "http://127.0.1:5000/delete"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
@@ -328,6 +329,22 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             message += f"{responsejson[i]["place"]} {responsejson[i]["name"]} {responsejson[i]["song_id"]}\n"
 
         await update.message.reply_text(message)
+
+async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if await isauthorized(update.message.from_user.username) != True:
+            await update.message.reply_text("You are not authorized ;)")
+            return
+        
+        song_id = context.args
+        song_id = ' '.join(song_id)# Convert the list into a string
+        
+        payload = {
+            "song_id": song_id
+        }
+
+        response = requests.post(UrlToDelete,json=payload)
+        
+        await update.message.reply_text(response.json())
         
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -367,6 +384,7 @@ def main():
     application.add_handler(CommandHandler('download', download))
     application.add_handler(CommandHandler('isauthorize', isauthorize))
     application.add_handler(CommandHandler('queue', queue))
+    application.add_handler(CommandHandler('delete', delete))
     
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
