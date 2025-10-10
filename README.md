@@ -108,6 +108,7 @@ Available commands:
   /start - 📜 Show this menu    
   /play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue    
   /playtop &lt;Spotify URL&gt; - ⬆️ Add a track to the top of the queue     
+  /random - 🎲 Play a random song that is already download   
   /pause - ⏸️ Pause the current song    
   /resume - 🔄 Resume the paused song    
   /skip - ⏭️ Skip the current song    

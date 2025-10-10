@@ -75,7 +75,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
             "/start - 📜 Show this menu\n"
             "/play &lt;Spotify URL&gt; - ▶️ Play a song or ➕ add it to the queue\n"
-            "/playtop &lt;Spotify URL&gt; - ⬆️ Add a track to the top of the queue"
+            "/playtop &lt;Spotify URL&gt; - ⬆️ Add a track to the top of the queue\n"
+            "/random - 🎲 Play a random song that is already download\n"
             "/pause - ⏸️ Pause the current song\n"
             "/resume - 🔄 Resume the paused song\n"
             "/skip - ⏭️ Skip the current song\n"
@@ -307,16 +308,19 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if await isauthorized(update.message.from_user.username) != True:
             await update.message.reply_text("You are not authorized ;)")
             return
+        
         index = context.args
         if len(index) == 0:
             index = 1
         else:
             index = ' '.join(index)
-        print(index)
+        
         payload = {
             "index": int(index)
         }
+
         response = requests.post(UrlToGetQueue,json=payload)
+        
         await update.message.reply_text(response.json())
         
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -335,7 +339,7 @@ async def button_selection_handler(update: Update, context: ContextTypes.DEFAULT
     await query.edit_message_text(f'You selected option: {query.data.split("_")[1]}')
 
 
-def main():
+def main(): 
     # Create the Application instance
     application = Application.builder().token(BOT_TOKEN).build()
 
