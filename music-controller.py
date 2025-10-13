@@ -647,8 +647,8 @@ if __name__ == "__main__":
 
 
     httpd = HTTPServer(('', PORT), ApiRequestHandler)
-    #threading.Thread(target=start_checking, daemon=True).start()
-    #threading.Thread(target=start_checkingQueue, daemon=True).start()
+    threading.Thread(target=start_checking, daemon=True).start()
+    threading.Thread(target=start_checkingQueue, daemon=True).start()
     print(f"Application started at http://127.0.0.1:{PORT}/")
     httpd.serve_forever()
 
