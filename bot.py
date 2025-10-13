@@ -313,6 +313,8 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             return
         
         index = context.args
+        if index == "404":
+            return  await update.message.reply_text("Are you a nerd 🤓🥸 ?")
         if len(index) == 0:
             index = 1
         else:
