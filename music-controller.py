@@ -496,11 +496,11 @@ def stop(_):
 @api.post("/mix")
 def mix(_):
     if mixing[0] == False: 
-        
-        mixing.clear()
-        mixing.append(True)
         if len(history["songs"])<5:
             return f"You must have played at least 5 songs"
+        mixing.clear()
+        mixing.append(True)
+        
         
     
         return f"mix is now ON"
