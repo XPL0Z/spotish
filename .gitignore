@@ -3,6 +3,8 @@
 #inutile
 authorize.json
 test.json
+spotish-web/
+node_modules/
 test.py
 resultats.jsonl
 result.json

@@ -369,6 +369,7 @@ def add(args):
                             element = elements[j]
                             songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
                         return f"The playlist {name} was added to the queue"
+                    
         for element in elements:
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
@@ -390,15 +391,18 @@ def add(args):
         return f"The album {name} was added to the queue"
     
     name = GetNameFromId(song_id,0)
+    
     song = {"link": link, "song_id": song_id, "author": author, "needtobeplay" : True}
-    if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
-        for i in range(len(songs_to_dl["songs"])-1,-1,-1):
-            if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0:
-                songs_to_dl["songs"].insert(i+1,song)
-                return f"The song {name} was added to the queue"
+    if len(songs_to_dl["songs"]) > 0:
+        if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
+            for i in range(len(songs_to_dl["songs"])-1,-1,-1):
+                if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0:
+                    songs_to_dl["songs"].insert(i+1,song)
+                    return f"The song {name} was added to the queue"
 
     
     songs_to_dl["songs"].append(song)
+    print(song)
     return f"The song {name} was added to the queue"
 
 @api.post("/addSongtop")
