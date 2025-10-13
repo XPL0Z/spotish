@@ -34,6 +34,7 @@ UrlToPlayRandom = "http://127.0.1:5000/playrandom"
 UrlToDownload = "http://127.0.1:5000/download"
 UrlToGetQueue = "http://127.0.1:5000/queue"
 UrlToDelete = "http://127.0.1:5000/delete"
+UrlToShuffle = "http://127.0.1:5000/shuffle"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
@@ -351,6 +352,15 @@ async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
         await update.message.reply_text(response.json())
         
+async def shuffle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if await isauthorized(update.message.from_user.username) != True:
+            await update.message.reply_text("You are not authorized ;)")
+            return
+
+        response = requests.post(UrlToShuffle,json={})
+        
+        await update.message.reply_text(response.json())
+        
 async def show_option_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("Option 1", callback_data='button_1')],
@@ -390,6 +400,7 @@ def main():
     application.add_handler(CommandHandler('isauthorize', isauthorize))
     application.add_handler(CommandHandler('queue', queue))
     application.add_handler(CommandHandler('delete', delete))
+    application.add_handler(CommandHandler('shuffle', shuffle))
     
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))

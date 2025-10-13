@@ -573,10 +573,11 @@ def getqueue(args):
         i+= 1
     return  NamesAndID
 
-@api.get("/shuffle")
+@api.post("/shuffle")
 def shuffle(_):
     random.shuffle(queue["songs"])
     random.shuffle(songs_to_dl["songs"])
+    return f"The queue has been shuffled"
     
 @api.post("/delete")
 def delete(args):
