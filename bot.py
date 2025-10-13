@@ -334,7 +334,7 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(responsejson)
         print("responsejson")
         
-        message = ""
+        message = "Index | Name | Spotify ID"
         if len(response.json()) > 0:
             for i in range(len(response.json())):
                 message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']}\n"
