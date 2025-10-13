@@ -553,8 +553,6 @@ def getqueue(args):
     if index is None:
         return { "error": "index parameter required" }
     
-    if index > len(queue["songs"]) + len(songs_to_dl_atfirst["songs"]) + len(songs_to_dl["songs"]):
-        return f"There is no songs at this index"
     
     songs_to_return = []
     

@@ -170,6 +170,7 @@ async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def isauthorize(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     arg = context.args
     arg = ' '.join(arg)
+    arg = arg.split("@")[1]
     if len(arg) == 0:
         if await isauthorized(update.message.from_user.username) == True:
             await update.message.reply_text(f"You are @{update.message.from_user.username} and authorized ;)")
@@ -322,14 +323,17 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         response = requests.post(UrlToGetQueue,json=payload)
         responsejson = response.json()
+        print("responsejson")
         print(responsejson)
+        print("responsejson")
         
         message = ""
-        for i in range(len(response.json())):
-            message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']}\n"
-
-
-        await update.message.reply_text(message)
+        if len(response.json()) > 0:
+            for i in range(len(response.json())):
+                message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']}\n"
+            await update.message.reply_text(message)
+        await update.message.reply_text("The queue is empty")
+        
 
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if await isauthorized(update.message.from_user.username) != True:
