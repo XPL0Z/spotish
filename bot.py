@@ -189,24 +189,25 @@ async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     
     if len(context.args) != 3:
-        await update.message.reply_text("Invalid. Usage: /adduser alice 30 m Use s (seconds), m (minutes), or h (hours).")
+        await update.message.reply_text("Invalid. Usage: /adduser @alice 30 m Use s (seconds), m (minutes), or h (hours).")
         return
     
     username = context.args[0]
+    username = username.split("@")[1]
     duration = abs(int(context.args[1]))
     unit = context.args[2]
     current_time = int(time.time())
     if unit == "s":
         endat = current_time + duration
-        message = f"{username} is now allowed for {duration} seconds"
+        message = f"@{username} is now allowed for {duration} seconds"
     elif unit == "m":
         endat = current_time + duration * 60
-        message = f"{username} is now allowed for {duration} minutes"
+        message = f"@{username} is now allowed for {duration} minutes"
     elif unit == "h":
         endat = current_time + duration * 3600
-        message = f"{username} is now allowed for {duration} hours"
+        message = f"@{username} is now allowed for {duration} hours"
     else:
-        await update.message.reply_text("Invalid. Usage: /adduser alice 30 m Use s (seconds), m (minutes), or h (hours).")
+        await update.message.reply_text("Invalid. Usage: /adduser @alice 30 m Use s (seconds), m (minutes), or h (hours).")
         return
     
     
