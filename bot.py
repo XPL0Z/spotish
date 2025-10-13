@@ -331,8 +331,8 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if len(response.json()) > 0:
             for i in range(len(response.json())):
                 message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']}\n"
-            await update.message.reply_text(message)
-        await update.message.reply_text("The queue is empty")
+            return await update.message.reply_text(message)
+        return await update.message.reply_text("The queue is empty")
         
 
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
