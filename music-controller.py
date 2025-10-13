@@ -540,10 +540,10 @@ def playrandom(args):
         filename = file.name.split(".")
         
         songs.append(filename[0])
-
     choice = random.choice(songs)
-    playsong(choice ,author)
+    song = {"link":  "https://open.spotify.com/track/"+choice, "song_id": choice, "author": author, "needtobeplay" : True}
     name = GetNameFromId(choice, 0)
+    queue["songs"].append(song)
     return f"{name} was added to the queue"
 
 @api.post("/queue")
@@ -566,7 +566,6 @@ def getqueue(args):
 
     for i in range(len(songs_to_dl["songs"])):
        songs_to_return.append(songs_to_dl["songs"][i]["song_id"])
-    print(songs_to_return[index-2])
     
     NamesAndID = []
     i = index
