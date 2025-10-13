@@ -60,7 +60,6 @@ async def isauthorized(username):
     for i in range(len(authorized_user)):
         print(authorized_user[i]["endat"])
         if authorized_user[i]["endat"] > int(time.time()) or authorized_user[i]["endat"] == -1:
-            print("TEST")
             if authorized_user[i]["username"] == username:
                 await WriteAuthorizeUser()
                 return True
@@ -194,10 +193,9 @@ async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     
     username = context.args[0]
-    duration = int(context.args[1])
+    duration = abs(int(context.args[1]))
     unit = context.args[2]
     current_time = int(time.time())
-    
     if unit == "s":
         endat = current_time + duration
         message = f"{username} is now allowed for {duration} seconds"
