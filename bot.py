@@ -58,7 +58,6 @@ async def WriteAuthorizeUser():
 # this function checks if a date of a user is expired and delete it, primary usage is to check if a user is authorized
 async def isauthorized(username):
     for i in range(len(authorized_user)):
-        print(authorized_user[i]["endat"])
         if authorized_user[i]["endat"] > int(time.time()) or authorized_user[i]["endat"] == -1:
             if authorized_user[i]["username"] == username:
                 await WriteAuthorizeUser()
@@ -240,7 +239,6 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("Please enter a valid number between 0 and 100")
     except Exception as e:
         await update.message.reply_text(f"An error occurred: {str(e)}")
-        print(f"Error in volume command: {e}")
     
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await isauthorized(update.message.from_user.username) != True:
@@ -321,14 +319,11 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         response = requests.post(UrlToGetQueue,json=payload)
         responsejson = response.json()
-        print("responsejson")
-        print(responsejson)
-        print("responsejson")
         
-        message = "Index | Name | Spotify ID"
+        message = "Index | Name | Spotify ID \n"
         if len(response.json()) > 0:
             for i in range(len(response.json())):
-                message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']}\n"
+                message += f"{responsejson[i]['place']} {responsejson[i]['name']} {responsejson[i]['song_id']} \n"
             return await update.message.reply_text(message)
         return await update.message.reply_text("The queue is empty")
         

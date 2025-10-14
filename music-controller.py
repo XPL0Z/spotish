@@ -14,6 +14,7 @@ import asyncio
 import glob
 from pathlib import Path
 import random
+from yt_dlp import YoutubeDL
 
 path = Path.cwd()
 
@@ -157,6 +158,9 @@ def remove_song(index):
 def download_sync(link,song_id,author):
     subprocess.run(["spotdl", "download", link, "--output", f"Songs/{song_id}.{{output-ext}}", "--client-id", CLIENT_ID, "--client-secret", CLIENT_SECRET])
     song = {"song_id": song_id, "author": author}
+    if author == "recommendation":
+        downloadingmix.clear()
+        downloadingmix.append(False)
     return song
 
 def playsong(song_id, author):
@@ -169,9 +173,7 @@ def playsong(song_id, author):
     if len(queue["songs"]) != 0:
         print("First element removed :", queue["songs"].pop(0))
     
-    if author == "recommendation":
-        downloadingmix.clear()
-        downloadingmix.append(False)
+    
     
     
         
@@ -296,10 +298,11 @@ async def CheckingifQueueisempty():
     global mixing
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False :
+            print("Playing"+ str(playing[0]))
             print(queue["songs"])
             playsong(queue["songs"][0]["song_id"], queue["songs"][0]["author"])
         
-        if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False:
+        if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False and len(songs_to_dl["songs"]) == 0:
             seed_ids = [song["song_id"] for song in history["songs"][0:5]]
             songs_to_dl["songs"].append(GetRecommandation(seed_ids))
             
@@ -308,7 +311,6 @@ async def CheckingifQueueisempty():
 def start_checking():
     print("Checking if there is songs to download")
     asyncio.run(Downloading())
-
 
 def start_checkingQueue():
     print("Checking if there is songs to play")
