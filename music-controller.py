@@ -490,6 +490,8 @@ def stop(_):
     changetoNOTplaying()
     queue["songs"].clear()
     songs_to_dl["songs"].clear()
+    mixing.clear()
+    mixing.append(False)
     requests.post(UrlToStop, json={})
     return f"The queue has been cleared"
 
