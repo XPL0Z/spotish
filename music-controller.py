@@ -46,8 +46,11 @@ UrlToPlay = "http://127.0.0.1:7000/play"
 UrlToGetLenght = "http://127.0.0.1:7000/length"
 UrlToStop = "http://127.0.0.1:7000/stop"
 UrlToSkip = "http://127.0.0.1:7000/skip"
+UrlToPause = "http://127.0.0.1:7000/pause"
+UrlToResume = "http://127.0.0.1:7000/resume"
 
 playing = [False]
+StatePause = [False]
 mixing= [False]
 downloadingmix = [False]
 queue = {
@@ -471,6 +474,10 @@ def download(args):
         
 @api.post("/notplaying")
 def notplaying(_):
+    
+    if StatePause[0] == True:
+        return False
+    
     changetoNOTplaying()
     if len(queue["songs"]) == 0:
         return {"error": "No songs in queue"}
@@ -603,6 +610,18 @@ def delete(args):
             songs_to_dl["songs"].remove(song)
             return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
 
+@api.post("/pause")
+def pause(_):
+    if StatePause[0] == False:
+        StatePause.clear()
+        StatePause.append(True)
+        requests.post(UrlToPause, json={})
+        return f"The music has been paused"
+    
+    StatePause.clear()
+    StatePause.append(False)
+    requests.post(UrlToResume, json={})
+    return f"The music has been resumed"
 
 if __name__ == "__main__":
     class ApiRequestHandler(BaseHTTPRequestHandler):

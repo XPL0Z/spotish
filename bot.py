@@ -35,8 +35,7 @@ UrlToDownload = "http://127.0.1:5000/download"
 UrlToGetQueue = "http://127.0.1:5000/queue"
 UrlToDelete = "http://127.0.1:5000/delete"
 UrlToShuffle = "http://127.0.1:5000/shuffle"
-UrlToPause = "http://127.0.0.1:7000/pause"
-UrlToResume = "http://127.0.0.1:7000/resume"
+UrlToPause = "http://127.0.0.1:5000/pause"
 UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 
 for admin in admins:
@@ -135,14 +134,6 @@ async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response = requests.post(UrlToPause, json={})
     await update.message.reply_text(response.json())
     
-    
-
-async def resume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if await isauthorized(update.message.from_user.username) != True:
-        await update.message.reply_text("You are not authorized ;)")
-        return
-    await update.message.reply_text("The music has been resumed")
-    response = requests.post(UrlToResume,json={})
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await isauthorized(update.message.from_user.username) != True:
@@ -394,7 +385,7 @@ def main():
     application.add_handler(CommandHandler('play', play))
     application.add_handler(CommandHandler('playtop', playtop))
     application.add_handler(CommandHandler('pause', pause))
-    application.add_handler(CommandHandler('resume', resume))
+    application.add_handler(CommandHandler('resume', pause))
     application.add_handler(CommandHandler('skip', skip))
     application.add_handler(CommandHandler('stop', stop))
     application.add_handler(CommandHandler('volume', volume))
