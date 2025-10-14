@@ -227,8 +227,8 @@ Python 3.11.8
 8. Get a spotify ClientID and SecretID [here](https://developer.spotify.com/dashboard)
 9. Place your token bot, ClientID, SecretID and your username in the .env. You can add multiple user, you need to split usernames by a space
 10. Rename example-authorize.json to authorize.json
-10. Set the time between each check for update in the .env (recommended 3600)
-11. Launch run.py
+11. Set the time between each check for update in the .env (recommended 3600)
+12. Launch run.py
   ```bash
     python run.py
   ```
