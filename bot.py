@@ -304,15 +304,15 @@ async def queue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             return
         
         index = context.args
-        print(type(index))
-        print(index)
-        if index[0] == "404":
-             await update.message.reply_text("Are you a neeerd 🤓🥸 ?")
-        print(index)
+        
+        
 
         if len(index) == 0:
+            
             index = 1
         else:
+            if index[0] == "404":
+                return await update.message.reply_text("Are you a neeerd 🤓🥸 ?")
             index = ' '.join(index)
         
         payload = {
