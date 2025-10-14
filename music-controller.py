@@ -44,6 +44,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, 
 
 PORT = 5000
 UrlToPlay = "http://127.0.0.1:7000/play"
+UrlToGetTimeCode = "http://127.0.0.1:7000/now"
 UrlToGetLenght = "http://127.0.0.1:7000/length"
 UrlToStop = "http://127.0.0.1:7000/stop"
 UrlToSkip = "http://127.0.0.1:7000/skip"
@@ -174,9 +175,6 @@ def playsong(song_id, author):
         print("First element removed :", queue["songs"].pop(0))
     
     
-    
-    
-        
 def GetSongFromPlaylist(playlist_id):
     track_ids = []
     results = sp.playlist_tracks(playlist_id)
@@ -298,7 +296,7 @@ async def CheckingifQueueisempty():
     global mixing
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False :
-            print("Playing"+ str(playing[0]))
+            print("Playing "+ str(playing[0]))
             print(queue["songs"])
             playsong(queue["songs"][0]["song_id"], queue["songs"][0]["author"])
         
@@ -344,6 +342,25 @@ def list(_):
         
     }
 
+@api.get("/infos")
+def infos(_): 
+    timecode = requests.get(UrlToGetTimeCode).json()
+    print("TIMECODE" + str(timecode))
+    length = requests.get(UrlToGetLenght).json()
+    print("LENGTH" + str(length))
+    if len(history["songs"])> 0:
+        print(history)
+        Name = GetNameFromId(history["songs"][0]["song_id"])
+    else:
+        Name = None
+    print("Name" + str(Name))
+    print("Status" + str(playing[0]))
+    return {
+        "timecode": timecode,
+        "length": length,
+        "Name": Name,
+        "status": playing[0],   
+    }
     
 @api.post("/addSong")
 def add(args):
