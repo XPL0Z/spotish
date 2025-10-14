@@ -120,7 +120,7 @@ Available commands:
   /download &lt;Spotify URL&gt; - 💾 Download a song or a playlist     
   /adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user  
   /isauthorize  - ❓ Checks if someone is authorize. If there is no argument you are checking yourself. Don't put @  
-  /queue &lt;song_id&gt; - 📋 Get future songs to play   
+  /queue &lt;index&gt; - 📋 Get future songs to play   
   /delete &lt;song_id&gt; - 🗑️ To delete a song from queue  
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
