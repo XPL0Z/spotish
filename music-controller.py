@@ -382,7 +382,7 @@ def infos(_):
         "timecode": timecode,
         "length": length,
         "Name": Name,
-        "status": playing[0],
+        "status": StatePause[0],
         "volume": currentvolume[0],
     }
     
