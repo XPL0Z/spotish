@@ -80,9 +80,10 @@ def stop(args=None):
 def set_volume(args: dict):
     print("volume args", args)
     vol = args.get("volume", None)
+    
     if vol is None:
         return {"error": "volume parameter required"}
-
+    
     try:
         vol = int(vol)  # convert into a int
         vol = max(0, min(100, vol))  # max between 0 et 100

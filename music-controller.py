@@ -15,6 +15,7 @@ import glob
 from pathlib import Path
 import random
 from yt_dlp import YoutubeDL
+import json
 
 path = Path.cwd()
 
@@ -50,11 +51,14 @@ UrlToStop = "http://127.0.0.1:7000/stop"
 UrlToSkip = "http://127.0.0.1:7000/skip"
 UrlToPause = "http://127.0.0.1:7000/pause"
 UrlToResume = "http://127.0.0.1:7000/resume"
+UrlToChangeVolume = "http://127.0.0.1:7000/volume"
 
 playing = [False]
 StatePause = [False]
 mixing= [False]
 downloadingmix = [False]
+currentvolume = [50]
+
 queue = {
     "songs": [
         #{ "song_id": "idofthespotifysong", "author": "username" },
@@ -82,6 +86,8 @@ history = {
         # {"song_id" : idofthespotifysong}
     ]
 }
+
+Names = {}
 
 ############################################################################      
 #<---------------------------Function Section ----------------------------->
@@ -359,7 +365,8 @@ def infos(_):
         "timecode": timecode,
         "length": length,
         "Name": Name,
-        "status": playing[0],   
+        "status": playing[0],
+        "volume": currentvolume[0],
     }
     
 @api.post("/addSong")
@@ -606,6 +613,19 @@ def shuffle(_):
     random.shuffle(queue["songs"])
     random.shuffle(songs_to_dl["songs"])
     return f"The queue has been shuffled"
+
+@api.post("/volume")
+def volume(args):
+    newvolume = args.get("newvolume", None)
+    
+    if newvolume is None:
+        return { "error": "newvolume parameter required" }
+    
+    requests.post(UrlToChangeVolume, json={"volume": int(newvolume)})
+    
+    currentvolume.clear()
+    currentvolume.append(newvolume)
+    return f"The volume is now at  {str(newvolume)}"
     
 @api.post("/delete")
 def delete(args):

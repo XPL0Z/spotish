@@ -36,7 +36,7 @@ UrlToGetQueue = "http://127.0.1:5000/queue"
 UrlToDelete = "http://127.0.1:5000/delete"
 UrlToShuffle = "http://127.0.1:5000/shuffle"
 UrlToPause = "http://127.0.0.1:5000/pause"
-UrlToChangeVolume = "http://127.0.0.1:7000/volume"
+UrlToChangeVolume = "http://127.0.0.1:5000/volume"
 
 for admin in admins:
     authorized_user.append({"username": admin, "endat": -1})
@@ -228,7 +228,7 @@ async def volume(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             await update.message.reply_text("Volume must be between 0 and 100. Reminder: /volume 0-100")
             return
         payload = {
-            "volume": volume_int
+            "newvolume": volume_int
         }
         response = requests.post(UrlToChangeVolume, json=payload)
         if response.status_code == 200:
