@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import PauseButton from "./components/Pause-Button";
 import ResumeButton from "./components/Resume-Button";
+import NextButton from "./components/Next-Button";
+import PreviousButton from "./components/Previous-Button";
+import VolumeContainer from "./components/Volume-Container";
 
 export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -28,15 +31,16 @@ export default function Home() {
   return (
 
     <main className="flex flex-col items-center justify-center min-h-screen space-y-6">
-
+    
       <div className="flex space-x-8">
+      <PreviousButton disabled={ "disable" } />
       {
-        isPlaying ? <ResumeButton setter={setIsPlaying} /> : <PauseButton setter={setIsPlaying} />
+        isPlaying ? <PauseButton setter={setIsPlaying} /> : <ResumeButton setter={setIsPlaying} />
       }
-      {/* <IsPlaying status={data?.status} /> */}
-      {/* le ? est pour vérifier si status existe avant d'accéder à status */}
+      <NextButton  />
+      
       </div>
-
+      <VolumeContainer />
     </main>
   
   );
