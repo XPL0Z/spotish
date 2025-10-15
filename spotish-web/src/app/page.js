@@ -7,6 +7,7 @@ import PreviousButton from "./components/Previous-Button";
 import VolumeContainer from "./components/Volume-Container";
 
 export default function Home() {
+  const [volume, setVolume] = useState(70);
   const [isPlaying, setIsPlaying] = useState(false);
   const [data, setData] = useState(null); // obligatoire pour stocker les données et acceder dans le render au data.status
   const Getinfos = async () => {
@@ -17,7 +18,7 @@ export default function Home() {
     const data = await res.json();
     console.log("Réponse backend :", data);
     console.log(data.status)
-
+    setVolume(data.volume);
     setIsPlaying(data.status != isPlaying ? data.status : isPlaying)  // Met à jour isPlaying seulement si le status a changé;
   };
   useEffect(()=>{
@@ -40,7 +41,7 @@ export default function Home() {
       <NextButton  />
       
       </div>
-      <VolumeContainer />
+      <VolumeContainer setter={setVolume} value={volume}/>
     </main>
   
   );

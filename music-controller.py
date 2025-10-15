@@ -368,21 +368,22 @@ def list(_):
 @api.get("/infos")
 def infos(_): 
     timecode = requests.get(UrlToGetTimeCode).json()
-    print("TIMECODE" + str(timecode))
+    print("TIMECODE " + str(timecode))
     length = requests.get(UrlToGetLenght).json()
-    print("LENGTH" + str(length))
+    print("LENGTH " + str(length))
     if len(history["songs"])> 0:
         print(history)
         Name = GetNameFromId(history["songs"][0]["song_id"],0)
     else:
         Name = None
-    print("Name" + str(Name))
-    print("Status" + str(playing[0]))
+    print("Name " + str(Name))
+    print("Paused " + str(playing[0]))
     return {
         "timecode": timecode,
         "length": length,
         "Name": Name,
-        "status": StatePause[0],
+        "Paused": not StatePause[0],
+        "Playing": playing[0],
         "volume": currentvolume[0],
     }
     
