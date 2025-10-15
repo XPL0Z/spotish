@@ -2,6 +2,7 @@
 .env 
 #inutile
 authorize.json
+Names.json
 test.json
 spotish-web/
 node_modules/
