@@ -53,7 +53,7 @@ def play(args: dict):
     media_player.set_media(media)
     media_player.play()
     length = media_player.get_length()
-        
+    
     return { "length": length }
 
 @api.post("/pause")
@@ -109,6 +109,16 @@ def list(_):
     
     return value
 
+@api.post("/timecode")
+def timecode(args : int):
+    timecode = args.get("timecode", None)
+    print(timecode)
+    if timecode is None:
+        return {"error": "timecode parameter is required"}
+    timecode = int(timecode)
+    media_player.set_time(timecode)
+
+    return {"timecode": timecode}
 
 if __name__ == "__main__":
     class ApiRequestHandler(BaseHTTPRequestHandler):
