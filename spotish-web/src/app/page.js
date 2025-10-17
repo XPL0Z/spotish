@@ -55,6 +55,7 @@ export default function Home() {
       </div>
 
       <VolumeContainer setter={setVolume} value={volume}/>
+      
     </main>
   
   );

@@ -11,16 +11,16 @@ export default ({setter, value}) => {
   return (
   <div>           
       <div className="flex items-center">
+          
+          <VolumeSlider setter={setter} value={value}/>
+          
           {
           value == 0 ? <VolumeCutIcon /> : 
               value <= 30 ?<VolumeMinIcon />:
                  value <= 70? <VolumeMidIcon /> :
                       <VolumeMaxIcon />
-          } 
-  
-          
-          
-          <VolumeSlider setter={setter} value={value}/>
+          }
+           
       </div>
   </div>
   );                      
