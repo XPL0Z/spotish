@@ -85,20 +85,19 @@ history = {
     ]
 }
 
-Names = [
-    # {"song_id": "idofthespotifysong", "name": "the name"}
-    ]
-FILE_PATH = './Names.json'
-# add track name's that are save in Names.json into Names
-with open('Names.json', 'r') as file:
+Songinfos = []
+FILE_PATH = './Songinfos.json'
+# add track name's that are save in infos.json into infos
+with open('infos.json', 'r') as file:
     python_obj = json.load(file)
 
 for song in python_obj:
-    Names.append(song)
+    print(song)
+    Songinfos.append(song)
     
-def SaveNames():
+def SaveInfos():
     with open(FILE_PATH, 'w') as output_file:
-        output_file.write(json.dumps(Names, indent=2))
+        output_file.write(json.dumps(Songinfos, indent=2))
         
 ############################################################################      
 #<---------------------------Function Section ----------------------------->
@@ -131,15 +130,15 @@ def GetIdFromLink(link):
 def GetNameFromId(song_id,type:int):
     try:
         if type == 0:
-            
-            for song in Names:
+            for song in Songinfos:
+                print("Also")
                 if song["song_id"] == song_id:
                     return song["name"]
             print("The name was asked to spotify")
             track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
             name = track_info["name"]
-            Names.append({"song_id": song_id, "name": name})
-            SaveNames()
+            Songinfos.append({"song_id": song_id, "name": name})
+            SaveInfos()
             return name
         elif type == 1:
     
@@ -154,6 +153,21 @@ def GetNameFromId(song_id,type:int):
             return name
     except spotipy.exceptions.SpotifyException as e:
         return False
+
+def GetInfos(song_id):
+    for song in Songinfos:
+        print("Also")
+        if song["song_id"] == song_id:
+            return song["name"], song["artist"], song["cover"]
+    track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
+    artist = track_info["artists"][0]["name"]
+    name = track_info["name"]
+    cover = track_info["album"]["images"][0]["url"]
+    song = {"song_id": song_id, "name":name,"artist": artist, "cover": cover}
+    Songinfos.append(song)
+    SaveInfos()
+    return name, artist, cover
+
 def changetoNOTplaying():
     playing.clear()
     playing.append(False)
@@ -187,11 +201,10 @@ def download_sync(link,song_id,author):
         downloadingmix.append(False)
     return song
 
-def playsong(song_id, author,name):
+def playsong(song_id):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
-    song = {"song_id": song_id,"name": name,"author": author}
-    history["songs"].insert(0, song)
+    
     requests.post(UrlToPlay, json=payloadtosend)
     
     if len(queue["songs"]) != 0:
@@ -317,11 +330,12 @@ async def CheckingifQueueisempty():
     global mixing
     while True:
         if len(queue["songs"]) != 0 and playing[0] == False :
-            print("Playing "+ str(playing[0]))
             song_id = queue["songs"][0]["song_id"]
+            name, artist,  cover = GetInfos(song_id)
             author = queue["songs"][0]["author"]
-            name = queue["songs"][0].get("name") if queue["songs"][0].get("name") else GetNameFromId(song_id,0)
-            playsong(song_id, author,name)
+            song = {"song_id": song_id,"name": name,"author": author, "artist": artist, "cover":cover}
+            playsong(song_id)
+            history["songs"].insert(0, song)
         
         if mixing[0] == True and len(queue["songs"]) == 0 and downloadingmix[0] == False and len(songs_to_dl["songs"]) == 0:
             seed_ids = [song["song_id"] for song in history["songs"][0:5]]
@@ -361,7 +375,8 @@ def list(_):
         "count to dl": len(songs_to_dl["songs"]),
         "songs": queue["songs"],
         "songstodl": songs_to_dl["songs"],
-        "history": history["songs"]
+        "history": history["songs"],
+        "infos": Songinfos
         
     }
 
@@ -373,7 +388,7 @@ def infos(_):
     print("LENGTH " + str(length))
     if len(history["songs"])> 0:
         print(history)
-        Name = GetNameFromId(history["songs"][0]["song_id"],0)
+        name,artist,cover= GetInfos(history["songs"][0]["song_id"])
     else:
         Name = None
     print("Name " + str(Name))
@@ -381,9 +396,11 @@ def infos(_):
     return {
         "timecode": timecode,
         "length": length,
-        "name": Name,
         "paused": StatePause[0],
         "volume": currentvolume[0],
+        "name": name,
+        "artist": artist,
+        "cover": cover
     }
     
 @api.post("/addSong")
@@ -436,9 +453,8 @@ def add(args):
             songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The album {name} was added to the queue"
     
-    name = GetNameFromId(song_id,0)
-    
-    song = {"link": link, "song_id": song_id,"name": name,"author": author, "needtobeplay" : True}
+    name,artist,cover = GetInfos(song_id)
+    song = {"link": link, "song_id": song_id,"name": name, "artist": artist,"cover":cover, "author": author, "needtobeplay" : True}
     if len(songs_to_dl["songs"]) > 0:
         if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
             for i in range(len(songs_to_dl["songs"])-1,-1,-1):
@@ -489,8 +505,8 @@ def add(args):
             i+=1
         return f"The album {name} was added to the queue"
     
-    name = GetNameFromId(song_id,0)
-    song = {"link": link, "song_id": song_id,"name": name, "author": author, "needtobeplay" : True}
+    name,artist,cover = GetInfos(song_id)
+    song = {"link": link, "song_id": song_id,"name": name,"artist":artist, "cover": cover, "author": author, "needtobeplay" : True}
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
 
@@ -582,7 +598,7 @@ def playrandom(args):
     if author is None:
         return { "error": "author parameter is required"}
     folder_path = Path("Songs")
-
+    print("HERE")
     # Tous les fichiers MP3
     mp3_files = folder_path.glob("*.mp3")
     songs = []
@@ -591,9 +607,10 @@ def playrandom(args):
         
         songs.append(filename[0])
     choice = random.choice(songs)
-    name = GetNameFromId(choice, 0)
-    song = {"link":  "https://open.spotify.com/track/"+choice, "song_id": choice, "name": name, "author": author, "needtobeplay" : True}
-    
+    name,artist,cover = GetInfos(choice)
+ 
+    song = {"link":  "https://open.spotify.com/track/"+choice, "song_id": choice, "name": name,"artist":artist, "cover":cover, "author": author, "needtobeplay" : True}
+    print("YES")
     queue["songs"].append(song)
     return f"{name} was added to the queue"
 
@@ -683,11 +700,12 @@ def pause(_):
 def previous(_):
     if len(history["songs"]) == 0:
         return f"You haven't played a song before"
-    name = GetNameFromId(history["songs"][0]["song_id"],0)
-    queue["songs"].insert(0, {"song_id": history["songs"][0]["song_id"],"link": "https://open.spotify.com/track/"+str(history["songs"][0]["song_id"]),"name": name,"author": history["songs"][0]["author"], "needtobeplay" : "True"})
+    name,artist,cover = GetInfos(history["songs"][0]["song_id"])
+    queue["songs"].insert(0, {"song_id": history["songs"][0]["song_id"],"name": name,"artist":artist,"cover":cover, "author": history["songs"][0]["author"], "needtobeplay" : "True"})
     history["songs"].pop(0)
     requests.post(UrlToSkip, json={})
     return f"We came back to the previous song {name}"
+
 if __name__ == "__main__":
     class ApiRequestHandler(BaseHTTPRequestHandler):
         global api

@@ -2,7 +2,7 @@
 .env 
 #inutile
 authorize.json
-Names.json
+Songinfos.json
 test.json
 node_modules/
 test.py
