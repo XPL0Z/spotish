@@ -679,6 +679,15 @@ def pause(_):
     requests.post(UrlToResume, json={})
     return f"The music has been resumed"
 
+@api.post("/previous")
+def previous(_):
+    if len(history["songs"]) == 0:
+        return f"You haven't played a song before"
+    name = GetNameFromId(history["songs"][0]["song_id"],0)
+    queue["songs"].insert(0, {"song_id": history["songs"][0]["song_id"],"link": "https://open.spotify.com/track/"+str(history["songs"][0]["song_id"]),"name": name,"author": history["songs"][0]["author"], "needtobeplay" : "True"})
+    history["songs"].pop(0)
+    requests.post(UrlToSkip, json={})
+    return f"We came back to the previous song {name}"
 if __name__ == "__main__":
     class ApiRequestHandler(BaseHTTPRequestHandler):
         global api
