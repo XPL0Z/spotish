@@ -1,6 +1,6 @@
 export default () => {    
   return (                
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+	<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
   <path strokeLinecap="round" strokeLinejoin="round" d="M 16.463 8.288 C 18.513 10.338 18.513 13.662 16.463 15.712 M 6.75 8.25 L 11.47 3.53 C 11.684 3.316 12.007 3.252 12.287 3.368 C 12.567 3.484 12.75 3.757 12.75 4.06 L 12.75 19.94 C 12.75 20.243 12.567 20.516 12.287 20.632 C 12.007 20.748 11.684 20.684 11.47 20.47 L 6.75 15.75 L 4.51 15.75 C 3.63 15.75 2.806 15.243 2.572 14.396 C 2.358 13.615 2.249 12.81 2.25 12 C 2.25 11.17 2.362 10.367 2.572 9.604 C 2.806 8.756 3.63 8.25 4.51 8.25 L 6.75 8.25 Z"/>
 </svg>
 
