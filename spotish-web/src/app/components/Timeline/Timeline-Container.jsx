@@ -18,6 +18,9 @@ export default ({ setTimecode, timecode, duration }) => {
             let seconds = timeins - (minutes * 60);
             result += seconds.toString()
         }else{
+            if (timeins < 10){
+                timeins = "0" + timeins.toString();
+            }
             result = "00:" + timeins.toString();
         }
         return  result;

@@ -3,7 +3,6 @@ import VolumeMaxIcon from "./Volume-Max-Icon";
 import VolumeSlider from "./Volume-Slider";
 import VolumeMinIcon from "./Volume-Min-icon";
 import VolumeMidIcon from "./Volume-Mid-icon";
-import { useState } from "react";
 
 export default ({setter, value}) => {    
     

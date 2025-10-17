@@ -1,11 +1,11 @@
 "use client"
 import { useEffect, useState } from "react";
-import PauseButton from "./components/Pause-Button";
-import ResumeButton from "./components/Resume-Button";
-import NextButton from "./components/Next-Button";
-import PreviousButton from "./components/Previous-Button";
-import VolumeContainer from "./components/Volume-Container";
-import TimelineContainer from "./components/Timeline-Container";
+import PauseButton from "./components/PlayerControls/Pause-Button";
+import ResumeButton from "./components/PlayerControls/Resume-Button";
+import NextButton from "./components/PlayerControls/Next-Button";
+import PreviousButton from "./components/PlayerControls/Previous-Button";
+import VolumeContainer from "./components/VolumeControls/Volume-Container";
+import TimelineContainer from "./components/Timeline/Timeline-Container";
 
 export default function Home() {
   const [volume, setVolume] = useState(70);
@@ -55,7 +55,7 @@ export default function Home() {
       </div>
 
       <VolumeContainer setter={setVolume} value={volume}/>
-      
+
     </main>
   
   );

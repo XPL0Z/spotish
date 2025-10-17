@@ -4,10 +4,6 @@ import { useEffect } from "react";
 
 export default ({ setTimecode, timecode, duration }) => {
 
-    useEffect(() => {
-
-    }, []);
-
     const handleChange = async (event) => {
         const newValue = event.target.value;
         fetch("/api/timecode", {
