@@ -2,10 +2,9 @@
 import { useEffect, useState } from "react";
 import PauseButton from "./components/PlayerControls/Pause-Button";
 import ResumeButton from "./components/PlayerControls/Resume-Button";
-import NextButton from "./components/PlayerControls/Next-Button";
-import PreviousButton from "./components/PlayerControls/Previous-Button";
 import VolumeContainer from "./components/VolumeControls/Volume-Container";
 import TimelineContainer from "./components/Timeline/Timeline-Container";
+import TrackNavigator from "./components/PlayerControls/TrackNavigator";
 
 export default function Home() {
   const [volume, setVolume] = useState(70);
@@ -38,15 +37,16 @@ export default function Home() {
     <main className="flex items-center justify-center min-h-screen">
       
       <div className="flex flex-col items-center justify-center w-full ">
- 
+
         <div className="flex ">
 
-        <PreviousButton disabled={ "disable" } />
+        <TrackNavigator className="rotate-180" api="previous"/>
 
         {
           isPlaying ?  <ResumeButton setter={setIsPlaying} />: <PauseButton setter={setIsPlaying} />
         }
-        <NextButton  />
+      
+        <TrackNavigator api={"skip"}/>
 
         </div>
 
