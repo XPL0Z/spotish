@@ -8,19 +8,20 @@ import { useState } from "react";
 export default ({setter, value}) => {    
     
     
-  return (                
-    <div className="flex items-center">
-        {
-        value == 0 ? <VolumeCutIcon /> : 
-            value <= 30 ?<VolumeMinIcon />:
-               value <= 70? <VolumeMidIcon /> :
-                    <VolumeMaxIcon />
-        } 
-
-        
-        
-        <VolumeSlider setter={setter} value={value}/>
-    </div>
-
+  return (
+  <div>           
+      <div className="flex items-center">
+          {
+          value == 0 ? <VolumeCutIcon /> : 
+              value <= 30 ?<VolumeMinIcon />:
+                 value <= 70? <VolumeMidIcon /> :
+                      <VolumeMaxIcon />
+          } 
+  
+          
+          
+          <VolumeSlider setter={setter} value={value}/>
+      </div>
+  </div>
   );                      
 };

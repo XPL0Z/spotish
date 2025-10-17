@@ -111,8 +111,9 @@ def list(_):
 
 @api.post("/timecode")
 def timecode(args : int):
+    
     timecode = args.get("timecode", None)
-    print(timecode)
+    
     if timecode is None:
         return {"error": "timecode parameter is required"}
     timecode = int(timecode)

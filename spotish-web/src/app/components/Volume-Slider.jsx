@@ -19,7 +19,7 @@ export default ( {setter, value} ) => {
   
     
     return (
-            <input handleClick
+            <input
                 onChange={handleChange}
                 type="range" 
                 min="0" 
@@ -27,5 +27,5 @@ export default ( {setter, value} ) => {
                 value={value} 
                 className="accent-[#D216DA] w-full h-2 bg-gray-200 rounded-lg cursor-pointer dark:bg-gray-700"
             />
-    );                        
+    );
 };
