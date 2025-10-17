@@ -381,9 +381,8 @@ def infos(_):
     return {
         "timecode": timecode,
         "length": length,
-        "Name": Name,
-        "Paused": not StatePause[0],
-        "Playing": playing[0],
+        "name": Name,
+        "paused": StatePause[0],
         "volume": currentvolume[0],
     }
     
