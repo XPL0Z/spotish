@@ -87,6 +87,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
             "/isauthorize  - ❓ Checks if someone is authorize\n"
             "/queue &lt;index&gt; - 📋 Get future songs to play\n"
+            "/shuffle - 🎲 randomize the queue\n"
             "/delete &lt;song_id&gt; - 🗑️ To delete a song from queue\n"
             ) 
      
