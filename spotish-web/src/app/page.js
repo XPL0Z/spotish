@@ -6,15 +6,15 @@ import VolumeContainer from "./components/VolumeControls/Volume-Container";
 import TimelineContainer from "./components/Timeline/Timeline-Container";
 import TrackNavigator from "./components/PlayerControls/TrackNavigator";
 import ActualSongContainer from "./components/ActualSong/ActualSong-Container";
-
+import Search from "./components/SearchBar/Search";
 export default function Home() {
   const [volume, setVolume] = useState(70);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration,setDuration] = useState(0);
   const [timecode, setTimecode] = useState(0);
   const [cover, setCover] = useState("/unkonwn-cover.png");
-  const [name, setName] = useState(null);
-  const [artist, setArtist] = useState(null);
+  const [name, setName] = useState("No song");
+  const [artist, setArtist] = useState("No artist");
   const [data, setData] = useState(null); // obligatoire pour stocker les données et acceder dans le render au data.status
   const Getinfos = async () => {
     const res = await fetch("/api/infos", {
@@ -39,7 +39,13 @@ export default function Home() {
 }, [])
 
   return (
+  <div>
+    {/* // Search Bar */}
+    <div className="flex justify-center pt-4">
+      <Search/>
+    </div>
     
+    {/* // Footer */}
     <div className="flex items-center justify-center min-h-screen">
       
       <ActualSongContainer author={artist} link={cover} title={name}/>
@@ -65,6 +71,6 @@ export default function Home() {
       <VolumeContainer setter={setVolume} value={volume}/>
 
     </div>
-  
+  </div>
   );
 }

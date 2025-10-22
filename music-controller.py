@@ -130,7 +130,6 @@ def GetNameFromId(song_id,type:int):
     try:
         if type == 0:
             for song in Songinfos:
-                print("Also")
                 if song["song_id"] == song_id:
                     return song["name"]
             print("The name was asked to spotify")
@@ -155,7 +154,6 @@ def GetNameFromId(song_id,type:int):
 
 def GetInfos(song_id):
     for song in Songinfos:
-        print("Also")
         if song["song_id"] == song_id:
             return song["name"], song["artist"], song["cover"]
     track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
@@ -383,23 +381,15 @@ def list(_):
 
 @api.get("/infos")
 def infos(_): 
-    print("YEEEEEES")
     timecode = requests.get(UrlToGetTimeCode).json()
     length = requests.get(UrlToGetLenght).json()
-    print("YEEEEEES2")
     if len(history["songs"])> 0:
-        print("TOI")
-        print(history["songs"][0]["song_id"])
         name,artist,cover= GetInfos(history["songs"][0]["song_id"])
-        print("NAMMME"+str(name))
     else:
-        print("Toi2")
-        name = "No songs"
+        name = "No song"
         artist = "No artist"
         cover = "https://github.com/XPL0Z/spotish/blob/main/images/spotish_icon_logo_no_bg.png?raw=true"
         
-    print("Name " + str(name))
-    print("Paused " + str(playing[0]))
     return {
         "timecode": timecode,
         "length": length,
@@ -543,13 +533,10 @@ def notplaying(_):
     
     if StatePause[0] == True:
         return False
-    
     changetoNOTplaying()
-    if len(queue["songs"]) == 0:
-        return {"error": "No songs in queue"}
-
     return True
 
+    
 @api.post("/skip")
 def skip(_):
     requests.post(UrlToSkip, json={})
