@@ -2,6 +2,7 @@ import TimelineSlider from "./Timeline-Slider";
 export default ({ setTimecode, timecode, duration }) => {  
     const MsToSecond = (timeinms) => {
         let result ="";
+        if (timeinms === -1) return "00:00";
         let timeins= Math.floor(timeinms / 1000);
         
         if (timeins > 60){

@@ -88,11 +88,10 @@ history = {
 Songinfos = []
 FILE_PATH = './Songinfos.json'
 # add track name's that are save in infos.json into infos
-with open('infos.json', 'r') as file:
+with open('Songinfos.json', 'r') as file:
     python_obj = json.load(file)
 
 for song in python_obj:
-    print(song)
     Songinfos.append(song)
     
 def SaveInfos():
@@ -380,18 +379,26 @@ def list(_):
         
     }
 
+
+
 @api.get("/infos")
 def infos(_): 
+    print("YEEEEEES")
     timecode = requests.get(UrlToGetTimeCode).json()
-    print("TIMECODE " + str(timecode))
     length = requests.get(UrlToGetLenght).json()
-    print("LENGTH " + str(length))
+    print("YEEEEEES2")
     if len(history["songs"])> 0:
-        print(history)
+        print("TOI")
+        print(history["songs"][0]["song_id"])
         name,artist,cover= GetInfos(history["songs"][0]["song_id"])
+        print("NAMMME"+str(name))
     else:
-        Name = None
-    print("Name " + str(Name))
+        print("Toi2")
+        name = "No songs"
+        artist = "No artist"
+        cover = "https://github.com/XPL0Z/spotish/blob/main/images/spotish_icon_logo_no_bg.png?raw=true"
+        
+    print("Name " + str(name))
     print("Paused " + str(playing[0]))
     return {
         "timecode": timecode,
