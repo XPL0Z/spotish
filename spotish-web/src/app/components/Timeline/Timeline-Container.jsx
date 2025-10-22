@@ -34,7 +34,7 @@ export default ({ setTimecode, timecode, duration }) => {
   return (                
     <div className="w-2/7 flex items-center space-x-4"> 
         <span>{MsToSecond(timecode)}</span>
-        <TimelineSlider setTimecode={setTimecode} timecode={timecode} duration={duration}/>
+        <TimelineSlider setTimecode={setTimecode} timecode={timecode ===-1 ? 0 : timecode} duration={duration===-1 ? 0 :duration}/>
         <span>{MsToSecond(duration)}</span>
     </div>
   );
