@@ -12,7 +12,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration,setDuration] = useState(0);
   const [timecode, setTimecode] = useState(0);
-  const [cover, setCover] = useState(null);
+  const [cover, setCover] = useState("/unkonwn-cover.png");
   const [name, setName] = useState(null);
   const [artist, setArtist] = useState(null);
   const [data, setData] = useState(null); // obligatoire pour stocker les données et acceder dans le render au data.status
@@ -26,10 +26,9 @@ export default function Home() {
     setVolume(data.volume);
     setDuration(data.length);
     setTimecode(Number(data.timecode));
-    setCover(data.cover);
     setName(data.name);
-    setArtist(data.artist);
-    setIsPlaying(data.paused != isPlaying ? data.paused : isPlaying)  // Met à jour isPlaying seulement si le status a changé;
+    setArtist(data.artist);  // Met
+    setIsPlaying(data.paused != isPlaying ? isPlaying : data.paused)  // Met à jour isPlaying seulement si le status a changé;
   };
   useEffect(()=>{
   const interval = setInterval(() => {
@@ -40,8 +39,8 @@ export default function Home() {
 }, [])
 
   return (
-// className="flex flex-col items-center justify-center min-h-screen space-y-6"
-    <main className="flex items-center justify-center min-h-screen">
+    
+    <div className="flex items-center justify-center min-h-screen">
       
       <ActualSongContainer author={artist} link={cover} title={name}/>
       
@@ -50,7 +49,7 @@ export default function Home() {
         <div className="flex ">
 
           <TrackNavigator className="rotate-180" api="previous"/>
-
+          
           {
             isPlaying ?  <ResumeButton setter={setIsPlaying} />: <PauseButton setter={setIsPlaying} />
           }
@@ -65,7 +64,7 @@ export default function Home() {
 
       <VolumeContainer setter={setVolume} value={volume}/>
 
-    </main>
+    </div>
   
   );
 }
