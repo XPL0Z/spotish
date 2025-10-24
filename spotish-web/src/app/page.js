@@ -27,6 +27,7 @@ export default function Home() {
     setDuration(data.length);
     setTimecode(Number(data.timecode));
     setName(data.name);
+    setCover(data.cover);
     setArtist(data.artist);  // Met
     setIsPlaying(data.paused != isPlaying ? isPlaying : data.paused)  // Met à jour isPlaying seulement si le status a changé;
   };
