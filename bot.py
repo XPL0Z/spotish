@@ -177,7 +177,7 @@ async def isauthorize(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         
 async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
-    if await isauthorized(update.message.from_user.username) != True:
+    if update.message.from_user.username not in admins:
         await update.message.reply_text("You are not authorized ;)")
         return
     
