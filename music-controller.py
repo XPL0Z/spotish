@@ -87,6 +87,14 @@ history = {
     ]
 }
 
+Downloaded_songs = []
+folder_path = Path("Songs")
+# Tous les fichiers MP3
+mp3_files = folder_path.glob("*.mp3")
+for file in mp3_files:
+    filename = file.name.split(".")
+    Downloaded_songs.append(filename[0])
+    
 Songinfos = []
 FILE_PATH = './Songinfos.json'
 # add track name's that are save in infos.json into infos
@@ -99,7 +107,8 @@ for song in python_obj:
 def SaveInfos():
     with open(FILE_PATH, 'w') as output_file:
         output_file.write(json.dumps(Songinfos, indent=2))
-        
+
+print(Downloaded_songs)
 ############################################################################      
 #<---------------------------Function Section ----------------------------->
 ############################################################################
@@ -163,10 +172,11 @@ def GetInfos(song_id):
     artist = track_info["artists"][0]["name"]
     name = track_info["name"]
     cover = track_info["album"]["images"][0]["url"]
-    song = {"song_id": song_id, "name":name,"artist": artist, "cover": cover}
+    duration = track_info["duration_ms"]//1000
+    song = {"song_id": song_id, "name":name,"artist": artist, "cover": cover, "duration": duration}
     Songinfos.append(song)
     SaveInfos()
-    return name, artist, cover
+    return name, artist, cover,duration
 
 def changetoNOTplaying():
     playing.clear()
@@ -201,9 +211,11 @@ def download_sync(link,song_id,author):
         downloadingmix.append(False)
     return song
 
-def search_and_download_from_soundcloud(query, song_id=None):
+def search_and_download_from_soundcloud(query,song_id,duration_in_s:int):
     """Recherche et télécharge un track SoundCloud par nom"""
-    
+    if song_id in Downloaded_songs:
+        print(f"{query} a déjà été téléchargé une fois")
+        return True
     print(f"🔍 Recherche de: {query}")
     
     # Initialiser le client SoundCloud
@@ -258,7 +270,11 @@ def search_and_download_from_soundcloud(query, song_id=None):
                 print(f"{i}. {getattr(track, 'title', 'Titre inconnu')} - Erreur: {e}")
         
         # Prendre automatiquement le premier résultat
-        selected_track = results[0]
+        for i in range(len(results)+1 ):
+            if abs(duration_in_s - (results[i].duration // 1000)) <= 10:
+                print("✅ La différence est inférieure ou égale à 10 secondes.")
+                selected_track = results[i]
+                break
 
         duration = getattr(selected_track, 'duration', 0) // 1000
         minutes = duration // 60
@@ -310,7 +326,7 @@ def search_and_download_from_soundcloud(query, song_id=None):
                     print(f"📝 Renommé en: {song_id}.mp3")
             
             print(f"📁 Fichier dans: ./Songs/")
-            return song_id if song_id else True
+            return True
         else:
             print("\n❌ Erreur lors du téléchargement")
             if result.stdout:
@@ -324,7 +340,7 @@ def search_and_download_from_soundcloud(query, song_id=None):
         import traceback
         traceback.print_exc()
         return False
-
+    
 def playsong(song_id):
     changetoplaying()
     payloadtosend = { "song_id": str(song_id) }
@@ -439,17 +455,18 @@ async def Downloading():
                 author = songs_to_dl["songs"][0]["author"]
                 link = songs_to_dl["songs"][0]["link"]
 
-                if "artist" not in songs_to_dl["songs"][0]:
-                    name,artist,cover =GetInfos(songs_to_dl["songs"][0]["song_id"])
-                    songs_to_dl["songs"][0].update({"artist": artist, "name": name,"cover": cover})
+                if "duration" not in songs_to_dl["songs"][0]:
+                    name,artist,cover,duration =GetInfos(songs_to_dl["songs"][0]["song_id"])
+                    songs_to_dl["songs"][0].update({"artist": artist, "name": name,"cover": cover,"duration": duration})
                 else:
                     name = songs_to_dl["songs"][0]["name"]
                     artist = songs_to_dl["songs"][0]["artist"]
+                    duration = songs_to_dl["songs"][0]["duration"]
                 if songs_to_dl["songs"][0]["needtobeplay"] == False:
                     download_sync(link,song_id,author)
                 else:
                     print('songs_to_dl["songs"][0] '+str(songs_to_dl["songs"][0]))
-                    search_and_download_from_soundcloud(name + " " + artist, song_id)
+                    search_and_download_from_soundcloud(name + " " + artist, song_id,duration)
                     queue["songs"].append({"song_id": song_id, "name": name, "artist": artist, "author": author})
                 if len(songs_to_dl["songs"]) != 0 :
                     songs_to_dl["songs"].pop(0)
@@ -730,7 +747,6 @@ def playrandom(args):
     if author is None:
         return { "error": "author parameter is required"}
     folder_path = Path("Songs")
-    print("HERE")
     # Tous les fichiers MP3
     mp3_files = folder_path.glob("*.mp3")
     songs = []

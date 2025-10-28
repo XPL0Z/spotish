@@ -31,13 +31,13 @@ export default function SearchResults({ tracks }) {
       {tracks.map(track => (
         <div 
           key={track.link} 
-          className="flex items-center gap-2 mb-2 bg-gray-700 p-2 rounded hover:bg-gray-800 cursor-pointer transition-colors" 
+          className="contents items-center gap-2 mb-2 bg-gray-700 p-2 rounded hover:bg-gray-800 hover:border-2 border-[#D216DA] cursor-pointer transition-colors" 
           onClick={() => handleClick(track.link)}
         >
           <img
             src={track.cover} 
             alt={track.name} 
-            className="w-12 h-12 object-cover rounded border-2 border-[#D216DA]" 
+            className="w-12 h-12 object-cover rounded border-2 " 
           />
           <div className="text-white">
             <span className="font-semibold">{track.name}</span>
