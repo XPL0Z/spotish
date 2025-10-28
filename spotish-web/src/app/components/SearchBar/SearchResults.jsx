@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from "react";
-
+import { Toaster, toast } from "sonner";
 export default function SearchResults({ tracks }) {
   useEffect(() => {
     console.log("🎵 SearchResults - tracks reçus:", tracks);
@@ -28,12 +28,15 @@ export default function SearchResults({ tracks }) {
 
   return (
     <div className="absolute top-full mt-2 w-96 flex flex-col max-h-96 overflow-y-auto bg-gray-900 rounded-lg shadow-xl z-50">
+      <Toaster position="bottom-right" />
       {tracks.map(track => (
         <div 
           key={track.link} 
           className="flex items-center gap-2 p-2 rounded-lg border-2 border-transparent hover:bg-gray-800 hover:border-[#D216DA] cursor-pointer transition-all" 
-          onClick={() => handleClick(track.link)}
-        >
+          onClick={() => {
+            handleClick(track.link)
+            toast(`Added: ${track.name} by ${track.artist}`);
+          }}>
           <img
             src={track.cover} 
             alt={track.name} 
