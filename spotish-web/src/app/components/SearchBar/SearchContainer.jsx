@@ -1,15 +1,15 @@
 'use client';
 import { useState } from "react";
 import SearchBar from "./SearchBar";
-import SearchResult from "./SearchResult";
+import SearchResults from "./SearchResults";
 
 export default function SearchContainer() {
   const [tracks, setTracks] = useState([]);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="relative flex flex-col items-center">
       <SearchBar setTracks={setTracks} />
-      <SearchResult tracks={tracks || []} />
+      <SearchResults tracks={tracks || []} />
     </div>
   );
 }

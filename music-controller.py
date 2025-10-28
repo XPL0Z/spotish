@@ -108,7 +108,6 @@ def SaveInfos():
     with open(FILE_PATH, 'w') as output_file:
         output_file.write(json.dumps(Songinfos, indent=2))
 
-print(Downloaded_songs)
 ############################################################################      
 #<---------------------------Function Section ----------------------------->
 ############################################################################
@@ -371,8 +370,9 @@ def GetSongFromPlaylist(playlist_id):
     return track_ids
 
 def GetSongFromAlbum(album_id):
+    
     results = sp.album_tracks(album_id)
-    #print(results)
+    
     track_ids = []
 
     for item in results['items']:
