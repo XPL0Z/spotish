@@ -12,9 +12,9 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration,setDuration] = useState(0);
   const [timecode, setTimecode] = useState(0);
-  const [cover, setCover] = useState("/unkonwn-cover.png");
-  const [name, setName] = useState("No song");
-  const [artist, setArtist] = useState("No artist");
+  const [cover, setCover] = useState("https://github.com/XPL0Z/spotish/blob/main/images/spotish_icon_logo_no_bg.png?raw=true");
+  const [name, setName] = useState("Loading...");
+  const [artist, setArtist] = useState("Loading...");
   const [data, setData] = useState(null); // obligatoire pour stocker les données et acceder dans le render au data.status
   const Getinfos = async () => {
     const res = await fetch("/api/infos", {
