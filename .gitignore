@@ -4,9 +4,10 @@
 authorize.json
 Songinfos.json
 test.json
+resultats.json
 node_modules/
 test.py
-resultats.jsonl
+resultats.json
 result.json
 .cache/
 .cache

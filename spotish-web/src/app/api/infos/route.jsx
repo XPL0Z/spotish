@@ -8,7 +8,6 @@ export async function GET(request) {
         });
 
         const data = await res.json();
-        console.log("Données reçues :", data);
         return NextResponse.json(data);
     } catch (error) {
         console.error("Erreur dans la route GET :", error);

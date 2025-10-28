@@ -11,8 +11,7 @@ export async function POST(request) {
           "Content-Type": "application/json", // si tu envoies du JSON
         },
         body: JSON.stringify({ action: "pause" }), // corps de la requête
-        });
-        
+        }); 
         return NextResponse.json({
         success: true,
         message: "Action backend exécutée",

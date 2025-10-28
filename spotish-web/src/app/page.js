@@ -6,7 +6,7 @@ import VolumeContainer from "./components/VolumeControls/Volume-Container";
 import TimelineContainer from "./components/Timeline/Timeline-Container";
 import TrackNavigator from "./components/PlayerControls/TrackNavigator";
 import ActualSongContainer from "./components/ActualSong/ActualSong-Container";
-import Search from "./components/SearchBar/Search";
+import SearchContainer from "./components/SearchBar/SearchContainer";
 export default function Home() {
   const [volume, setVolume] = useState(70);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -43,7 +43,7 @@ export default function Home() {
   <div>
     {/* // Search Bar */}
     <div className="flex justify-center pt-4">
-      <Search/>
+      <SearchContainer/>
     </div>
     
     {/* // Footer */}
