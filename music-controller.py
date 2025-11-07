@@ -1,5 +1,3 @@
-import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from os import link
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
@@ -16,26 +14,15 @@ import random
 import json
 import glob
 from soundcloud import SoundCloud
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 path = Path.cwd()
 
 load_dotenv()
 
-class API():
-    def __init__(self):
-        self.routing = { "GET": { }, "POST": { } }
-    
-    def get(self, path):
-        def wrapper(fn):
-            self.routing["GET"][path] = fn
-        return wrapper
+app = FastAPI()
 
-    def post(self, path):
-        def wrapper(fn):
-            self.routing["POST"][path] = fn
-        return wrapper
-
-api = API()
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
@@ -165,16 +152,17 @@ def GetNameFromId(song_id,type:int):
 def GetInfos(song_id):
     for song in Songinfos:
         if song["song_id"] == song_id:
-            return song["name"], song["artist"], song["cover"]
+            return song["name"], song["artist"], song["cover"],song["duration"]
     print(f"asked to spotify for {song_id}")
     track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
     artist = track_info["artists"][0]["name"]
     name = track_info["name"]
     cover = track_info["album"]["images"][0]["url"]
-    duration = track_info["duration_ms"]//1000
+    duration = track_info["duration"]//1000
     song = {"song_id": song_id, "name":name,"artist": artist, "cover": cover, "duration": duration}
     Songinfos.append(song)
     SaveInfos()
+    
     return name, artist, cover,duration
 
 def changetoNOTplaying():
@@ -456,6 +444,7 @@ async def Downloading():
                 link = songs_to_dl["songs"][0]["link"]
 
                 if "duration" not in songs_to_dl["songs"][0]:
+                    print(GetInfos(songs_to_dl["songs"][0]["song_id"]))
                     name,artist,cover,duration =GetInfos(songs_to_dl["songs"][0]["song_id"])
                     songs_to_dl["songs"][0].update({"artist": artist, "name": name,"cover": cover,"duration": duration})
                 else:
@@ -483,7 +472,7 @@ async def CheckingifQueueisempty():
             print(queue["songs"][0])
             song_id = queue["songs"][0]["song_id"]
             print(song_id)
-            name, artist,  cover = GetInfos(song_id)
+            name, artist,  cover, duration= GetInfos(song_id)
             author = queue["songs"][0]["author"]
             song = {"song_id": song_id,"name": name,"author": author, "artist": artist, "cover":cover}
             playsong(song_id)
@@ -502,15 +491,35 @@ def start_checking():
 def start_checkingQueue():
     print("Checking if there is songs to play")
     asyncio.run(CheckingifQueueisempty())
-    
+#########################################################
+# <-----------------CLASS SECTION---------------------->#
+#########################################################
+class add_a_song(BaseModel):
+    author: str
+    link: str
 
+class search_a_song(BaseModel):
+    author: str
+    research: str
+
+class author(BaseModel):
+    author : str
+
+class index(BaseModel):
+    index : int
+
+class volume(BaseModel):
+    volume : int
+
+class song_id(BaseModel):
+    song_id:str
 #########################################################
 # <----------------- API SECTION ---------------------->#
 #########################################################
 
 
-@api.get("/")
-def index(_):
+@app.get("/")
+def index():
     return { 
         "name": "Python REST API Example",
         "summary": "This is simple REST API architecture with pure Python",
@@ -519,27 +528,23 @@ def index(_):
     }
 
 
-@api.get("/list")
-def list(_):
+@app.get("/list")
+def list():
     return {
-        
         "count": len(queue["songs"]),
         "count to dl": len(songs_to_dl["songs"]),
         "songs": queue["songs"],
         "songstodl": songs_to_dl["songs"],
         "history": history["songs"],
         "infos": Songinfos
-        
     }
 
-
-
-@api.get("/infos")
+@app.get("/infos")
 def infos(_): 
     timecode = requests.get(UrlToGetTimeCode).json()
     length = requests.get(UrlToGetLenght).json()
     if len(history["songs"])> 0:
-        name,artist,cover= GetInfos(history["songs"][0]["song_id"])
+        name,artist,cover,duration= GetInfos(history["songs"][0]["song_id"])
     else:
         name = "No song"
         artist = "No artist"
@@ -555,21 +560,12 @@ def infos(_):
         "cover": cover
     }
     
-@api.post("/addSong")
-def add(args):
-    author = args.get("author", None)
-    link = args.get("link", None)
-
-    
-        
-    if link is None:
-        return { "error": "link parameter required" }
-    if author is None:
-        return { "error": "author parameter is required"}
-    
-    
+@app.post("/addSong")
+def add(song: add_a_song):
+    print(song)
+    link = song.link
     song_id = GetIdFromLink(link)
-    print(song_id)
+    
     
     if link.find("playlist") !=-1:
         print("Playlist")
@@ -582,11 +578,11 @@ def add(args):
                     if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0:
                         for j in range(len(elements)):
                             element = elements[j]
-                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True})
                         return f"The playlist {name} was added to the queue"
                     
         for element in elements:
-            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": song.author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
     
     if link.find("album") != -1:
@@ -599,14 +595,14 @@ def add(args):
                     if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0 :
                         for j in range(len(elements)):
                             element = elements[j]
-                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True})
                         return f"The playlist {name} was added to the queue"
         for element in GetSongFromAlbum(song_id):
-            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True})
         return f"The album {name} was added to the queue"
     
-    name,artist,cover = GetInfos(song_id)
-    song = {"link": link, "song_id": song_id,"name": name, "artist": artist,"cover":cover, "author": author, "needtobeplay" : True}
+    name,artist,cover,duration = GetInfos(song_id)
+    song = {"link": link, "song_id": song_id,"name": name, "artist": artist,"cover":cover, "author": song.author, "needtobeplay" : True}
     if len(songs_to_dl["songs"]) > 0:
         if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
             for i in range(len(songs_to_dl["songs"])-1,-1,-1):
@@ -619,16 +615,8 @@ def add(args):
     print(song)
     return f"The song {name} was added to the queue"
 
-@api.post("/addSongtop")
-def add(args):
-    author = args.get("author", None)   
-    link = args.get("link", None)
-    
-    if link is None:
-        return { "error": "link parameter required" }
-    
-    if author is None:
-        return { "error": "author parameter is required"}
+@app.post("/addSongtop")
+def add(song:add_a_song):
     
     song_id = GetIdFromLink(link)
     print(song_id)
@@ -640,7 +628,7 @@ def add(args):
             total = len(AllTracks)
             current_length = len(songs_to_dl["songs"])
             position = current_length+total-i
-            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
+            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": song.author, "needtobeplay": True})
             i+=1
         return f"The playlist {name} was added at the top of the queue"
     
@@ -653,38 +641,32 @@ def add(args):
             total = len(AllTracks)
             current_length = len(songs_to_dl["songs"])
             position = current_length+total-i
-            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True,})
+            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True,})
             i+=1
         return f"The album {name} was added to the queue"
     
-    name,artist,cover = GetInfos(song_id)
-    song = {"link": link, "song_id": song_id,"name": name,"artist":artist, "cover": cover, "author": author, "needtobeplay" : True}
+    name,artist,cover,duration = GetInfos(song_id)
+    song = {"link": link, "song_id": song_id,"name": name,"artist":artist, "cover": cover, "author": song.author, "needtobeplay" : True}
     songs_to_dl_atfirst["songs"].insert(0,song)
     return f"The song {name} was added to the queue"
 
-@api.post("/download")
-def download(args):
-    link = args.get("link", None)
-    author = args.get("author", None)
-    if link is None:
-        return { "error": "link parameter required" }
-    if author is None:
-        return { "error": "author parameter is required"}
+@app.post("/download")
+def download(song:add_a_song):
     
     song_id = GetIdFromLink(link)
     if link.find("playlist") != -1:
         name = GetNameFromId(song_id,1)
         
         for element in GetSongFromPlaylist(song_id):
-            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": False})
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": song.author, "needtobeplay": False})
         return f"The playlist {name} will be download"
     name = GetNameFromId(song_id,0)
-    song = { "link": link, "song_id": song_id, "name": name, "author": author, "needtobeplay" : False}
+    song = { "link": link, "song_id": song_id, "name": name, "author": song.author, "needtobeplay" : False}
     songs_to_dl["songs"].append(song)
     return f"The song {name} will be download"
         
-@api.post("/notplaying")
-def notplaying(_):
+@app.post("/notplaying")
+def notplaying():
     
     if StatePause[0] == True:
         return False
@@ -692,16 +674,16 @@ def notplaying(_):
     return True
 
     
-@api.post("/skip")
-def skip(_):
+@app.post("/skip")
+def skip():
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return f"The queue is empty"
     name = GetNameFromId(queue["songs"][0]["song_id"],0)
     return f"Music skipped, Now playing : {name}"
 
-@api.post("/stop")
-def stop(_):
+@app.post("/stop")
+def stop():
     changetoNOTplaying()
     queue["songs"].clear()
     songs_to_dl["songs"].clear()
@@ -710,8 +692,8 @@ def stop(_):
     requests.post(UrlToStop, json={})
     return f"The queue has been cleared"
 
-@api.post("/mix")
-def mix(_):
+@app.post("/mix")
+def mix():
     if mixing[0] == False: 
         if len(history["songs"])<5:
             return f"You must have played at least 5 songs"
@@ -725,27 +707,21 @@ def mix(_):
         mixing.append(False)
         return f"Mix is now OFF"
     
-@api.post("/search")
-def search(args):
-    research = args.get("research", None)
-    author = args.get("author", None)
-    if author is None:
-        return { "error": "author parameter is required"}
+@app.post("/search")
+def search(query : search_a_song):
     
-    response =sp.search(q=research,limit=1,offset=0,type="track")
+    
+    response =sp.search(q=query.research,limit=1,offset=0,type="track")
     name = response["tracks"]["items"][0]["name"]
     link = response["tracks"]["items"][0]["external_urls"]["spotify"]
     song_id = response["tracks"]["items"][0]["id"]
-    song = {"link": link, "song_id" :song_id, "name": name, "author": author,"needtobeplay" : True}
+    song = {"link": link, "song_id" :song_id, "name": name, "author": query.author,"needtobeplay" : True}
     print(song)
     songs_to_dl["songs"].append(song)
     return f"{name} was added to the queue"
 
-@api.post("/playrandom")
-def playrandom(args):
-    author = args.get("author", None)
-    if author is None:
-        return { "error": "author parameter is required"}
+@app.post("/playrandom")
+def playrandom(author : author):
     folder_path = Path("Songs")
     # Tous les fichiers MP3
     mp3_files = folder_path.glob("*.mp3")
@@ -755,20 +731,15 @@ def playrandom(args):
         
         songs.append(filename[0])
     choice = random.choice(songs)
-    name,artist,cover = GetInfos(choice)
+    name,artist,cover,duration= GetInfos(choice)
  
-    song = {"link":  "https://open.spotify.com/track/"+choice, "song_id": choice, "name": name,"artist":artist, "cover":cover, "author": author, "needtobeplay" : True}
+    song = {"link":  "https://open.spotify.com/track/"+choice, "song_id": choice, "name": name,"artist":artist, "cover":cover, "author": author.author, "needtobeplay" : True}
     print("YES")
     queue["songs"].append(song)
     return f"{name} was added to the queue"
 
-@api.post("/queue")
-def getqueue(args):
-    index = args.get("index", None)
-   
-    if index is None:
-        return { "error": "index parameter required" }
-    
+@app.post("/queue")
+def getqueue(index : index):
     
     songs_to_return = []
     
@@ -789,50 +760,43 @@ def getqueue(args):
         i+= 1
     return  NamesAndID
 
-@api.post("/shuffle")
-def shuffle(_):
+@app.post("/shuffle")
+def shuffle():
     random.shuffle(queue["songs"])
     random.shuffle(songs_to_dl["songs"])
     return f"The queue has been shuffled"
 
-@api.post("/volume")
-def volume(args):
-    newvolume = args.get("newvolume", None)
+@app.post("/volume")
+def volume(volume : volume):
     
-    if newvolume is None:
-        return { "error": "newvolume parameter required" }
-    
-    requests.post(UrlToChangeVolume, json={"volume": int(newvolume)})
+    requests.post(UrlToChangeVolume, json={"volume": int(volume.volume)})
     
     currentvolume.clear()
-    currentvolume.append(newvolume)
+    currentvolume.append(volume.newvolume)
 
-    return f"The volume is now at  {str(newvolume)}"
+    return f"The volume is now at  {str(volume.newvolume)}"
     
-@api.post("/delete")
-def delete(args):
-    song_id = args.get("song_id", None)
-    if song_id is None:
-        return { "error": "id parameter required" }
+@app.post("/delete")
+def delete(song : song_id):
 
     for song in queue["songs"]:
         print(song)
-        if song["song_id"] == song_id:
+        if song["song_id"] == song.song_id:
             queue["songs"].remove(song)
             return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
 
     for song in songs_to_dl_atfirst["songs"]:
-        if song["song_id"] == song_id:
+        if song["song_id"] == song.song_id:
             songs_to_dl_atfirst["songs"].remove(song)
             return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
     
     for song in songs_to_dl["songs"]:
-        if song["song_id"] == song_id:
+        if song["song_id"] == song.song_id:
             songs_to_dl["songs"].remove(song)
             return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
 
-@api.post("/pause")
-def pause(_):
+@app.post("/pause")
+def pause():
     if StatePause[0] == False:
         StatePause.clear()
         StatePause.append(True)
@@ -844,65 +808,19 @@ def pause(_):
     requests.post(UrlToResume, json={})
     return f"The music has been resumed"
 
-@api.post("/previous")
-def previous(_):
+@app.post("/previous")
+def previous():
     if len(history["songs"]) == 0:
         return f"You haven't played a song before"
-    name,artist,cover = GetInfos(history["songs"][0]["song_id"])
+    name,artist,cover,duration = GetInfos(history["songs"][0]["song_id"])
     queue["songs"].insert(0, {"song_id": history["songs"][0]["song_id"],"name": name,"artist":artist,"cover":cover, "author": history["songs"][0]["author"], "needtobeplay" : "True"})
     history["songs"].pop(0)
     requests.post(UrlToSkip, json={})
     return f"We came back to the previous song {name}"
 
-if __name__ == "__main__":
-    class ApiRequestHandler(BaseHTTPRequestHandler):
-        global api
-        
-        def call_api(self, method, path, args):
-            if path in api.routing[method]:
-                try:
-                    result = api.routing[method][path](args)
-                    self.send_response(200)
-                    self.end_headers()
-                    self.wfile.write(json.dumps(result, indent=4).encode())
-                except Exception as e:
-                    self.send_response(500, "Server Error")
-                    self.end_headers()
-                    self.wfile.write(json.dumps({ "error": e.args }, indent=4).encode())
-            else:
-                self.send_response(404, "Not Found")
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "not found"}, indent=4).encode())
 
-        def do_GET(self):
-            parsed_url = urlparse(self.path)
-            path = parsed_url.path
-            args = parse_qs(parsed_url.query)
-            
-            for k in args.keys():
-                if len(args[k]) == 1:
-                    args[k] = args[k][0]
-            
-            self.call_api("GET", path, args)
-
-        def do_POST(self):
-            parsed_url = urlparse(self.path)
-            path = parsed_url.path
-            if self.headers.get("content-type") != "application/json":
-                self.send_response(400)
-                self.end_headers()
-                self.wfile.write(json.dumps({
-                    "error": "posted data must be in json format"
-                }, indent=4).encode())
-            else:
-                data_len = int(self.headers.get("content-length"))
-                data = self.rfile.read(data_len).decode()
-                self.call_api("POST", path, json.loads(data))
-
-
-    httpd = HTTPServer(('', PORT), ApiRequestHandler)
-    threading.Thread(target=start_checking, daemon=True).start()
-    threading.Thread(target=start_checkingQueue, daemon=True).start()
-    print(f"Application started at http://127.0.0.1:{PORT}/")
-    httpd.serve_forever()
+    
+threading.Thread(target=start_checking, daemon=True).start()
+threading.Thread(target=start_checkingQueue, daemon=True).start()
+print(f"Application started at http://127.0.0.1:{PORT}/")
 
