@@ -1,5 +1,4 @@
 import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from os import link
 import asyncio
 from unicodedata import name
@@ -9,6 +8,8 @@ from time import sleep
 import asyncio
 import requests
 import threading
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 
 PORT = 7000
@@ -30,7 +31,11 @@ class API():
             self.routing["POST"][path] = fn
         return wrapper
 
-api = API()
+app = FastAPI()
+
+#########################################################
+# <-------------- WHILE TRUE SECTION ------------------>#
+#########################################################
 
 async def CheckingIfPlaying():
     print("running")
@@ -42,12 +47,22 @@ async def CheckingIfPlaying():
 def start_checking():
     asyncio.run(CheckingIfPlaying())
 
-@api.post("/play")
-def play(args: dict):
-    print("play args", args)
-    song_id = args.get("song_id", None)
-    if song_id is None:
-        return { "error": "id parameter required" }
+#########################################################
+# <-----------------CLASS SECTION---------------------->#
+#########################################################
+class add_a_song(BaseModel):
+    song_id : str
+
+class setvolume(BaseModel):
+    volume : int
+
+
+#########################################################
+# <----------------- API SECTION ---------------------->#
+#########################################################
+@app.post("/play")
+def play(song: add_a_song):
+    song_id =song.song_id
 
     media = vlc.Media("Songs/"+str(song_id)+".mp3")
     media_player.set_media(media)
@@ -56,33 +71,29 @@ def play(args: dict):
     
     return { "length": length }
 
-@api.post("/pause")
-def pause(args=None):
+@app.post("/pause")
+def pause():
     media_player.pause()
     return f"The music has been paused"
 
-@api.post("/resume")
-def resume(args=None):
+@app.post("/resume")
+def resume():
     media_player.play()
     return f"The music has been resumed"
 
-@api.post("/skip")
-def skip(args=None):
+@app.post("/skip")
+def skip():
     media_player.set_time(media_player.get_length())
     return {"status": "skipped"}
 
-@api.post("/stop")
-def stop(args=None):
+@app.post("/stop")
+def stop():
     media_player.set_time(media_player.get_length())
     return {"status": "stopped"}
 
-@api.post("/volume")
-def set_volume(args: dict):
-    print("volume args", args)
-    vol = args.get("volume", None)
-    
-    if vol is None:
-        return {"error": "volume parameter required"}
+@app.post("/volume")
+def set_volume(volume: setvolume):
+    vol = volume.volume
     
     try:
         vol = int(vol)  # convert into a int
@@ -96,20 +107,20 @@ def set_volume(args: dict):
         print("Erreur volume :", e)
         return {"error": str(e)}
 
-@api.get("/now")
+@app.get("/now")
 def list(_):
     value = media_player.get_time()
     
     return value
 
 
-@api.get("/length")
+@app.get("/length")
 def list(_):
     value = media_player.get_length()
     
     return value
 
-@api.post("/timecode")
+@app.post("/timecode")
 def timecode(args : int):
     
     timecode = args.get("timecode", None)
@@ -121,53 +132,4 @@ def timecode(args : int):
 
     return {"timecode": timecode}
 
-if __name__ == "__main__":
-    class ApiRequestHandler(BaseHTTPRequestHandler):
-        global api
-        
-        def call_api(self, method, path, args):
-            if path in api.routing[method]:
-                try:
-                    result = api.routing[method][path](args)
-                    self.send_response(200)
-                    self.end_headers()
-                    self.wfile.write(json.dumps(result, indent=4).encode())
-                except Exception as e:
-                    self.send_response(500, "Server Error")
-                    self.end_headers()
-                    self.wfile.write(json.dumps({ "error": e.args }, indent=4).encode())
-            else:
-                self.send_response(404, "Not Found")
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "not found"}, indent=4).encode())
-
-        def do_GET(self):
-            parsed_url = urlparse(self.path)
-            path = parsed_url.path
-            args = parse_qs(parsed_url.query)
-            
-            for k in args.keys():
-                if len(args[k]) == 1:
-                    args[k] = args[k][0]
-            
-            self.call_api("GET", path, args)
-
-        def do_POST(self):
-            parsed_url = urlparse(self.path)
-            path = parsed_url.path
-            if self.headers.get("content-type") != "application/json":
-                self.send_response(400)
-                self.end_headers()
-                self.wfile.write(json.dumps({
-                    "error": "posted data must be in json format"
-                }, indent=4).encode())
-            else:
-                data_len = int(self.headers.get("content-length"))
-                data = self.rfile.read(data_len).decode()
-                self.call_api("POST", path, json.loads(data))
-
-
-    httpd = HTTPServer(('', PORT), ApiRequestHandler)
-    print(f"Application started at http://127.0.0.1:{PORT}/")
-    threading.Thread(target=start_checking, daemon=True).start()
-    httpd.serve_forever()
+threading.Thread(target=start_checking, daemon=True).start()
