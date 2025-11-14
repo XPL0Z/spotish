@@ -24,19 +24,23 @@ admins = ADMIN_ID.split()
 authorized_user = []
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
-UrlToAdd = "http://127.0.0.1:5000/addSong"
-UrlToAddTop = "http://127.0.0.1:5000/addSongtop"
-UrlToStop = "http://127.0.0.1:5000/stop"
-UrlToMix = "http://127.0.0.1:5000/mix"
-UrlToSkip = "http://127.0.0.1:5000/skip"
-UrlToSearch = "http://127.0.0.1:5000/search"
-UrlToPlayRandom = "http://127.0.1:5000/playrandom"
-UrlToDownload = "http://127.0.1:5000/download"
-UrlToGetQueue = "http://127.0.1:5000/queue"
-UrlToDelete = "http://127.0.1:5000/delete"
-UrlToShuffle = "http://127.0.1:5000/shuffle"
-UrlToPause = "http://127.0.0.1:5000/pause"
-UrlToChangeVolume = "http://127.0.0.1:5000/volume"
+host_controller = os.getenv("HOST-CONTROLLER")
+controller_port = os.get("CONTROLLER-PORT")
+
+UrlToAdd = host_controller + controller_port + "/addSong"
+UrlToAddTop = host_controller + controller_port +  "/addSongtop"
+UrlToStop = host_controller + controller_port + "/stop"
+UrlToMix = host_controller + controller_port + "/mix"
+UrlToSkip = host_controller + controller_port + "/skip"
+UrlToSearch = host_controller + controller_port + "/search"
+UrlToPlayRandom = host_controller + controller_port + "/playrandom"
+UrlToDownload = host_controller + controller_port + "/download"
+UrlToGetQueue = host_controller + controller_port + "/queue"
+UrlToDelete = host_controller + controller_port + "/delete"
+UrlToShuffle = host_controller + controller_port + "/shuffle"
+UrlToPause = host_controller + controller_port + "/pause"
+UrlToChangeVolume = host_controller + controller_port + "/volume"
+
 for admin in admins:
     authorized_user.append({"username": admin, "endat": -1})
 

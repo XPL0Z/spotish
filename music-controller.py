@@ -1,4 +1,3 @@
-from os import link
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
 import subprocess
@@ -31,14 +30,17 @@ path = os.getcwd()
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 PORT = 5000
-UrlToPlay = "http://127.0.0.1:7000/play"
-UrlToGetTimeCode = "http://127.0.0.1:7000/now"
-UrlToGetLenght = "http://127.0.0.1:7000/length"
-UrlToStop = "http://127.0.0.1:7000/stop"
-UrlToSkip = "http://127.0.0.1:7000/skip"
-UrlToPause = "http://127.0.0.1:7000/pause"
-UrlToResume = "http://127.0.0.1:7000/resume"
-UrlToChangeVolume = "http://127.0.0.1:7000/volume"
+host_player = os.getenv("HOST-PLAYER")
+player_port = os.get("PLAYER-PORT")
+
+UrlToPlay = host_player + player_port + "/play"
+UrlToGetTimeCode = host_player + player_port + "/now"
+UrlToGetLenght = host_player + player_port + "/length"
+UrlToStop = host_player + player_port + "/stop"
+UrlToSkip = host_player + player_port + "/skip"
+UrlToPause = host_player + player_port + "/pause"
+UrlToResume = host_player + player_port + "/resume"
+UrlToChangeVolume = host_player + player_port + "/volume"
 
 playing = [False]
 StatePause = [False]
@@ -617,8 +619,9 @@ def add(song: add_a_song):
 
 @app.post("/addSongtop")
 def add(song:add_a_song):
-    
+    link = song.link
     song_id = GetIdFromLink(link)
+    
     print(song_id)
     if link.find("playlist") != -1 :
         name = GetNameFromId(song_id, 1)
@@ -652,7 +655,7 @@ def add(song:add_a_song):
 
 @app.post("/download")
 def download(song:add_a_song):
-    
+    link = song.link
     song_id = GetIdFromLink(link)
     if link.find("playlist") != -1:
         name = GetNameFromId(song_id,1)

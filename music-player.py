@@ -10,13 +10,15 @@ import requests
 import threading
 from fastapi import FastAPI
 from pydantic import BaseModel
+import os
 
 
 PORT = 7000
 
 media_player = vlc.MediaPlayer()
-
-Urlnotplaying =  "http://127.0.0.1:5000/notplaying"
+host_controller = os.getenv("HOST-CONTROLLER")
+player_controller = os.get("CONTROLLER-PORT")
+Urlnotplaying =  host_controller + player_controller + "/notplaying"
 class API():
     def __init__(self):
         self.routing = { "GET": { }, "POST": { } }
@@ -38,7 +40,8 @@ app = FastAPI()
 #########################################################
 
 async def CheckingIfPlaying():
-    print("running")
+    print("waiting 10 seconds before sending request")
+    sleep(10)
     while True:
         if media_player.is_playing() == 0:
             requests.post(Urlnotplaying, json={})
