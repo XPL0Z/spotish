@@ -1,5 +1,6 @@
 import json
-from os import link
+import os
+from dotenv import load_dotenv
 import asyncio
 from unicodedata import name
 from urllib.parse import urlparse, parse_qs
@@ -14,10 +15,11 @@ import os
 
 
 PORT = 7000
+load_dotenv()
 
 media_player = vlc.MediaPlayer()
-host_controller = os.getenv("HOST-CONTROLLER")
-player_controller = os.get("CONTROLLER-PORT")
+host_controller = os.getenv("HOST_CONTROLLER")
+player_controller = os.getenv("CONTROLLER_PORT")
 Urlnotplaying =  host_controller + player_controller + "/notplaying"
 class API():
     def __init__(self):

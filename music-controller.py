@@ -30,8 +30,8 @@ path = os.getcwd()
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 PORT = 5000
-host_player = os.getenv("HOST-PLAYER")
-player_port = os.get("PLAYER-PORT")
+host_player = os.getenv("HOST_PLAYER")
+player_port = os.getenv("PLAYER_PORT")
 
 UrlToPlay = host_player + player_port + "/play"
 UrlToGetTimeCode = host_player + player_port + "/now"
@@ -157,10 +157,11 @@ def GetInfos(song_id):
             return song["name"], song["artist"], song["cover"],song["duration"]
     print(f"asked to spotify for {song_id}")
     track_info = sp.track(f"https://open.spotify.com/track/{song_id}")
+    print(track_info)
     artist = track_info["artists"][0]["name"]
     name = track_info["name"]
     cover = track_info["album"]["images"][0]["url"]
-    duration = track_info["duration"]//1000
+    duration = track_info["duration_ms"]//1000
     song = {"song_id": song_id, "name":name,"artist": artist, "cover": cover, "duration": duration}
     Songinfos.append(song)
     SaveInfos()
@@ -446,13 +447,13 @@ async def Downloading():
                 link = songs_to_dl["songs"][0]["link"]
 
                 if "duration" not in songs_to_dl["songs"][0]:
-                    print(GetInfos(songs_to_dl["songs"][0]["song_id"]))
                     name,artist,cover,duration =GetInfos(songs_to_dl["songs"][0]["song_id"])
                     songs_to_dl["songs"][0].update({"artist": artist, "name": name,"cover": cover,"duration": duration})
                 else:
                     name = songs_to_dl["songs"][0]["name"]
                     artist = songs_to_dl["songs"][0]["artist"]
                     duration = songs_to_dl["songs"][0]["duration"]
+                    
                 if songs_to_dl["songs"][0]["needtobeplay"] == False:
                     download_sync(link,song_id,author)
                 else:
@@ -725,6 +726,7 @@ def search(query : search_a_song):
 
 @app.post("/playrandom")
 def playrandom(author : author):
+    print(author)
     folder_path = Path("Songs")
     # Tous les fichiers MP3
     mp3_files = folder_path.glob("*.mp3")

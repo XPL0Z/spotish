@@ -24,8 +24,8 @@ admins = ADMIN_ID.split()
 authorized_user = []
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
-host_controller = os.getenv("HOST-CONTROLLER")
-controller_port = os.get("CONTROLLER-PORT")
+host_controller = os.getenv("HOST_CONTROLLER")
+controller_port = os.getenv("CONTROLLER_PORT")
 
 UrlToAdd = host_controller + controller_port + "/addSong"
 UrlToAddTop = host_controller + controller_port +  "/addSongtop"
