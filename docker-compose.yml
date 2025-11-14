@@ -1,0 +1,39 @@
+services:
+  controller:
+    build: .
+    ports:
+      - ${CONTROLLER_PORT}:${CONTROLLER_PORT}
+    volumes:
+      - .:/app
+    command: uvicorn music-controller:app --host 0.0.0.0 --port ${CONTROLLER_PORT}
+
+  bot: 
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - controller
+    command: python bot.py
+
+  player:
+    build: .
+
+    ports:
+      - ${PLAYER_PORT}:${PLAYER_PORT} 
+    devices:
+      - /dev/snd:/dev/snd
+    
+    environment:
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
+    
+    volumes:
+      - .:/app
+      - /run/user/1000/pulse:/run/user/1000/pulse:ro
+      - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    
+    ipc: host
+
+    depends_on:
+      - bot
+
+    command: uvicorn music-player:app --host 0.0.0.0 --port ${PLAYER_PORT}
