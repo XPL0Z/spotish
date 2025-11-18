@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
         // Ici, ton code backend (pause une action, enregistrer en DB, etc.)
-        const res = await fetch("http://127.0.0.1:5000/skip", {
+        const res = await fetch(process.env.HOST_CONTROLLER+process.env.CONTROLLER_PORT +"/skip", {
         method: "POST",
         headers: {
         "Content-Type": "application/json"

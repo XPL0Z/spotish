@@ -17,7 +17,6 @@ services:
 
   player:
     build: .
-
     ports:
       - ${PLAYER_PORT}:${PLAYER_PORT} 
     devices:
@@ -37,3 +36,18 @@ services:
       - bot
 
     command: uvicorn music-player:app --host 0.0.0.0 --port ${PLAYER_PORT}
+
+  frontend:
+    build:
+      context: ./spotish-web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - controller
+      - player
+    environment:
+      - HOST_CONTROLLER=${HOST_CONTROLLER}
+      - CONTROLLER_PORT=${CONTROLLER_PORT}
+      - HOST_PLAYER=${HOST_PLAYER}
+      - PLAYER_PORT=${PLAYER_PORT}

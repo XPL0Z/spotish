@@ -9,9 +9,9 @@ export async function POST(request) {
         const { author, link } = body; // ✅ Récupérer les bonnes variables
         
         console.log("Données reçues:", { author, link });
-        
+        Api_url = process.env.HOST_CONTROLLER+ +process.env.CONTROLLER_PORT +"/addSong"
         // Appel à ton backend Python/Flask
-        const res = await fetch("http://127.0.0.1:5000/addSong", {
+        const res = await fetch(Api_url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

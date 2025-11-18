@@ -11,7 +11,7 @@ export async function POST(request) {
         console.log("timecode reçu:", timecode);
         
         // Appel à ton backend Python/Flask
-        const res = await fetch("http://127.0.0.1:7000/timecode", {
+        const res = await fetch(process.env.HOST_PLAYER+process.env.PLAYER_PORT +"/timecode", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

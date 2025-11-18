@@ -5,7 +5,8 @@ export async function POST(request) {
   try {
         // Ici, ton code backend (pause une action, enregistrer en DB, etc.)
         console.log("Pause demandée !");
-        const res = await fetch("http://127.0.0.1:5000/pause", {
+        Api_url = process.env.HOST_CONTROLLER+ +process.env.CONTROLLER_PORT +"/pause"
+        const res = await fetch(Api_url, {
         method: "POST",          // <-- méthode POST
         headers: {
           "Content-Type": "application/json", // si tu envoies du JSON

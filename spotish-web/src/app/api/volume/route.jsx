@@ -11,7 +11,7 @@ export async function POST(request) {
         console.log("Volume reçu:", volume);
         
         // Appel à ton backend Python/Flask
-        const res = await fetch("http://127.0.0.1:5000/volume", {
+        const res = await fetch(process.env.HOST_CONTROLLER+process.env.CONTROLLER_PORT +"/volume", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
