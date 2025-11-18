@@ -113,14 +113,14 @@ def set_volume(volume: setvolume):
         return {"error": str(e)}
 
 @app.get("/now")
-def list(_):
+def list():
     value = media_player.get_time()
     
     return value
 
 
 @app.get("/length")
-def list(_):
+def list():
     value = media_player.get_length()
     
     return value

@@ -543,7 +543,7 @@ def list():
     }
 
 @app.get("/infos")
-def infos(_): 
+def info(): 
     timecode = requests.get(UrlToGetTimeCode).json()
     length = requests.get(UrlToGetLenght).json()
     if len(history["songs"])> 0:
