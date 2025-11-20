@@ -235,8 +235,21 @@ Python 3.11.8
     python run.py
   ```
 
+<!-- DOCKER INSTALLATION -->
+## DOCKER INSTALLATION
+1. Make sure you have docker installed proparly if not check the installation guide [here](https://docs.docker.com/engine/install/)
+2. Rename the exemple.env to .env and change the nessesarry files
+3. Compose your docker
+  ```
+  docker build -t spotish .
+  ```
+1. then run the docker
+  ```
+  docker run spotish
+  ```
 
-
+# ⚠️
+for now only works in linux using pipewire
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 ---
 
