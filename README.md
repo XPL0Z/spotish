@@ -241,11 +241,11 @@ Python 3.11.8
 2. Rename the exemple.env to .env and change the nessesarry files
 3. Compose your docker
   ```
-  docker build -t spotish .
+  docker-compose build
   ```
 1. then run the docker
   ```
-  docker run spotish
+  docker run spotish:latest
   ```
 
 # ⚠️
