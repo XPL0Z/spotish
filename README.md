@@ -130,6 +130,7 @@ Available commands:
 ### Built With
 
 * [![Python][Python]][Python-url]
+* [![Nextjs][Nextjslogo]][Nextjs-url]
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -143,64 +144,9 @@ Available commands:
 ### Prerequisites
 
 * Before you begin installing the project, you must first have installed **Python** on your machine. Otherwise, follow the instructions below.
+* Minimum Node.js version: 20.9
+* 
 
-#### Installing Python
-
-##### On Ubuntu/Debian
-
-1. Open a terminal.
-2. Update the package list:
-```bash
-sudo apt update
-```
-3. Install Python:
-```bash
-sudo apt install python3
-```
-4. Verify the installation:
-```bash
-python3 --version
-```
-You should see a version number appear, for example:
-```
-Python 3.10.12
-```
-
----
-
-##### On macOS
-
-1. Open a terminal.
-2. Install [Homebrew](https://brew.sh/) if you haven't already done so.
-3. Install Python with Homebrew:
-```bash
-brew install python
-```
-4. Check the installation:
-```bash
-python3 --version
-```
-You should get something like this:
-```
-Python 3.11.8
-```
-
----
-
-##### On Windows
-
-1. Go to the official website [python.org/downloads](https://www.python.org/downloads/).
-2. Download the installer for the latest version of Python.
-3. **Important:** Check the **“Add Python to PATH”** box during installation.
-4. Complete the installation by following the instructions.
-5. Open the command prompt and verify the installation:
-```bash
-python --version
-```
-You should see:
-```
-Python 3.11.8
-```
 
 ---
 ## Installation of Spotish and his dependencies
@@ -208,35 +154,19 @@ Python 3.11.8
   ```bash
     git clone https://github.com/XPL0Z/spotish.git
   ```
-2. Enter the directory
-  ```bash
-    cd spotish
-  ```
-3. Create an virtual environnement
-  ```bash
-    python -m venv .venv
-  ```
-4. Activate the virtual environnement
-  ``` bash
-    source .venv/bin/activate
-  ```
-5. Install requirements
-  ```bash
-    pip install -r requirements.txt
-  ```
 6. Rename Example.env to .env
 7. Get a token bot at [@Botfather](https://t.me/botfather)
 8. Get a spotify ClientID and SecretID [here](https://developer.spotify.com/dashboard)
-9. Place your token bot, ClientID, SecretID and your username in the .env. You can add multiple user, you need to split usernames by a space
+9. Place your token bot, ClientID, SecretID and your username in the .env. You can add multiple user, you need to split usernames by a space. Set HOSTING parameters
 10. Rename example-Songinfos.json to Songinfos.json
 11. Rename example-authorize.json to authorize.json
-12. Set the time between each check for update in the .env (recommended 3600)
-13. Launch run.py
-  ```bash
-    python run.py
+### Run the docker container
+1. Build 
+  ``` bash
+    docker compose up --build
   ```
-
-
+For DEV contact me to have more info.
+You want to code new features !?  Contact me on [Telegram](https://t.me/xploz)  for more infos, and how to run manually
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 ---
@@ -340,3 +270,5 @@ Share the Project Link: [spotish](https://github.com/xpl0z/spotish) !
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com 
+[Nextjslogo]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white 
+[Nextjs-url]: https://nextjs.org/ 
