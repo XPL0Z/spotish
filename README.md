@@ -112,6 +112,7 @@ Available commands:
   /pause - ⏸️ Pause the current song    
   /resume - 🔄 Resume the paused song    
   /skip - ⏭️ Skip the current song    
+  /previpus - ⏮️ Go back one song   
   /stop - 🛑 Stop playback and 🧹 clear the queue    
   /volume &lt;0-100&gt; - 🔊 Adjust the volume    
   /adduser &lt;username&gt; - ➕ Add an authorized user (without @)    

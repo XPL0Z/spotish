@@ -15,6 +15,7 @@ import glob
 from soundcloud import SoundCloud
 from fastapi import FastAPI
 from pydantic import BaseModel
+import logging 
 
 path = Path.cwd()
 
@@ -22,6 +23,15 @@ load_dotenv()
 
 app = FastAPI()
 
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler("main.log")
+file_handler.setFormatter(logging.Formatter(
+    "%(asctime)s - %(levelname)s - %(message)s"
+))
+logger.addHandler(file_handler)
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
@@ -497,24 +507,26 @@ def start_checkingQueue():
 #########################################################
 # <-----------------CLASS SECTION---------------------->#
 #########################################################
-class add_a_song(BaseModel):
+class Author(BaseModel):
+    author : str
+
+class Index(BaseModel):
+    index : int
+
+class Volume(BaseModel):
+    author : str
+    volume : int
+class Add_song(BaseModel):
     author: str
     link: str
 
-class search_a_song(BaseModel):
+class Search_song(BaseModel):
     author: str
     research: str
 
-class author(BaseModel):
-    author : str
 
-class index(BaseModel):
-    index : int
 
-class volume(BaseModel):
-    volume : int
-
-class song_id(BaseModel):
+class Song_id(BaseModel):
     song_id:str
 #########################################################
 # <----------------- API SECTION ---------------------->#
@@ -543,9 +555,7 @@ def list():
     }
 
 @app.get("/infos")
-def info(): 
-    print(UrlToGetLenght)
-    print(UrlToGetTimeCode)
+def info():
     timecode = requests.get(UrlToGetTimeCode).json()
     length = requests.get(UrlToGetLenght).json()
     if len(history["songs"])> 0:
@@ -566,11 +576,10 @@ def info():
     }
     
 @app.post("/addSong")
-def add(song: add_a_song):
-    print(song)
+def add(song: Add_song):
     link = song.link
     song_id = GetIdFromLink(link)
-    
+    author = song.author
     
     if link.find("playlist") !=-1:
         print("Playlist")
@@ -583,11 +592,11 @@ def add(song: add_a_song):
                     if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0:
                         for j in range(len(elements)):
                             element = elements[j]
-                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True})
+                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
                         return f"The playlist {name} was added to the queue"
                     
         for element in elements:
-            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": song.author, "needtobeplay": True})
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
         return f"The playlist {name} was added to the queue"
     
     if link.find("album") != -1:
@@ -600,14 +609,14 @@ def add(song: add_a_song):
                     if songs_to_dl["songs"][i]["needtobeplay"] == True or i == 0 :
                         for j in range(len(elements)):
                             element = elements[j]
-                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True})
+                            songs_to_dl["songs"].insert(i+1+j,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
                         return f"The playlist {name} was added to the queue"
         for element in GetSongFromAlbum(song_id):
-            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True})
+            songs_to_dl["songs"].append({"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True})
         return f"The album {name} was added to the queue"
     
     name,artist,cover,duration = GetInfos(song_id)
-    song = {"link": link, "song_id": song_id,"name": name, "artist": artist,"cover":cover, "author": song.author, "needtobeplay" : True}
+    song = {"link": link, "song_id": song_id,"name": name, "artist": artist,"cover":cover, "author": author, "needtobeplay" : True}
     if len(songs_to_dl["songs"]) > 0:
         if songs_to_dl["songs"][len(songs_to_dl["songs"])-1]["needtobeplay"] == False:
             for i in range(len(songs_to_dl["songs"])-1,-1,-1):
@@ -615,16 +624,16 @@ def add(song: add_a_song):
                     songs_to_dl["songs"].insert(i+1,song)
                     return f"The song {name} was added to the queue"
 
-    
+    logger.info(f"{name} was added by {author}")
     songs_to_dl["songs"].append(song)
     print(song)
     return f"The song {name} was added to the queue"
 
 @app.post("/addSongtop")
-def add(song:add_a_song):
+def add(song:Add_song):
     link = song.link
     song_id = GetIdFromLink(link)
-    
+    author = song.author
     print(song_id)
     if link.find("playlist") != -1 :
         name = GetNameFromId(song_id, 1)
@@ -634,7 +643,7 @@ def add(song:add_a_song):
             total = len(AllTracks)
             current_length = len(songs_to_dl["songs"])
             position = current_length+total-i
-            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": song.author, "needtobeplay": True})
+            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element, "author": author, "needtobeplay": True})
             i+=1
         return f"The playlist {name} was added at the top of the queue"
     
@@ -647,18 +656,20 @@ def add(song:add_a_song):
             total = len(AllTracks)
             current_length = len(songs_to_dl["songs"])
             position = current_length+total-i
-            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": song.author, "needtobeplay": True,})
+            songs_to_dl["songs"].insert(position,{"link" : "https://open.spotify.com/track/"+str(element), "song_id":element,"author": author, "needtobeplay": True,})
             i+=1
         return f"The album {name} was added to the queue"
     
     name,artist,cover,duration = GetInfos(song_id)
-    song = {"link": link, "song_id": song_id,"name": name,"artist":artist, "cover": cover, "author": song.author, "needtobeplay" : True}
+    song = {"link": link, "song_id": song_id,"name": name,"artist":artist, "cover": cover, "author": author, "needtobeplay" : True}
     songs_to_dl_atfirst["songs"].insert(0,song)
+    logger.info(f"{name} was added to the top by {author}")
     return f"The song {name} was added to the queue"
 
 @app.post("/download")
-def download(song:add_a_song):
+def download(song:Add_song):
     link = song.link
+    author = song.author
     song_id = GetIdFromLink(link)
     if link.find("playlist") != -1:
         name = GetNameFromId(song_id,1)
@@ -669,6 +680,7 @@ def download(song:add_a_song):
     name = GetNameFromId(song_id,0)
     song = { "link": link, "song_id": song_id, "name": name, "author": song.author, "needtobeplay" : False}
     songs_to_dl["songs"].append(song)
+    logger.info(f"{name} was downloaded by {author}")
     return f"The song {name} will be download"
         
 @app.post("/notplaying")
@@ -681,40 +693,49 @@ def notplaying():
 
     
 @app.post("/skip")
-def skip():
+def skip(author : Author):
+    author = author.author
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return f"The queue is empty"
     name = GetNameFromId(queue["songs"][0]["song_id"],0)
+    history_name = GetInfos(history["songs"][0]["song_id"])
+    logger.info(f"{history_name[0]} was skipped by {author}")
     return f"Music skipped, Now playing : {name}"
 
 @app.post("/stop")
-def stop():
+def stop(author : Author):
+    author = author.author
     changetoNOTplaying()
     queue["songs"].clear()
     songs_to_dl["songs"].clear()
+    songs_to_dl_atfirst.clear()
     mixing.clear()
     mixing.append(False)
     requests.post(UrlToStop, json={})
-    return f"The queue has been cleared"
+    logger.info(f"{author} asked to stop the music")
+    return f"The queue has been cleared and the music stopped"
 
 @app.post("/mix")
-def mix():
+def mix(author : Author):
+    author = author.author
     if mixing[0] == False: 
         if len(history["songs"])<5:
+            logger.info(f"{author} wanted to activated mix but hasn't played enough songs")
             return f"You must have played at least 5 songs"
         mixing.clear()
         mixing.append(True)
-    
+        logger.info(f"Mix was activated by {author}")
         return f"mix is now ON"
     else:
         
         mixing.clear()
         mixing.append(False)
+        logger.info(f"Mix was desactivated by {author}")
         return f"Mix is now OFF"
     
 @app.post("/search")
-def search(query : search_a_song):
+def search(query : Search_song):
     
     
     response =sp.search(q=query.research,limit=1,offset=0,type="track")
@@ -727,8 +748,8 @@ def search(query : search_a_song):
     return f"{name} was added to the queue"
 
 @app.post("/playrandom")
-def playrandom(author : author):
-    print(author)
+def playrandom(author : Author):
+    author = author.author
     folder_path = Path("Songs")
     # Tous les fichiers MP3
     mp3_files = folder_path.glob("*.mp3")
@@ -743,11 +764,12 @@ def playrandom(author : author):
     song = {"link":  "https://open.spotify.com/track/"+choice, "song_id": choice, "name": name,"artist":artist, "cover":cover, "author": author.author, "needtobeplay" : True}
     print("YES")
     queue["songs"].append(song)
+    logger.info(f"{author} played a random song")
     return f"{name} was added to the queue"
 
 @app.post("/queue")
-def getqueue(index : index):
-    
+def getqueue(index : Index):
+    index = index.index
     songs_to_return = []
     
     for i in range(len(queue["songs"])):
@@ -768,62 +790,79 @@ def getqueue(index : index):
     return  NamesAndID
 
 @app.post("/shuffle")
-def shuffle():
+def shuffle(author : Author):
+    author = author.author
     random.shuffle(queue["songs"])
     random.shuffle(songs_to_dl["songs"])
+    logger.info(f"{author} shuffled the entire queue")
     return f"The queue has been shuffled"
 
 @app.post("/volume")
-def volume(volume : volume):
-    
+def volume(volume : Volume):
+    author = volume.author
+    logger.debug(currentvolume)
     requests.post(UrlToChangeVolume, json={"volume": int(volume.volume)})
     
+    logger.info(f"{author} changed the volume from {currentvolume[0]} to {volume.volume}")
     currentvolume.clear()
-    currentvolume.append(volume.newvolume)
+    currentvolume.append(volume.volume)
 
-    return f"The volume is now at  {str(volume.newvolume)}"
+    return f"The volume is now at  {str(volume.volume)}"
     
 @app.post("/delete")
-def delete(song : song_id):
-
+def delete(song : Song_id):
+    author = song.author
     for song in queue["songs"]:
         print(song)
         if song["song_id"] == song.song_id:
             queue["songs"].remove(song)
-            return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
+            name = GetNameFromId(song['song_id'], 0 )
+            logger.info(f"{author} removed from queue {name}")
+            return f"The song {name} was removed"
 
     for song in songs_to_dl_atfirst["songs"]:
         if song["song_id"] == song.song_id:
             songs_to_dl_atfirst["songs"].remove(song)
-            return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
+            name = GetNameFromId(song['song_id'], 0 )
+            logger.info(f"{author} removed from songs_to_dl_atfirst {name}")
+            return f"The song {name} was removed"
     
     for song in songs_to_dl["songs"]:
         if song["song_id"] == song.song_id:
             songs_to_dl["songs"].remove(song)
-            return f"The song {GetNameFromId(song['song_id'], 0 )} was removed"
+            name = GetNameFromId(song['song_id'], 0 )
+            logger.info(f"{author} removed from songs_to_dl {name}")
+            return f"The song {name} was removed"
 
+    
 @app.post("/pause")
-def pause():
+def pause(author : Author):
+    author = author.author
     if StatePause[0] == False:
         StatePause.clear()
         StatePause.append(True)
         requests.post(UrlToPause, json={})
+        logger.info(f"{author} has paused the music")
         return f"The music has been paused"
     
     StatePause.clear()
     StatePause.append(False)
     requests.post(UrlToResume, json={})
+    logger.info(f"{author} has resumed the music")
     return f"The music has been resumed"
 
 @app.post("/previous")
-def previous():
+def previous(author : Author):
+    author = author.author
     if len(history["songs"]) == 0:
+        logger.info(f"{author} wanted to come back to the previous. But there was no song")
         return f"You haven't played a song before"
     name,artist,cover,duration = GetInfos(history["songs"][0]["song_id"])
     queue["songs"].insert(0, {"song_id": history["songs"][0]["song_id"],"name": name,"artist":artist,"cover":cover, "author": history["songs"][0]["author"], "needtobeplay" : "True"})
     history["songs"].pop(0)
     requests.post(UrlToSkip, json={})
-    return f"We came back to the previous song {name}"
+    logger.info(f"{author} went back to the previous song {name}. ")
+    return f"We went back to the previous song {name}"
 
 
     
