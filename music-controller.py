@@ -441,11 +441,17 @@ async def Downloading():
     while True:
         if len(songs_to_dl_atfirst["songs"]) != 0:
             for song in songs_to_dl_atfirst["songs"]:
-                song_id = songs_to_dl_atfirst["songs"][0]["song_id"]
-                author = songs_to_dl_atfirst["songs"][0]["author"]
-                link = songs_to_dl_atfirst["songs"][0]["link"]
                 print("added")
-                queue["songs"].insert(0,download_sync(link, song_id,author))
+                if "duration" not in songs_to_dl["songs"][0]:
+                    name,artist,cover,duration =GetInfos(songs_to_dl["songs"][0]["song_id"])
+                    songs_to_dl["songs"][0].update({"artist": artist, "name": name,"cover": cover,"duration": duration})
+                else:
+                    name = songs_to_dl["songs"][0]["name"]
+                    artist = songs_to_dl["songs"][0]["artist"]
+                    duration = songs_to_dl["songs"][0]["duration"]
+                # download_sync(link, song_id,author)
+                search_and_download_from_soundcloud(name + " " + artist, song_id,duration)
+                queue["songs"].insert(0,{"song_id": song_id, "author": author})
                 if len(songs_to_dl_atfirst["songs"]) != 0:
                     songs_to_dl_atfirst["songs"].pop(0)
             
@@ -465,7 +471,8 @@ async def Downloading():
                     duration = songs_to_dl["songs"][0]["duration"]
                     
                 if songs_to_dl["songs"][0]["needtobeplay"] == False:
-                    download_sync(link,song_id,author)
+                    # download_sync(link,song_id,author)
+                    search_and_download_from_soundcloud(name + " " + artist, song_id,duration)
                 else:
                     print('songs_to_dl["songs"][0] '+str(songs_to_dl["songs"][0]))
                     search_and_download_from_soundcloud(name + " " + artist, song_id,duration)
