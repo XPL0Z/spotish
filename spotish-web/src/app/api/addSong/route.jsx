@@ -7,9 +7,9 @@ export async function POST(request) {
         // ✅ Parser le body JSON et récupérer link ET author
         const body = await request.json();
         const { author, link } = body; // ✅ Récupérer les bonnes variables
-        
+
         console.log("Données reçues:", { author, link });
-        Api_url = process.env.HOST_CONTROLLER+ +process.env.CONTROLLER_PORT +"/addSong"
+        const Api_url = process.env.HOST_CONTROLLER + process.env.CONTROLLER_PORT + "/addSong"
         // Appel à ton backend Python/Flask
         const res = await fetch(Api_url, {
             method: "POST",
@@ -21,10 +21,10 @@ export async function POST(request) {
 
         // ✅ Parser la réponse
         const data = await res.json();
-        
+
         console.log("Réponse backend:", data);
         return NextResponse.json({ success: true, data });
-        
+
     } catch (error) {
         console.error("Erreur dans la route POST:", error);
         return NextResponse.json(

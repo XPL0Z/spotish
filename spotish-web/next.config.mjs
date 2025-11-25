@@ -21,6 +21,9 @@ const nextConfig = {
     CONTROLLER_PORT : process.env.CONTROLLER_PORT,
     HOST_CONTROLLER : process.env.HOST_CONTROLLER,
   },
+  images: {
+    domains : ["avatars.githubusercontent.com"],
+  },
   output : "standalone"
 };
 

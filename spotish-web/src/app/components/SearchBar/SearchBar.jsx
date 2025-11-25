@@ -1,6 +1,6 @@
 'use client';
 
-export default function SearchBar({ setTracks }) {
+export default function SearchBar({ setTracks, author }) {
   const changeresult = async (e) => {
     const value = e.target.value;
 
@@ -22,13 +22,13 @@ export default function SearchBar({ setTracks }) {
     if (event.key === 'Enter') {
       const value = event.target.value;
       console.log("Envoi de la requête pour le lien :", value);
-      
+
       await fetch("/api/addSong", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author: "WEB", link: value })
+        body: JSON.stringify({ author: author, link: value })
       });
-      
+
       event.target.value = ""; // vider l'input
       setTracks([]); // vider les résultats
     }

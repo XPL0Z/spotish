@@ -1,7 +1,7 @@
 "use client";
 
 export default ({ setter }) => {
-    // Fonction déclenchée au clic
+  // Fonction déclenchée au clic
   const handleClick = async () => {
     const res = await fetch("/api/pause", {
       method: "POST",
