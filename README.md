@@ -217,8 +217,13 @@ Don't forget to give the project a star! Thanks again!
 <a href="https://github.com/xpl0z/spotish/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=xpl0z/spotish" alt="contrib.rocks image" />
 </a>
+<!-- contributors -->
 
+#### CONTRIBUTORS :
 
+<a href="https://github.com/Christopher-Sundeby/spotish/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Christopher-Sundeby/spotish" alt="contrib.rocks image" />
+</a>
 
 <!-- LICENSE -->
 ## License
@@ -242,10 +247,8 @@ Share the Project Link: [spotish](https://github.com/xpl0z/spotish) !
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-<!-- contributors -->
-## CONTRIBUTORS
 
-- [@Christopher-Sundeby](https://github.com/Christopher-Sundeby)
+
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
