@@ -242,6 +242,10 @@ Share the Project Link: [spotish](https://github.com/xpl0z/spotish) !
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
+<!-- contributors -->
+## CONTRIBUTORS
+
+- [@Christopher-Sundeby](https://github.com/Christopher-Sundeby)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
