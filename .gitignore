@@ -1,6 +1,8 @@
 #fichier sensible 
 .env 
 #inutile
+bot.log
+main.log
 authorize.json
 Songinfos.json
 test.json

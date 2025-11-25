@@ -13,7 +13,6 @@ import json
 import aiofiles
 
 
-
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -32,6 +31,7 @@ UrlToAddTop = host_controller + controller_port +  "/addSongtop"
 UrlToStop = host_controller + controller_port + "/stop"
 UrlToMix = host_controller + controller_port + "/mix"
 UrlToSkip = host_controller + controller_port + "/skip"
+UrlToPrevious = host_controller + controller_port + "/previous"
 UrlToSearch = host_controller + controller_port + "/search"
 UrlToPlayRandom = host_controller + controller_port + "/playrandom"
 UrlToDownload = host_controller + controller_port + "/download"
@@ -40,6 +40,7 @@ UrlToDelete = host_controller + controller_port + "/delete"
 UrlToShuffle = host_controller + controller_port + "/shuffle"
 UrlToPause = host_controller + controller_port + "/pause"
 UrlToChangeVolume = host_controller + controller_port + "/volume"
+
 
 for admin in admins:
     authorized_user.append({"username": admin, "endat": -1})
@@ -82,6 +83,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/pause - ⏸️ Pause the current song\n"
             "/resume - 🔄 Resume the paused song\n"
             "/skip - ⏭️ Skip the current song\n"
+            "/previous - ⏮️ go back one song\n"
             "/stop - 🛑 Stop playback and 🧹 clear the queue\n"
             "/volume &lt;0-100&gt; - 🔊 Adjust the volume\n"
             "/adduser &lt;username&gt; &lt;duration&gt; &lt;unit&gt; - ➕ Add an authorized user \n"
@@ -102,6 +104,9 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("You are not authorized ;)")
         return
     
+    if not context.args:
+        await update.message.reply_text("You must provide a link. Usage: /play <url>")
+        return
     
     link = context.args
     link = ' '.join(link)# Convert the list into a string
@@ -109,6 +114,7 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "link": link,
         "author": update.message.from_user.username
     }
+    print(payload)
     response = requests.post(UrlToAdd, json=payload)
     await update.message.reply_text(response.json())
 
@@ -130,22 +136,43 @@ async def playtop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
 
 async def pause(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
     if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
-    
-    response = requests.post(UrlToPause, json={})
+
+    payload = {
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToPause, json=payload)
     await update.message.reply_text(response.json())
     
     
 async def skip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
     if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
+
+    payload = {
+        "author": update.message.from_user.username
+    }
     
-    response = requests.post(UrlToSkip,json={})
+    response = requests.post(UrlToSkip,json=payload)
     await update.message.reply_text(response.json())
+
+async def previous(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
+    if await isauthorized(update.message.from_user.username) != True:
+        await update.message.reply_text("You are not authorized ;)")
+        return
+
+    payload = {
+        "author": update.message.from_user.username
+    }
+    
+    response = requests.post(UrlToPrevious,json=payload)
+    await update.message.reply_text(response.json())
     
         
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -153,7 +180,10 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("You are not authorized ;)")
         return
     
-    response = requests.post(UrlToStop,json={})
+    payload = {
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToStop,json=payload)
     await update.message.reply_text(response.json())
     
 async def test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -267,8 +297,10 @@ async def mix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await isauthorized(update.message.from_user.username) != True:
         await update.message.reply_text("You are not authorized ;)")
         return
-    
-    response = requests.post(UrlToMix, json={})
+    payload = {
+        "author": update.message.from_user.username
+    }
+    response = requests.post(UrlToMix, json=payload)
     
     await update.message.reply_text(response.json())
 
@@ -341,7 +373,8 @@ async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         song_id = ' '.join(song_id)# Convert the list into a string
         
         payload = {
-            "song_id": song_id
+            "song_id": song_id,
+            "author":update.message.from_user.username
         }
 
         response = requests.post(UrlToDelete,json=payload)
@@ -353,7 +386,10 @@ async def shuffle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             await update.message.reply_text("You are not authorized ;)")
             return
 
-        response = requests.post(UrlToShuffle,json={})
+        payload = {
+            "author": update.message.from_user.username
+        }
+        response = requests.post(UrlToShuffle,json=payload)
         
         await update.message.reply_text(response.json())
         
@@ -397,7 +433,7 @@ def main():
     application.add_handler(CommandHandler('queue', queue))
     application.add_handler(CommandHandler('delete', delete))
     application.add_handler(CommandHandler('shuffle', shuffle))
-    
+    application.add_handler(CommandHandler('previous', previous))
     # Register a CallbackQueryHandler to handle button selections
     application.add_handler(CallbackQueryHandler(button_selection_handler, pattern='^button_'))
 
