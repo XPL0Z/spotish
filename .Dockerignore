@@ -1,3 +1,5 @@
 # All Github unwanted files
 .gitignore
 .README.md
+images/
+
