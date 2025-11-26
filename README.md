@@ -83,7 +83,7 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+##  About The Project
 <div align="center">
   <a href="https://github.com/xpl0z/spotish">
       <img src="images/spotish_banner.png" alt="Logo" width=100%>
@@ -95,7 +95,7 @@ Spotish is a telegram bot to play spotify link on speaker !
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-## Demo
+##  Demo
 <div align="center">
 <img src="images/spotish_demo.gif" width=75%>
 </div>
@@ -129,8 +129,8 @@ Available commands:
 
 ### Built With
 
-* [![Python][Python]][Python-url]
-* [![Nextjs][Nextjslogo]][Nextjs-url]
+*   [![Python][Python]][Python-url]
+*   [![Nextjs][Nextjslogo]][Nextjs-url]
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -138,28 +138,30 @@ Available commands:
 
 
 <!-- GETTING STARTED -->
-# Getting Started
+#   Getting Started
 
 
 ### Prerequisites
 
-* Before you begin installing the project, you must first have installed **Python** on your machine. Otherwise, follow the instructions below.
-* Minimum Node.js version: 20.9
+*   Before you begin installing the project, you must first have installed **Python** on your machine. Otherwise, follow the instructions below.
+*   Minimum Node.js version: 20.9
 * 
 
 
 ---
-## Installation of Spotish and his dependencies
-1. Download Spotish
-  ```bash
-    git clone https://github.com/XPL0Z/spotish.git
-  ```
-6. Rename Example.env to .env
-7. Get a token bot at [@Botfather](https://t.me/botfather)
-8. Get a spotify ClientID and SecretID [here](https://developer.spotify.com/dashboard)
-9. Place your token bot, ClientID, SecretID and your username in the .env. You can add multiple user, you need to split usernames by a space. Set HOSTING parameters
-10. Rename example-Songinfos.json to Songinfos.json
-11. Rename example-authorize.json to authorize.json
+##  Installation of Spotish and his dependencies
+1.  Download Spotish
+     ```bash
+      git clone https://github.com/XPL0Z/spotish.git
+    ```
+6.  Rename Example.env to .env
+7.  Get a token bot at [@Botfather](https://t.me/botfather)
+8.  Get a spotify ClientID and SecretID [here](https://developer.spotify.com/dashboard)
+9.  Get for the oauth Client ID, Client Secret [here](https://github.com/settings/developers)  
+10. Get oauth Secret [here](https://generate-secret.vercel.app/32)
+11. Place your token bot, ClientID, SecretID and your username in the .env. You can add multiple user, you need to split usernames by a space. Set HOSTING parameters and oauth parameters
+12. Rename example-Songinfos.json to Songinfos.json
+13. Rename example-authorize.json to authorize.json
 ### Run the docker container
 1. Build 
   ``` bash
