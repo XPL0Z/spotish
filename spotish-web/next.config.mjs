@@ -16,15 +16,18 @@ const nextConfig = {
   env: {
     CLIENT_ID: process.env.CLIENT_ID,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
-    PLAYER_PORT : process.env.PLAYER_PORT,
-    HOST_PLAYER : process.env.HOST_PLAYER,
-    CONTROLLER_PORT : process.env.CONTROLLER_PORT,
-    HOST_CONTROLLER : process.env.HOST_CONTROLLER,
+    PLAYER_PORT: process.env.PLAYER_PORT,
+    HOST_PLAYER: process.env.HOST_PLAYER,
+    CONTROLLER_PORT: process.env.CONTROLLER_PORT,
+    HOST_CONTROLLER: process.env.HOST_CONTROLLER,
+    AUTH_SECRET: process.env.AUTH_SECRET,
+    AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
+    AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
   },
   images: {
-    domains : ["avatars.githubusercontent.com"],
+    domains: ["avatars.githubusercontent.com"],
   },
-  output : "standalone"
+  output: "standalone"
 };
 
 export default nextConfig;

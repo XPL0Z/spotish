@@ -24,7 +24,7 @@ export default async function Login() {
                                 alt={session.user.name ?? "AVATAR"}
                                 style={{ borderRadius: "50%", padding: "10px" }} />
                         )}
-                        <p className="text-5xl ">{session.user.name}</p>
+                        <p className="text-5xl ">{session.user.username}</p>
                         <SignOutButton className="w-3/4 h-10 m-3 bg-red-500 rounded-lg cursor-pointer" />
                         <a className="bg-[#D216DA] w-3/4 h-10 m-3 rounded-lg  flex items-center justify-center " href="/">Continue</a>
 
