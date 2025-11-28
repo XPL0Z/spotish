@@ -61,6 +61,9 @@ class add_a_song(BaseModel):
 class setvolume(BaseModel):
     volume : int
 
+class Timecode(BaseModel):
+    timecode : int
+    author : str
 
 #########################################################
 # <----------------- API SECTION ---------------------->#
@@ -126,13 +129,8 @@ def list():
     return value
 
 @app.post("/timecode")
-def timecode(args : int):
-    
-    timecode = args.get("timecode", None)
-    
-    if timecode is None:
-        return {"error": "timecode parameter is required"}
-    timecode = int(timecode)
+def timecode(args : Timecode):
+    timecode = args.timecode 
     media_player.set_time(timecode)
 
     return {"timecode": timecode}

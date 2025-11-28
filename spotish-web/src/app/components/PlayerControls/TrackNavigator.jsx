@@ -1,9 +1,10 @@
-"use client"; 
+"use client";
 
-export default function TrackNavigator({ api, className = "" }) {
+export default function TrackNavigator({ api, author, className = "" }) {
   const handleClick = async () => {
     const res = await fetch(`/api/${api}`, {
       method: "POST",
+      body: JSON.stringify({ author: { author } }),
     });
 
     console.log("Réponse backend :", res);

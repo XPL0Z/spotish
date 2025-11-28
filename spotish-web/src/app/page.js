@@ -25,7 +25,7 @@ export default async function Home() {
       </header>
 
 
-      <Footer />
+      <Footer author={session.user.username} />
     </div>
   );
 }

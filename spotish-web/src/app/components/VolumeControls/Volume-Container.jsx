@@ -4,23 +4,23 @@ import VolumeSlider from "./Volume-Slider";
 import VolumeMinIcon from "./Volume-Min-icon";
 import VolumeMidIcon from "./Volume-Mid-icon";
 
-export default ({setter, value}) => {    
-    
-    
-  return (
-  <div>           
-      <div className="flex items-center">
-          
-          <VolumeSlider setter={setter} value={value}/>
-          
-          {
-          value == 0 ? <VolumeCutIcon /> : 
-              value <= 30 ?<VolumeMinIcon />:
-                 value <= 70? <VolumeMidIcon /> :
-                      <VolumeMaxIcon />
-          }
-           
-      </div>
-  </div>
-  );                      
+export default ({ setter, value, author }) => {
+
+
+    return (
+        <div>
+            <div className="flex items-center">
+
+                <VolumeSlider setter={setter} value={value} author={author} />
+
+                {
+                    value == 0 ? <VolumeCutIcon /> :
+                        value <= 30 ? <VolumeMinIcon /> :
+                            value <= 70 ? <VolumeMidIcon /> :
+                                <VolumeMaxIcon />
+                }
+
+            </div>
+        </div>
+    );
 };

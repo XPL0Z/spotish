@@ -702,6 +702,7 @@ def notplaying():
 @app.post("/skip")
 def skip(author : Author):
     author = author.author
+    print(author)
     requests.post(UrlToSkip, json={})
     if len(queue["songs"]) == 0:
         return f"The queue is empty"
@@ -807,6 +808,7 @@ def shuffle(author : Author):
 @app.post("/volume")
 def volume(volume : Volume):
     author = volume.author
+    print(author)
     logger.debug(currentvolume)
     requests.post(UrlToChangeVolume, json={"volume": int(volume.volume)})
     
@@ -844,6 +846,7 @@ def delete(song : Song_id):
     
 @app.post("/pause")
 def pause(author : Author):
+    print(author.author)
     author = author.author
     if StatePause[0] == False:
         StatePause.clear()
@@ -861,6 +864,7 @@ def pause(author : Author):
 @app.post("/previous")
 def previous(author : Author):
     author = author.author
+    print(author)
     if len(history["songs"]) == 0:
         logger.info(f"{author} wanted to come back to the previous. But there was no song")
         return f"You haven't played a song before"

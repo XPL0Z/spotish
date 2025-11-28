@@ -1,10 +1,11 @@
-"use client"; 
+"use client";
 
 export default ({ setter }) => {
   // Fonction déclenchée au clic
   const handleClick = async () => {
     const res = await fetch("/api/pause", {
       method: "POST",
+      body: JSON.stringify({ author: { author } }),
     });
 
     const data = await res.json();

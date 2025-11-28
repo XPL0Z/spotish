@@ -7,7 +7,7 @@ import TrackNavigator from "./PlayerControls/TrackNavigator";
 import VolumeContainer from "./VolumeControls/Volume-Container";
 import { useEffect, useState } from "react";
 
-export default () => {
+export default ({ author }) => {
   const [volume, setVolume] = useState(70);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -48,21 +48,21 @@ export default () => {
 
         <div className="flex ">
 
-          <TrackNavigator className="rotate-180" api="previous" />
+          <TrackNavigator className="rotate-180" api="previous" author={author} />
 
           {
-            isPlaying ? <ResumeButton setter={setIsPlaying} /> : <PauseButton setter={setIsPlaying} />
+            isPlaying ? <ResumeButton setter={setIsPlaying} author={author} /> : <PauseButton setter={setIsPlaying} author={author} />
           }
 
-          <TrackNavigator api="skip" />
+          <TrackNavigator api="skip" author={author} />
 
         </div>
 
-        <TimelineContainer setTimecode={setTimecode} timecode={timecode} duration={duration} />
+        <TimelineContainer setTimecode={setTimecode} timecode={timecode} duration={duration} author={author} />
 
       </div>
 
-      <VolumeContainer setter={setVolume} value={volume} />
+      <VolumeContainer setter={setVolume} value={volume} author={author} />
 
     </div>
   );

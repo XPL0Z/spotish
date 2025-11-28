@@ -2,16 +2,17 @@
 
 import { useEffect } from "react";
 
-export default ({ setTimecode, timecode, duration }) => {
-
+export default ({ setTimecode, timecode, duration, author }) => {
+    console.log("Author envoyé:", author);
     const handleChange = async (event) => {
+        console.log("Author envoyé:", author);
         const newValue = event.target.value;
         fetch("/api/timecode", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ timecode: event.target.value }) // ✅ Envoyer le timecode
+            body: JSON.stringify({ timecode: event.target.value, author: author }) // ✅ Envoyer le timecode
         });
         setTimecode(newValue); // ✅ UI instantanée
     };
