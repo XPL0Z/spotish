@@ -19,8 +19,11 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 ADMIN_ID = os.getenv("ADMIN_ID")
 admins = ADMIN_ID.split()
+DBNAME = os.getenv("DBNAME")
+DBUSER = os.getenv("DBUSER")
+DBPASSWORD = os.getenv("DBPASSWORD")
+DBHOST = os.geten("DBHOST")
 
-authorized_user = []
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 host_controller = os.getenv("HOST_CONTROLLER")
@@ -44,10 +47,10 @@ UrlToChangeVolume = host_controller + controller_port + "/volume"
 # this function checks if a date of a user is expired and delete it, primary usage is to check if a user is authorized
 async def isauthorized(username):
     conn = psycopg.connect(
-        dbname="spotish",
-        user="postgres",
-        password="1234",
-        host="127.0.0.1"
+        dbname=DBNAME,
+        user=DBUSER,
+        password=DBPASSWORD,
+        host=DBHOST
     )
     cursor = conn.cursor()
     cursor.execute(
@@ -69,10 +72,10 @@ async def isauthorized(username):
     
 async def add_or_update_user(username, endat,admin:bool=False):
     conn = await asyncpg.connect(
-        user='postgres',
-        password='1234',
-        database='spotish',
-        host='127.0.0.1'
+        dbname=DBNAME,
+        user=DBUSER,
+        password=DBPASSWORD,
+        host=DBHOST
     )
 
     
