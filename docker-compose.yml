@@ -1,4 +1,7 @@
 services:
+  app:
+    image: spotish:latest
+    build: .
   controller:
     build: .
     ports:
