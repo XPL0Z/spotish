@@ -214,14 +214,14 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- contributors --> 
+
 ### Top contributors:
 
 <a href="https://github.com/xpl0z/spotish/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=xpl0z/spotish" alt="contrib.rocks image" />
 </a>
 
-
+<!-- contributors --> 
 #### CONTRIBUTORS :
 <a href="https://github.com/xpl0z/spotish/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Christopher-Sundeby/spotish" alt="contrib.rocks image" />
