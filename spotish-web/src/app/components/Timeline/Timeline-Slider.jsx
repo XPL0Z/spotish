@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 
 export default ({ setTimecode, timecode, duration, author }) => {
-    console.log("Author envoyé:", author);
     const handleChange = async (event) => {
         console.log("Author envoyé:", author);
         const newValue = event.target.value;

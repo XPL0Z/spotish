@@ -1,6 +1,7 @@
 #fichier sensible 
 .env 
 #inutile
+test2.py
 bot.log
 main.log
 authorize.json

@@ -9,8 +9,8 @@ import spotipy  # type: ignore
 from spotipy.oauth2 import SpotifyClientCredentials # type: ignore
 from urllib.parse import urlparse
 import time
-import json
-import aiofiles
+import asyncpg
+import psycopg
 
 
 load_dotenv()
@@ -41,38 +41,75 @@ UrlToShuffle = host_controller + controller_port + "/shuffle"
 UrlToPause = host_controller + controller_port + "/pause"
 UrlToChangeVolume = host_controller + controller_port + "/volume"
 
-
-for admin in admins:
-    authorized_user.append({"username": admin, "endat": -1})
-
-FILE_PATH = './authorize.json'
-# add user that are save in authorize.json into authorized_user
-with open('authorize.json', 'r') as file:
-    python_obj = json.load(file)
-
-for user in python_obj:
-    if user not in authorized_user and int(time.time())<user["endat"]:
-        authorized_user.append(user)
-
-async def WriteAuthorizeUser():
-    async with aiofiles.open(FILE_PATH, 'w') as output_file:
-        await output_file.write(json.dumps(authorized_user, indent=2))
- 
-  
 # this function checks if a date of a user is expired and delete it, primary usage is to check if a user is authorized
 async def isauthorized(username):
-    for i in range(len(authorized_user)):
-        if authorized_user[i]["endat"] > int(time.time()) or authorized_user[i]["endat"] == -1:
-            if authorized_user[i]["username"] == username:
-                await WriteAuthorizeUser()
-                return True
-        else:
-            
-            if authorized_user[i]["endat"] < int(time.time()) and authorized_user[i]["endat"] != -1:
-                print("deleted")
-                del authorized_user[i]
+    conn = psycopg.connect(
+        dbname="spotish",
+        user="postgres",
+        password="1234",
+        host="127.0.0.1"
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT endat FROM authorized_users WHERE username=%s",
+        (username,)
+    )
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
 
-    return False
+    if not result:
+        return False  # utilisateur non trouvé
+
+    endat = result[0]
+    if endat ==-1:
+        return True  # administrateur permanent
+    return time.time() < endat 
+
+    
+async def add_or_update_user(username, endat,admin:bool=False):
+    conn = await asyncpg.connect(
+        user='postgres',
+        password='1234',
+        database='spotish',
+        host='127.0.0.1'
+    )
+
+    
+    await conn.execute(
+    '''
+    INSERT INTO authorized_users (username, endat, admin)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (username)
+    DO UPDATE SET endat = EXCLUDED.endat, admin = EXCLUDED.admin
+    ''',
+    username, endat, admin)
+
+    await conn.close()
+
+def initialise_admins():
+    conn = psycopg.connect(
+        dbname="spotish",
+        user="postgres",
+        password="1234",
+        host="127.0.0.1"
+    )
+    cursor = conn.cursor()
+    for admin in admins : 
+        print(admin)
+        cursor.execute(
+            '''
+            INSERT INTO authorized_users (username, endat, admin)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (username)
+            DO UPDATE SET endat = EXCLUDED.endat, admin = EXCLUDED.admin
+            ''',
+            (admin, -1, True)
+        )
+    print("Admins added to the DB")
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = ("<b>🎵 Available commands:</b>\n"
@@ -90,7 +127,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "/search &lt;track name&gt; - 🔍 Search and play a track by name\n"
             "/mix - ♾️ play recommendation from history\n"
             "/download &lt;Spotify URL&gt; - 💾 Download a song or a playlist\n"
-            "/isauthorize  - ❓ Checks if someone is authorize\n"
+            "/isauthorize - ❓ Checks if someone is authorize\n"
             "/queue &lt;index&gt; - 📋 Get future songs to play\n"
             "/shuffle - 🎲 randomize the queue\n"
             "/delete &lt;song_id&gt; - 🗑️ To delete a song from queue\n"
@@ -237,12 +274,8 @@ async def adduser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     
     
-    authorized_user.append({"username": username, "endat": endat})
+    await add_or_update_user(username,endat)
     
-    
-    await WriteAuthorizeUser()
-    
-    print(authorized_user)
     await update.message.reply_text(message)
     
 
@@ -441,5 +474,7 @@ def main():
     application.run_polling()
 
 print("Bot started...")
-print(authorized_user)
+print(admins)
+# asyncio.run(initialise_admins())
+initialise_admins()
 main()
